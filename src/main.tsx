@@ -16,7 +16,6 @@ import { createStore, parseState } from './state/store';
 import './styles/index.css';
 import { installInputModality } from './lib/a11y';
 import { compactSessions } from './domain/archive';
-import './lib/posthog';
 import { logApplicationBootstrapped, logApplicationDataReset, logApplicationFramePainted } from './services/posthog-logs';
 import { connectTelemetry, stopTelemetry, trackEvent } from './services/telemetry';
 import '@fontsource-variable/manrope/index.css';

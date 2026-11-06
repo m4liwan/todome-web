@@ -6,8 +6,10 @@
  *  - Only active in a signed release build: the release config bakes
  *    `app-update.yml` into resources. Local test builds have none, so the
  *    updater stays off there and the app says so plainly.
- *  - Checks 90 s after start and then every 6 hours, downloads quietly in the
- *    background and installs on the next quit. Nothing restarts on its own.
+ *  - Checks 90 s after start and then every 6 hours. A found update is only
+ *    announced ('available'); it downloads when the user asks for it
+ *    (autoDownload off), then installs on the next quit or after the user
+ *    confirms a restart. Nothing restarts on its own.
  *  - With a code-signing publisher in the build, electron-updater refuses any
  *    installer that is not signed by that same publisher.
  *  - "Automatisch suchen" can be switched off (privacy); a manual check stays.
@@ -19,7 +21,7 @@ const FIRST_CHECK_MS = 90_000;
 const EVERY_MS = 6 * 60 * 60_000;
 
 /**
- * @typedef {'disabled' | 'idle' | 'checking' | 'none' | 'downloading' | 'ready' | 'error'} UpdateStatus
+ * @typedef {'disabled' | 'idle' | 'checking' | 'none' | 'available' | 'downloading' | 'ready' | 'error'} UpdateStatus
  * @typedef {{ status: UpdateStatus, auto: boolean, current: string, version?: string, percent?: number, checkedAt?: number }} UpdateState
  */
 
@@ -32,6 +34,7 @@ function createUpdater({ app, readAuto, writeAuto, onChange }) {
   let timer = null;
   let first = null;
   let checking = false;
+  let downloading = false;
   /** @type {import('electron-updater').AppUpdater | null} */
   let updater = null;
 
@@ -52,7 +55,8 @@ function createUpdater({ app, readAuto, writeAuto, onChange }) {
   }
 
   if (updater) {
-    updater.autoDownload = true;
+    // Download only on request: a found update is offered, not fetched.
+    updater.autoDownload = false;
     updater.autoInstallOnAppQuit = true;
     updater.allowPrerelease = false;
     updater.allowDowngrade = false;
@@ -66,7 +70,7 @@ function createUpdater({ app, readAuto, writeAuto, onChange }) {
       if (state.status !== 'ready' && state.status !== 'downloading') set({ status: 'checking' });
     });
     updater.on('update-not-available', () => set({ status: 'none', checkedAt: Date.now(), version: undefined, percent: undefined }));
-    updater.on('update-available', (info) => set({ status: 'downloading', version: info.version, percent: 0, checkedAt: Date.now() }));
+    updater.on('update-available', (info) => set({ status: 'available', version: info.version, percent: undefined, checkedAt: Date.now() }));
     updater.on('download-progress', (p) => {
       const percent = Math.round(p.percent);
       if (percent !== state.percent) set({ status: 'downloading', percent });
@@ -93,6 +97,21 @@ function createUpdater({ app, readAuto, writeAuto, onChange }) {
     return state;
   }
 
+  /** Downloads the update found by the last check ('available' → 'downloading' → 'ready'). */
+  async function download() {
+    if (!updater || downloading || state.status !== 'available') return state;
+    downloading = true;
+    set({ status: 'downloading', percent: 0 });
+    try {
+      await updater.downloadUpdate();
+    } catch {
+      /* reported through the 'error' event */
+    } finally {
+      downloading = false;
+    }
+    return state;
+  }
+
   function schedule() {
     if (first) clearTimeout(first);
     if (timer) clearInterval(timer);
@@ -112,7 +131,11 @@ function createUpdater({ app, readAuto, writeAuto, onChange }) {
     get ready() {
       return state.status === 'ready';
     },
+    get available() {
+      return state.status === 'available';
+    },
     check,
+    download,
     setAuto(auto) {
       writeAuto(auto);
       set({ auto });

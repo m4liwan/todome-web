@@ -14,6 +14,8 @@ export function updateLine(u: UpdateState | null): string {
       return 'Sucht nach einer neuen Version …';
     case 'none':
       return 'Du bist auf dem neuesten Stand.';
+    case 'available':
+      return `${named(u)} ist verfügbar. Du kannst sie jetzt herunterladen.`;
     case 'downloading':
       return `${named(u)} wird im Hintergrund geladen${typeof u.percent === 'number' ? ` (${u.percent} %)` : ''}.`;
     case 'ready':
@@ -47,26 +49,35 @@ export function useUpdates() {
   const setAuto = useCallback((auto: boolean) => {
     void desktop?.updateSetAuto(auto).then(setState).catch(() => undefined);
   }, []);
+  const download = useCallback(() => {
+    void desktop?.updateDownload().then(setState).catch(() => undefined);
+  }, []);
   const install = useCallback(() => desktop?.updateInstall(), []);
-  return { state, check, setAuto, install };
+  return { state, check, download, setAuto, install };
 }
 
-/** Says once per version, quietly, that an update is ready. */
+/** Says once per version, quietly, that an update can be downloaded or is ready. */
 export function useUpdateNotice(): void {
   const services = useServices();
   const said = useRef<string | null>(null);
   useEffect(() => {
     if (!desktop) return;
     return desktop.onUpdate((s) => {
-      if (s.status !== 'ready' || !s.version || said.current === s.version) return;
-      said.current = s.version;
+      if ((s.status !== 'ready' && s.status !== 'available') || !s.version) return;
+      const key = `${s.status}:${s.version}`;
+      if (said.current === key) return;
+      said.current = key;
       try {
-        if (window.localStorage.getItem(ANNOUNCED_KEY) === s.version) return;
-        window.localStorage.setItem(ANNOUNCED_KEY, s.version);
+        if (window.localStorage.getItem(ANNOUNCED_KEY) === key) return;
+        window.localStorage.setItem(ANNOUNCED_KEY, key);
       } catch {
         /* say it anyway */
       }
-      services.announce(`Version ${s.version} ist bereit und wird beim nächsten Beenden installiert.`);
+      services.announce(
+        s.status === 'available'
+          ? `Version ${s.version} ist verfügbar. Unter Einstellungen → Über kannst du sie herunterladen.`
+          : `Version ${s.version} ist bereit und wird beim nächsten Beenden installiert.`,
+      );
     });
   }, [services]);
 }

@@ -57,7 +57,7 @@ export interface MediaInfo {
 }
 
 /** Auto-update (electron/updater.cjs). 'disabled' = no update channel in this build. */
-export type UpdateStatus = 'disabled' | 'idle' | 'checking' | 'none' | 'downloading' | 'ready' | 'error';
+export type UpdateStatus = 'disabled' | 'idle' | 'checking' | 'none' | 'available' | 'downloading' | 'ready' | 'error';
 
 export interface UpdateState {
   status: UpdateStatus;
@@ -96,6 +96,8 @@ export interface DesktopBridge {
   contactSend(payload: { topic: ContactTopic; message: string; replyTo?: string }): Promise<ContactResult>;
   updateState(): Promise<UpdateState>;
   updateCheck(): Promise<UpdateState>;
+  /** Downloads the update found by the last check (status 'available'). */
+  updateDownload(): Promise<UpdateState>;
   updateSetAuto(auto: boolean): Promise<UpdateState>;
   updateInstall(): void;
   onUpdate(callback: (state: UpdateState) => void): () => void;

@@ -13,6 +13,7 @@ const {
   app,
   BrowserWindow,
   Menu,
+  dialog,
   Notification,
   Tray,
   ipcMain,
@@ -515,6 +516,9 @@ function rebuildTrayMenu() {
       ...(updates && updates.ready
         ? [{ label: `Update ${updates.state.version ? `auf ${updates.state.version} ` : ''}installieren und neu starten`, click: installUpdateNow }]
         : []),
+      ...(updates && updates.available
+        ? [{ label: `Update ${updates.state.version ? `auf ${updates.state.version} ` : ''}herunterladen`, click: () => void updates.download() }]
+        : []),
       {
         label: 'Mini-Overlay',
         type: 'checkbox',
@@ -566,8 +570,38 @@ function startUpdater() {
     onChange: (state) => {
       if (win && !win.isDestroyed()) win.webContents.send('todome:update', state);
       rebuildTrayMenu();
+      if (state.status === 'ready') void confirmRestartForUpdate(state.version);
     },
   });
+}
+
+/** Version the restart question was already asked for (ask once per version). */
+let restartAskedFor = null;
+/**
+ * After the download: ask once whether to restart now. "Später" keeps the
+ * update ready; it installs on the next quit (autoInstallOnAppQuit).
+ */
+async function confirmRestartForUpdate(version) {
+  const key = version || '?';
+  if (restartAskedFor === key) return;
+  restartAskedFor = key;
+  const parent = win && !win.isDestroyed() && win.isVisible() ? win : null;
+  const options = {
+    type: 'info',
+    title: 'Update bereit',
+    message: `${version ? `ToDoMe. ${version}` : 'Die neue Version'} ist heruntergeladen.`,
+    detail: 'Jetzt neu starten und installieren? Deine Daten werden vorher gespeichert. Bei „Später“ wird das Update beim nächsten Beenden installiert.',
+    buttons: ['Jetzt neu starten', 'Später'],
+    defaultId: 0,
+    cancelId: 1,
+    noLink: true,
+  };
+  try {
+    const { response } = parent ? await dialog.showMessageBox(parent, options) : await dialog.showMessageBox(options);
+    if (response === 0) installUpdateNow();
+  } catch (err) {
+    console.error('[todome:update] restart dialog failed', err);
+  }
 }
 
 /** Let the app save first (like a normal quit), then install and restart. */
@@ -641,9 +675,16 @@ function registerIpc() {
     if (!fromApp(event)) throw new Error('untrusted sender');
     return updates ? updates.state : noUpdates();
   });
-  ipcMain.handle('todome:update-check', async (event) => {
+  const checkForUpdates = async (event) => {
     if (!fromApp(event)) throw new Error('untrusted sender');
     return updates ? updates.check() : noUpdates();
+  };
+  ipcMain.handle('todome:update-check', checkForUpdates);
+  // Generic alias for the same check (same sender validation).
+  ipcMain.handle('check-for-updates', checkForUpdates);
+  ipcMain.handle('todome:update-download', async (event) => {
+    if (!fromApp(event)) throw new Error('untrusted sender');
+    return updates ? updates.download() : noUpdates();
   });
   ipcMain.handle('todome:update-auto', (event, auto) => {
     if (!fromApp(event)) throw new Error('untrusted sender');
