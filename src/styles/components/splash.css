@@ -1,0 +1,168 @@
+/* ========================================================================
+   Splash and re-entry briefing
+   ======================================================================== */
+
+.briefing {
+  display: grid;
+  gap: 14px;
+}
+.briefing li {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+.briefing span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.briefing__note p {
+  font-style: italic;
+}
+.briefing__next p {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 650;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: var(--lime);
+  color: var(--lime-ink);
+  width: fit-content;
+}
+/* order-pinned: belongs to components/controls, kept here so the cascade stays as before */
+.tone span {
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+@media (max-width: 600px) {
+  .briefing li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+.splash.is-leaving {
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(1.03);
+  pointer-events: none;
+}
+.splash__grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  background-position: center;
+  mask-image: radial-gradient(circle at 50% 42%, #000 0, transparent 46%);
+  animation: fade-in 1.6s ease both;
+}
+.splash__logo {
+  position: absolute;
+  top: calc(32px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.85;
+  animation: fade-in 1s ease 0.2s both;
+}
+.splash__hello {
+  font-size: clamp(2rem, 4.4vw, 3.1rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  animation: fade-up 0.9s var(--ease-out) 0.45s both;
+}
+.splash__line {
+  display: grid;
+  min-height: 3.2em;
+  max-width: 34ch;
+}
+.splash__line p.is-on {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+.splash__line p.is-past {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+html.is-desktop .splash,
+html.is-desktop .onboard,
+html.is-desktop .standby,
+html.is-desktop .pause-room {
+  -webkit-app-region: drag;
+}
+html.is-desktop .splash button,
+html.is-desktop .onboard button,
+html.is-desktop .onboard input,
+html.is-desktop .onboard label,
+html.is-desktop .standby button,
+html.is-desktop .pause-room button {
+  -webkit-app-region: no-drag;
+}
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  overflow: hidden;
+  background: radial-gradient(ellipse 60% 50% at 50% 42%, rgb(var(--accent-2-rgb) / 0.12), transparent 70%),
+    var(--bg);
+  transition: opacity 0.75s ease,
+    filter 0.75s ease,
+    transform 0.75s var(--ease-out);
+  cursor: default;
+}
+.splash__enter {
+  display: grid;
+  justify-items: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.7s ease,
+    transform 0.7s var(--ease-out);
+  pointer-events: none;
+}
+.splash__enter.is-ready {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.splash__skip {
+  position: absolute;
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  border: 0;
+  background: none;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: color 0.5s ease,
+    background-color 0.5s ease,
+    letter-spacing 0.5s ease;
+}
+.splash__skip:hover {
+  color: var(--ink);
+  background: var(--surface-sunk);
+  letter-spacing: 0.02em;
+}
+.splash__center {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 26px;
+  text-align: center;
+  max-width: 640px;
+  width: min(900px, 100%);
+}
+.splash__kicker {
+  margin: 0 0 6px;
+  color: var(--ink-2);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  animation: fade-up 0.9s var(--ease-out) 0.3s both;
+}

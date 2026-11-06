@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ToDoMe – dein aktiver Arbeitstag-Coach für Selbstständige." />
+    <meta name="theme-color" content="#edf0f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0c10" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/png" href="/src/assets/favicon.png" />
+    <title>ToDoMe.</title>
+    <!-- First frame already in the right colours (no white flash before the CSS loads). -->
+    <style>
+      /* Only <html> paints the page colour, so the background layers
+         (ambient light, grid, atmosphere) stay visible above it. */
+      html { background: #edf0f4; }
+      body { margin: 0; background: transparent; }
+      html[data-theme='dark'] { background: #0b0c10; }
+      html[data-theme='dark'][data-palette='neon'] { background: #07070d; }
+      html[data-theme='dark'][data-palette='pulse'] { background: #0b0612; }
+      html[data-theme='dark'][data-palette='matrix'] { background: #050c0a; }
+      @media (prefers-color-scheme: dark) {
+        html:not([data-theme='light']) { background: #0b0c10; }
+        html:not([data-theme='light'])[data-palette='neon'] { background: #07070d; }
+        html:not([data-theme='light'])[data-palette='pulse'] { background: #0b0612; }
+        html:not([data-theme='light'])[data-palette='matrix'] { background: #050c0a; }
+      }
+      html.is-overlay, html.is-overlay body, html.is-companion, html.is-companion body { background: transparent !important; }
+    </style>
+    <script src="/boot.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

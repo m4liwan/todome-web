@@ -1,0 +1,188 @@
+/* ========================================================================
+   Day plan ("Danach")
+   ======================================================================== */
+
+.capacity {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  color: var(--ink-2);
+}
+.capacity__bar {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--surface-sunk);
+  overflow: hidden;
+}
+.capacity__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--g-work);
+  transition: width 0.6s var(--ease-out);
+}
+.capacity.is-over .capacity__bar span {
+  background: linear-gradient(90deg, #ffb547, #ff5e7e);
+}
+.capacity.is-over p {
+  color: var(--ink);
+  font-weight: 600;
+}
+.plan__label,
+.plan__fold summary {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin: 14px 0 4px;
+  cursor: pointer;
+}
+.tasks {
+  display: grid;
+  gap: 6px;
+}
+.task {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 10px 10px 14px;
+  border-radius: var(--radius);
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s, border-color 0.2s;
+  animation: rise 0.5s var(--ease-out) both;
+  animation-delay: calc(200ms + var(--i, 0) * 45ms);
+}
+.task:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
+}
+.task.is-running {
+  border-color: transparent;
+  background: linear-gradient(100deg, rgb(var(--accent-2-rgb) / 0.22), rgb(var(--accent-rgb) / 0.28) 70%, var(--surface-strong));
+}
+.task--muted {
+  opacity: 0.75;
+}
+.task--done .task__title {
+  color: var(--ink-3);
+  text-decoration: line-through;
+}
+.task__main {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+}
+.task__text {
+  min-width: 0;
+}
+.task__title {
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.task__meta {
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+.task__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+.task__actions .icon-ghost {
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+}
+.task:hover .icon-ghost,
+.task:focus-within .icon-ghost {
+  opacity: 1;
+}
+@media (hover: none) {
+  .task__actions .icon-ghost {
+    opacity: 1;
+  }
+}
+/* order-pinned: belongs to components/controls, kept here so the cascade stays as before */
+.live-badge span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: blink 1.4s ease-in-out infinite;
+}
+/* order-pinned: belongs to components/report, kept here so the cascade stays as before */
+.bars__track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--line-strong);
+  transition: width 0.8s var(--ease-out);
+}
+.later {
+  display: grid;
+  gap: 14px;
+}
+.later__list {
+  display: grid;
+  gap: 6px;
+}
+.later__title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.later__note {
+  flex: none;
+  font-size: 0.78rem;
+  color: var(--ink-3);
+}
+.later__list .later__more {
+  background: none;
+  padding: 2px 14px;
+  font-size: 0.84rem;
+  color: var(--ink-2);
+}
+.later__empty {
+  color: var(--ink-2);
+}
+.later__actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+.plan.is-expanded .later__actions {
+  margin-top: 14px;
+}
+.plan,
+.times-mini {
+  background: radial-gradient(520px circle at var(--mx, -600px) var(--my, -600px), var(--spot), transparent 45%),
+    radial-gradient(circle at 100% 0%, rgb(var(--accent-rgb) / 0.14), transparent 50%),
+    linear-gradient(160deg, var(--glass-sheen), transparent 38%),
+    var(--surface);
+}
+.later__list li:hover {
+  transform: translateX(3px);
+}
+.plan {
+  container-type: inline-size;
+}
+.later__list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--surface-sunk);
+  overflow: hidden;
+}
+@container (max-width: 360px) {
+  .later__note {
+    display: none;
+  }
+}

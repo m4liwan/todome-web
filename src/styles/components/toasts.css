@@ -1,0 +1,41 @@
+/* ========================================================================
+   Toasts and the storage notice
+   ======================================================================== */
+
+.toasts {
+  position: fixed;
+  left: 50%;
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 60;
+  display: grid;
+  gap: 8px;
+  width: min(480px, calc(100vw - 32px));
+}
+.toast {
+  padding: 13px 18px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  animation: pop-in 0.4s var(--ease-spring) both;
+}
+.storage-note {
+  display: grid;
+  gap: 10px;
+  max-width: 52ch;
+  line-height: 1.55;
+}
+.storage-note p {
+  margin: 0;
+}
+.storage-note__status {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgb(var(--accent-2-rgb) / 0.14);
+  color: var(--ink);
+}

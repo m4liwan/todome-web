@@ -1,0 +1,115 @@
+{
+  "name": "todome",
+  "productName": "ToDoMe",
+  "version": "1.14.1",
+  "description": "ToDoMe – aktiver Arbeitstag-Coach für Selbstständige",
+  "author": {
+    "name": "Rocco Hanke",
+    "email": "admin@konturia.de"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-electron.mjs",
+    "dev:web": "vite",
+    "app:dev": "node scripts/dev-electron.mjs",
+    "app": "npm run build && electron .",
+    "dist": "npm run build && electron-builder --win --x64 --publish never",
+    "release:check": "node scripts/check-release.mjs",
+    "release": "npm run release:check && npm run typecheck && npm run lint && npm test && vite build && electron-builder --config electron-builder.release.cjs --win --x64 --publish always",
+    "build": "tsc --noEmit && vite build",
+    "build:demo": "tsc --noEmit && vite build --mode demo",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "build": {
+    "appId": "de.konturia.todome",
+    "productName": "ToDoMe",
+    "copyright": "© 2026 ToDoMe by Rocco Hanke",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "ToDoMe-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ToDoMe",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "installerLanguages": [
+        "de_DE"
+      ],
+      "language": "1031",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
+    },
+    "linux": {
+      "target": [
+        "dir"
+      ],
+      "icon": "build/icon.png",
+      "category": "Office"
+    },
+    "publish": null
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource-variable/urbanist": "^5.3.0",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "axe-core": "^4.14.0",
+    "electron": "^45.2.2",
+    "electron-builder": "^26.18.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "globals": "^17.14.0",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.5.32",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^5.4.21",
+    "vite-plugin-singlefile": "^2.3.4",
+    "vitest": "^2.1.9"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11",
+    "posthog-js": "1.438.19"
+  }
+}

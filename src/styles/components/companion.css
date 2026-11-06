@@ -1,0 +1,555 @@
+/* ========================================================================
+   Companion: bubbles, avatar, scene, water card, prompts
+   ======================================================================== */
+
+.water {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(111, 182, 255, 0.16), rgba(74, 125, 255, 0.08));
+  border: 1px solid var(--line);
+}
+.prompts {
+  position: fixed;
+  right: calc(22px + env(safe-area-inset-right, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: grid;
+  gap: 12px;
+  width: min(420px, calc(100vw - 32px));
+}
+.prompt {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 16px 18px 18px 12px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-strong);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(28px) saturate(170%);
+  overflow: hidden;
+  animation: pop-in 0.5s var(--ease-spring) both;
+}
+.prompt::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--g-work);
+}
+.prompt--overrun::before,
+.prompt--idle::before {
+  background: linear-gradient(90deg, #ff8fb4, #ff6a6a);
+}
+.prompt--pause_over::before,
+.prompt--break_suggestion::before,
+.prompt--daily_cap::before,
+.prompt--shutdown::before {
+  background: var(--g-pause);
+}
+.prompt--start_delay::before {
+  background: var(--g-interrupt);
+}
+.prompt__avatar {
+  flex: none;
+  margin-top: -2px;
+}
+.prompt__content {
+  min-width: 0;
+}
+.prompt__title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.prompt__body {
+  margin: 3px 0 12px;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.prompt__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.prompt__timer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--ink);
+  opacity: 0.18;
+  transform-origin: left;
+  transition: transform 1s linear;
+}
+html.is-companion,
+html.is-companion body {
+  background: transparent !important;
+  overflow: hidden;
+}
+html.is-companion .ambient {
+  display: none;
+}
+.buddy-layer {
+  position: fixed;
+  bottom: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+.buddy-layer--right {
+  right: 0;
+}
+.buddy-layer--left {
+  left: 0;
+}
+.buddy-layer:not(.buddy-layer--desktop) {
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  left: calc(16px + env(safe-area-inset-left, 0px));
+  right: auto;
+}
+.buddy {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 10px;
+}
+.buddy--right {
+  flex-direction: row-reverse;
+}
+.buddy__avatar {
+  flex: none;
+  pointer-events: auto;
+  filter: drop-shadow(0 10px 16px rgba(17, 19, 24, 0.25));
+  animation: peek-in 0.7s var(--ease-spring) both;
+}
+.buddy__bubble {
+  position: relative;
+  width: 280px;
+  margin-bottom: 52px;
+  padding: 14px 16px 16px;
+  border-radius: 22px;
+  background: var(--surface-strong);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(24px) saturate(170%);
+  pointer-events: auto;
+  overflow: hidden;
+  transform-origin: bottom right;
+  animation: bubble-in 0.45s var(--ease-spring) 0.25s both;
+}
+.buddy--left .buddy__bubble {
+  transform-origin: bottom left;
+}
+.buddy__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.buddy__title {
+  font-size: 0.76rem;
+  font-weight: 750;
+  color: var(--ink-2);
+}
+.buddy__close {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-sunk);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.buddy__text {
+  margin: 4px 0 12px;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.buddy__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.buddy__timer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--g-work);
+  transform-origin: left;
+  animation: ttl linear forwards;
+}
+.buddy.is-out .buddy__avatar {
+  animation: peek-out 0.42s ease-in forwards;
+}
+.buddy.is-out .buddy__bubble {
+  animation: bubble-out 0.25s ease-in forwards;
+}
+.avatar {
+  display: block;
+  overflow: visible;
+}
+.avatar.is-animated .avatar__body {
+  transform-origin: 60px 104px;
+  animation: bob 3.4s ease-in-out infinite;
+}
+.avatar.is-animated .avatar__shadow {
+  transform-origin: 60px 112px;
+  animation: shadow 3.4s ease-in-out infinite;
+}
+.avatar.is-animated .avatar__eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eye-blink 4.6s ease-in-out infinite;
+}
+.avatar.is-animated .avatar__spark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+.avatar-picker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  justify-content: center;
+  gap: 10px;
+  /* Room for the focus ring and the hover lift: no card touches the scroll edge. */
+  padding: 6px 6px 8px;
+  max-width: 100%;
+}
+.avatar-option {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface-solid);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-out), border-color 0.2s;
+}
+.avatar-option:hover {
+  transform: translateY(-2px);
+}
+.avatar-option.is-on {
+  background: linear-gradient(160deg, rgb(var(--accent-rgb) / 0.28), var(--surface-solid) 70%);
+}
+.avatar-option span {
+  font-size: 0.74rem;
+  color: var(--ink-2);
+  line-height: 1.35;
+}
+.avatar-option strong,
+.avatar-option span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .avatar-picker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .buddy__bubble {
+    width: 230px;
+  }
+}
+.buddy-layer--desktop {
+  top: auto;
+  bottom: 0;
+  max-height: 100vh;
+}
+.buddy-layer--desktop.buddy-layer--right {
+  right: 0;
+  left: auto;
+}
+.buddy-layer--desktop.buddy-layer--left {
+  left: 0;
+  right: auto;
+}
+.buddy__bubble {
+  background: linear-gradient(170deg, var(--glass-sheen), transparent 40%), var(--surface-strong);
+  box-shadow: var(--glass-inset), var(--shadow-lg);
+}
+.buddy--desktop .buddy__bubble {
+  width: min(300px, calc(100vw - 150px));
+  max-height: calc(100vh - 76px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: linear-gradient(170deg, var(--glass-sheen), transparent 40%), var(--surface-solid);
+}
+.buddy__options .pill {
+  white-space: normal;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+}
+.scene__actor {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+.scene__actor .avatar {
+  width: 100%;
+  height: 100%;
+}
+.scene__prop,
+.scene__treadmill,
+.scene__pillow {
+  position: absolute;
+  overflow: visible;
+  filter: drop-shadow(0 4px 6px var(--prop-shadow));
+}
+.scene__prop {
+  z-index: 2;
+}
+.scene__prop--tea {
+  width: 36%;
+  right: -10%;
+  bottom: 2%;
+}
+.scene__steam path {
+  animation: steam 2.8s ease-in-out infinite;
+}
+.scene__steam path:nth-child(2) {
+  animation-delay: -1.4s;
+}
+.scene--tea .avatar__body {
+  animation: sip 5s ease-in-out infinite !important;
+  transform-origin: 60px 104px;
+}
+.scene__page {
+  transform-origin: 35px 28px;
+  animation: page 6s ease-in-out infinite;
+}
+.scene--reading .avatar__body {
+  animation: nod 4.4s ease-in-out infinite !important;
+  transform-origin: 60px 104px;
+}
+.scene__prop--notepad {
+  width: 42%;
+  right: -12%;
+  bottom: -2%;
+}
+.scene__pen {
+  transform-origin: 54px 40px;
+  animation: write 1.6s ease-in-out infinite;
+}
+.scene__ink {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  animation: ink 3.2s ease-in-out infinite;
+}
+.scene--writing .avatar__body {
+  animation: focus-tilt 3s ease-in-out infinite !important;
+  transform-origin: 60px 104px;
+}
+.scene__prop--dumbbell {
+  width: 74%;
+  left: 13%;
+  top: -6%;
+  animation: lift 1.8s ease-in-out infinite;
+}
+.scene--weights .avatar__body {
+  animation: squat 1.8s ease-in-out infinite !important;
+  transform-origin: 60px 108px;
+}
+.scene__treadmill {
+  width: 124%;
+  left: -12%;
+  bottom: -10%;
+  z-index: 0;
+}
+.scene__belt {
+  animation: belt 0.7s linear infinite;
+}
+.scene--treadmill .scene__actor {
+  bottom: 8%;
+  top: -8%;
+}
+.scene--treadmill .avatar__body {
+  animation: run 0.46s ease-in-out infinite !important;
+  transform-origin: 60px 108px;
+}
+.scene--treadmill .avatar__shadow {
+  display: none;
+}
+.scene__pillow {
+  width: 110%;
+  left: -5%;
+  bottom: -4%;
+  z-index: 0;
+}
+.scene--sleeping .avatar__body {
+  animation: sleep 5s ease-in-out infinite !important;
+  transform-origin: 60px 108px;
+}
+.avatar__zzz {
+  color: var(--ink-3);
+}
+.avatar__zzz text {
+  animation: zzz 3.6s ease-in-out infinite;
+}
+.avatar__zzz text:nth-child(2) {
+  animation-delay: -1.8s;
+}
+.avatar.is-animated .avatar__leaf {
+  transform-box: fill-box;
+  transform-origin: right bottom;
+  animation: leaf 4.2s ease-in-out infinite;
+}
+.avatar.is-animated .avatar__leaf--r {
+  transform-origin: left bottom;
+  animation-delay: -2.1s;
+}
+.avatar.is-animated .avatar__tail {
+  transform-box: fill-box;
+  transform-origin: left top;
+  animation: tail 2.6s ease-in-out infinite;
+}
+.hydro__main {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.hydro__glass {
+  flex: none;
+  overflow: visible;
+  filter: drop-shadow(0 10px 18px rgba(63, 125, 255, 0.25));
+}
+.hydro__water {
+  transition: transform 1.4s var(--ease-spring);
+}
+.hydro__wave {
+  animation: wave 4s linear infinite;
+}
+.hydro__wave--back {
+  animation: wave-back 6s linear infinite;
+}
+.hydro__bubbles circle {
+  animation: bubble 3.6s ease-in infinite;
+}
+.hydro__bubbles circle:nth-child(2) {
+  animation-delay: -1.2s;
+}
+.hydro__bubbles circle:nth-child(3) {
+  animation-delay: -2.4s;
+}
+.hydro__text {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.hydro__amount {
+  font-family: var(--font-display);
+  font-size: 2.3rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.hydro__amount small {
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+.hydro__title {
+  font-size: 1.05rem;
+}
+.hydro__line {
+  font-size: 0.88rem;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+.hydro__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hydro__buddy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.hydro__buddy p {
+  flex: 1;
+  min-width: 0;
+}
+.hydro__avatar:hover {
+  transform: scale(1.08) rotate(-4deg);
+}
+@media (max-width: 760px) {
+  .hydro__main {
+    align-items: flex-start;
+  }
+}
+.hydro__avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-sunk);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-spring);
+  padding: 0;
+  overflow: hidden;
+}
+.hydro__avatar .avatar {
+  display: block;
+}
+.scene__prop--book {
+  width: 46%;
+  left: auto;
+  right: -18%;
+  bottom: -6%;
+  transform: rotate(-8deg);
+}
+.hydro {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: radial-gradient(520px circle at var(--mx, -600px) var(--my, -600px), rgba(90, 160, 255, 0.14), transparent 45%),
+    radial-gradient(circle at 0% 100%, rgba(90, 160, 255, 0.18), transparent 55%),
+    linear-gradient(160deg, var(--glass-sheen), transparent 38%),
+    var(--surface);
+}
+.scene {
+  position: relative;
+  width: var(--scene-size);
+  height: var(--scene-size);
+  flex: none;
+  margin-inline: auto;
+}
+.scene--tea,
+.scene--writing,
+.scene--reading {
+  translate: none;
+}
+/* order-pinned: belongs to components/settings, kept here so the cascade stays as before */
+.palette,
+.layout-opt,
+.avatar-option {
+  position: relative;
+}

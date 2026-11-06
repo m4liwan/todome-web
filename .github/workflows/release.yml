@@ -1,0 +1,35 @@
+# Signed release for Windows, published as a draft on GitHub Releases.
+# Start: push a tag like v1.11.0 (git tag v1.11.0 && git push --tags).
+# After the draft is checked, publish it on GitHub: from then on the
+# installed apps find the update on their own.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run release
+        env:
+          WIN_PUBLISHER_NAME: ${{ secrets.WIN_PUBLISHER_NAME }}
+          AZURE_SIGNING_ENDPOINT: ${{ secrets.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ secrets.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_PROFILE: ${{ secrets.AZURE_SIGNING_PROFILE }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          TODOME_RELEASE_OWNER: ${{ vars.TODOME_RELEASE_OWNER }}
+          TODOME_RELEASE_REPO: ${{ vars.TODOME_RELEASE_REPO }}
+          # Fine-grained token with "Contents: read and write" on the release repo.
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}

@@ -1,0 +1,5 @@
+{
+  "$comment": "Kontaktformular. endpoint: Formspree-ID (z. B. xyzabcde) oder volle HTTPS-Adresse (https://formspree.io/f/<id>). Leer = Versand über das E-Mail-Programm an email.",
+  "endpoint": "",
+  "email": "admin@konturia.de"
+}

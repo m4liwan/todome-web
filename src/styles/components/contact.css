@@ -1,0 +1,33 @@
+/* ========================================================================
+   Feedback & Kontakt (settings → Allgemein)
+   ======================================================================== */
+
+.contact__form {
+  display: grid;
+  gap: 14px;
+}
+.contact__form p {
+  margin: 0;
+}
+.contact__form textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+.contact__error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgb(var(--accent-2-rgb) / 0.14);
+  color: var(--ink);
+  line-height: 1.45;
+}
+.contact__error-buddy {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+}
+.contact__error p {
+  min-width: 0;
+}

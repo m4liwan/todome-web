@@ -1,0 +1,188 @@
+/* ========================================================================
+   Closing view (Feierabend)
+   ======================================================================== */
+
+.gapform {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface-sunk);
+}
+.closing {
+  position: relative;
+  min-height: calc(100vh - 130px);
+  border-radius: 36px;
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(24px, 5vw, 64px) clamp(18px, 5vw, 64px);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-inset), var(--shadow);
+  animation: rise 0.8s var(--ease-out) both;
+}
+.closing__sky {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 70% 60% at 85% 0%, var(--sky-c), transparent 70%),
+    radial-gradient(ellipse 80% 70% at 0% 100%, var(--sky-b), transparent 70%),
+    linear-gradient(160deg, var(--sky-a), var(--sky-b) 55%, var(--sky-c));
+}
+.closing__sky::after {
+  content: '';
+  position: absolute;
+  width: 46vmax;
+  height: 46vmax;
+  right: -12vmax;
+  bottom: -18vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 170, 110, 0.5), transparent 65%);
+  filter: blur(30px);
+  animation: sunset 30s ease-in-out infinite alternate;
+}
+.closing__inner {
+  max-width: 780px;
+  margin: 0 auto;
+  display: grid;
+  gap: 26px;
+}
+.closing__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+}
+.closing__kicker {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin-bottom: 6px;
+}
+.closing h1 {
+  font-size: clamp(1.9rem, 3.8vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+.closing__lead {
+  margin-top: 12px;
+  max-width: 52ch;
+  font-size: 1.06rem;
+  font-weight: 550;
+  color: var(--ink-2);
+}
+.closing__block {
+  display: grid;
+  gap: 12px;
+  padding: 22px 24px;
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-inset);
+  backdrop-filter: blur(20px) saturate(160%);
+}
+.closing__block h2 {
+  font-size: 1.15rem;
+}
+.closing__block .field {
+  gap: 10px;
+}
+.closing__block textarea {
+  background: color-mix(in srgb, var(--surface-solid) 80%, transparent);
+}
+.closing__wins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+:root[data-theme='dark'] .closing__wins li {
+  background: rgba(255, 255, 255, 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .closing__wins li {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+.closing__pick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.closing__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 8px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 0.2s,
+    border-color 0.2s,
+    transform 0.15s;
+}
+.closing__option:hover {
+  border-color: var(--ink-3);
+}
+.closing__option.is-on {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+.closing__times summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+.closing__times summary::-webkit-details-marker {
+  display: none;
+}
+.closing__times[open] summary::after {
+  transform: rotate(225deg) translateY(-1px);
+}
+.closing__note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: rgba(255, 181, 71, 0.22);
+  font-weight: 600;
+}
+.closing__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.closing__sign {
+  text-align: right;
+}
+.closing--done {
+  display: grid;
+  place-items: center;
+}
+.closing__done {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  text-align: center;
+  max-width: 560px;
+}
+.closing__done .closing__lead {
+  margin-top: 0;
+}
+@media (max-width: 760px) {
+  /* order-pinned: belongs to components/active-session, kept here so the cascade stays as before */
+  .one,
+  .closing__head {
+    grid-template-columns: 1fr;
+  }
+}
+/* order-pinned: belongs to components/active-session, kept here so the cascade stays as before */
+.one {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 32%);
+  gap: 16px;
+}

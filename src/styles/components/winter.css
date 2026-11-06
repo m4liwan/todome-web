@@ -1,0 +1,132 @@
+/* ========================================================================
+   Winter decoration
+   ======================================================================== */
+
+.lights {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(8px, 2vw, 22px);
+  height: 250px;
+  margin-top: 18px;
+}
+.lights li {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  justify-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.lights__value {
+  min-height: 1.2em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.lights__track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 58px;
+  border-radius: 18px;
+  background: var(--surface-sunk);
+  overflow: hidden;
+}
+.lights__col {
+  width: 100%;
+  height: max(6px, calc(var(--h) * 100%));
+  border-radius: 18px;
+  background: linear-gradient(to top, var(--accent-2), var(--accent-mesh));
+  box-shadow: 0 0 26px rgb(var(--accent-rgb) / 0.45);
+  transform-origin: bottom;
+  animation: grow 1.1s var(--ease-out) both;
+}
+.lights li:nth-child(2) .lights__col {
+  animation-delay: 0.06s;
+}
+.lights li:nth-child(3) .lights__col {
+  animation-delay: 0.12s;
+}
+.lights li:nth-child(4) .lights__col {
+  animation-delay: 0.18s;
+}
+.lights li:nth-child(5) .lights__col {
+  animation-delay: 0.24s;
+}
+.lights li:nth-child(6) .lights__col {
+  animation-delay: 0.3s;
+}
+.lights li:nth-child(7) .lights__col {
+  animation-delay: 0.36s;
+}
+.lights li.is-best .lights__col {
+  box-shadow: 0 0 0 2px rgb(var(--accent-rgb) / 0.6),
+    0 0 40px rgb(var(--accent-rgb) / 0.75);
+}
+.lights__day {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.lights li.is-today .lights__day {
+  color: var(--ink);
+}
+.lights__water {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.lights__water.is-full {
+  background: #4a8bff;
+  box-shadow: 0 0 10px rgba(74, 139, 255, 0.8);
+}
+@media (max-width: 760px) {
+  .lights {
+    height: 200px;
+  }
+  .lights__value {
+    font-size: 0.64rem;
+  }
+}
+.garland {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 35;
+  height: 30px;
+  pointer-events: none;
+  animation: fade-in 2s ease both;
+}
+.garland__wire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 30px;
+}
+.garland__wire path {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+.garland__bulb {
+  position: absolute;
+  width: 6px;
+  height: 9px;
+  margin-left: -3px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: var(--c);
+  box-shadow: 0 0 10px 2px color-mix(in srgb, var(--c) 70%, transparent);
+  opacity: 0.85;
+  animation: twinkle-bulb 3.2s ease-in-out infinite;
+  animation-delay: var(--d);
+}
+@media (prefers-reduced-motion: reduce) {
+  .garland__bulb {
+    animation: none;
+  }
+}

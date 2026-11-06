@@ -1,0 +1,85 @@
+/* ========================================================================
+   Accessibility layer. Nothing here changes the default look:
+   it only applies to overlays that hold keyboard focus, to "more contrast"
+   (Windows: Settings → Accessibility → Contrast themes / prefers-contrast)
+   and to Windows contrast themes (forced colours).
+   ======================================================================== */
+
+/* Overlays that keep keyboard focus (lib/a11y useFocusTrap) never draw a ring around themselves. */
+[data-focus-trap]:focus {
+  outline: none;
+}
+
+/* "More contrast": quieter greys get darker, dimmed cards come back. */
+@media (prefers-contrast: more) {
+  :root {
+    --ink-2: #3a3f49;
+    --ink-3: #555b66;
+    --line: rgba(17, 19, 24, 0.22);
+    --line-strong: rgba(17, 19, 24, 0.4);
+  }
+  :root[data-theme='dark'] {
+    --ink-2: #d6dae1;
+    --ink-3: #b3b9c3;
+    --line: rgba(255, 255, 255, 0.24);
+    --line-strong: rgba(255, 255, 255, 0.42);
+  }
+  .shell.is-focusing .vitals,
+  .shell.is-focusing .timeline,
+  .shell.fs-breathe .hello__chips,
+  .shell.fs-breathe .vitals,
+  .shell.fs-breathe .panel:not(.panel--focus):not(.panel--greet) {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+  :focus-visible {
+    outline: 3px solid var(--ink) !important;
+    outline-offset: 2px;
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ink-2: #d6dae1;
+    --ink-3: #b3b9c3;
+    --line: rgba(255, 255, 255, 0.24);
+    --line-strong: rgba(255, 255, 255, 0.42);
+  }
+}
+
+/* Windows contrast themes: glass and shadows disappear there, so cards,
+   dialogs and controls get real borders and focus uses the system colour. */
+@media (forced-colors: active) {
+  .card,
+  .panel,
+  .dialog,
+  .focus,
+  .pill,
+  .btn,
+  .chip,
+  .round-btn,
+  .icon-btn,
+  .segnav,
+  .tool-pill,
+  .select,
+  .ws-card,
+  .prompt,
+  .buddy {
+    border: 1px solid CanvasText;
+  }
+  :focus-visible {
+    outline: 3px solid Highlight !important;
+    outline-offset: 2px;
+  }
+  .sr-only {
+    clip: rect(0 0 0 0);
+  }
+}
+
+/* Text fields: the shared field style outranks the focus style in base.css,
+   so keyboard users saw no focus at all. In keyboard mode (lib/a11y) the
+   intended ring comes back; mouse clicks look exactly as before. */
+html[data-input='keyboard'] input:not([type='checkbox']):not([type='radio']):not([type='range']):focus-visible,
+html[data-input='keyboard'] .select:focus-visible {
+  border-color: var(--ink);
+  box-shadow: var(--glass-inset), 0 0 0 4px rgb(var(--accent-rgb) / 0.45);
+}

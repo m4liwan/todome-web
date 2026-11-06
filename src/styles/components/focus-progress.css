@@ -1,0 +1,93 @@
+/* ========================================================================
+   Focus progress: wave, bar, beads
+   ======================================================================== */
+
+.tl-wave {
+  position: relative;
+  max-width: 640px;
+  height: 44px;
+  /* Both ends fade out softly: nothing sticks out, nothing looks cut off. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+}
+.tl-wave svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  transform-origin: 50% 50%;
+  animation: tl-breathe 6s ease-in-out infinite;
+}
+.tl-wave__drift {
+  animation: tl-drift 9s linear infinite;
+}
+.tl-wave__track {
+  fill: none;
+  stroke: var(--field-glass-strong);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.tl-wave__line {
+  fill: none;
+  stroke: var(--field-ink);
+  stroke-opacity: 0.75;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.tl-wave__fill-top {
+  stop-color: var(--field-ink);
+  stop-opacity: 0.16;
+}
+.tl-wave__fill-bottom {
+  stop-color: var(--field-ink);
+  stop-opacity: 0;
+}
+.tl-wave__now {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, transparent, var(--field-ink), transparent);
+  opacity: 0.55;
+  transition: left 1.2s var(--ease-out);
+  animation: tl-now 3s ease-in-out infinite;
+}
+.tl-wave.is-paused .tl-wave__drift,
+.tl-wave.is-paused svg,
+.tl-wave.is-paused .tl-wave__now {
+  animation-play-state: paused;
+}
+.tl-wave.is-paused {
+  opacity: 0.7;
+}
+.tl-wave.is-still .tl-wave__drift,
+.tl-wave.is-still svg,
+.tl-wave.is-still .tl-wave__now {
+  animation-duration: 14s;
+}
+.tl-bar {
+  position: relative;
+  max-width: 640px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--field-glass);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+.tl-bar__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--field-ink) 32%, transparent), color-mix(in srgb, var(--field-ink) 52%, transparent));
+  transition: width 1.2s var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-wave__drift,
+  .tl-wave svg,
+  .tl-wave__now {
+    animation: none;
+  }
+}

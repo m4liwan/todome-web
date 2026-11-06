@@ -1,0 +1,184 @@
+/* ========================================================================
+   Global rules that win by source order (theme fade, cross-component overrides)
+   ======================================================================== */
+
+.type-dot {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--type-color, var(--ink-3));
+}
+@media (max-width: 600px) {
+  .form--grid,
+  .clients__add,
+  .tone-picker,
+  .choices--row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.ambient span {
+  width: 64vmax;
+  height: 64vmax;
+  filter: blur(90px);
+}
+input:not([type='checkbox']):not([type='radio']):not([type='range']),
+textarea,
+.select {
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--surface-solid);
+  box-shadow: var(--glass-inset);
+}
+input[type='checkbox'],
+input[type='radio'],
+input[type='range'] {
+  accent-color: var(--accent-2);
+}
+.splash__line p {
+  grid-area: 1 / 1;
+  font-size: 1.08rem;
+  font-weight: 550;
+  color: var(--ink-2);
+  opacity: 0;
+  transform: translateY(8px);
+  filter: blur(4px);
+  transition: opacity 0.7s ease,
+    transform 0.7s var(--ease-out),
+    filter 0.7s ease;
+}
+.energy-chip__meter span {
+  width: 6px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--line-strong);
+}
+.closing__wins li {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  font-weight: 650;
+  animation: pop 0.5s var(--ease-spring) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+.closing__times summary::after {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-3px);
+  transition: transform 0.2s;
+}
+.segnav button,
+.segnav button.is-active {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  transition: color 0.35s ease;
+}
+@media (max-width: 760px) {
+  .flow__dots button {
+    padding: 4px 10px;
+  }
+}
+.seg-dot span {
+  position: absolute;
+  top: -18px;
+  min-width: 16px;
+  padding: 0 4px;
+  border-radius: 99px;
+  background: var(--surface-strong);
+  color: var(--ink-2);
+  font-size: 0.62rem;
+  font-weight: 750;
+  line-height: 14px;
+  text-align: center;
+}
+.later__list li {
+  background: linear-gradient(90deg, var(--surface-sunk), transparent 120%);
+  transition: transform 0.25s var(--ease-out);
+}
+button.weather__icon {
+  border: 0;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease-spring);
+}
+.one {
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 30%);
+}
+.module span {
+  font-size: 0.76rem;
+  color: var(--ink-2);
+}
+.settings__tabs button {
+  transition: background-color 0.3s ease,
+    color 0.3s ease;
+}
+html.flow-lock,
+html.flow-lock body {
+  overflow: hidden;
+}
+.topbar__brand .media__label {
+  max-width: 140px;
+}
+.splash__logo,
+.onboard__logo {
+  position: absolute;
+}
+.timeline-opt {
+  position: relative;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shell.fs-breathe .panel--focus .focus,
+  .shell.fs-micro .panel--focus .focus,
+  .shell.fs-cocoon .focus__dot,
+  .shell.fs-tunnel .home > .panel--focus,
+  .shell.fs-cocoon .home > .panel--focus {
+    animation: none;
+  }
+}
+.fstyle__menu button {
+  display: grid;
+  gap: 2px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.fstyle__menu span {
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+.bites__track li {
+  flex: 1;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--field-glass-strong);
+  transition: background-color 0.5s ease;
+}
+.bites__track li.is-done {
+  background: var(--field-ink);
+  opacity: 0.6;
+}
+.bites__track li.is-on {
+  background: var(--field-ink);
+}
+.legal summary::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  opacity: 0.6;
+  transition: transform 0.3s var(--ease-out);
+}

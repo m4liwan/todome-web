@@ -1,0 +1,37 @@
+{
+  "$comment": "Anbieterangaben für Impressum und Datenschutz. kind: \"person\" (Privatperson) oder \"company\". Leere Pflichtfelder (siehe required) stoppen `npm run release`. Optionale Felder leer lassen, wenn es sie nicht gibt. copyright erscheint unter Impressum und im Über-Reiter.",
+  "required": {
+    "person": [
+      "name",
+      "street",
+      "postalCode",
+      "city",
+      "email"
+    ],
+    "company": [
+      "name",
+      "representatives",
+      "street",
+      "postalCode",
+      "city",
+      "email"
+    ]
+  },
+  "operator": {
+    "kind": "person",
+    "name": "Rocco Hanke",
+    "street": "Grüner Weg 26a",
+    "postalCode": "35606",
+    "city": "Solms",
+    "country": "Deutschland",
+    "email": "admin@konturia.de",
+    "phone": "",
+    "website": "",
+    "legalForm": "",
+    "representatives": "",
+    "register": "",
+    "vatId": ""
+  },
+  "updated": "2026-11-06",
+  "copyright": "© 2026 ToDoMe by Rocco Hanke"
+}

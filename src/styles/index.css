@@ -1,0 +1,42 @@
+/* ToDoMe styles.
+   tokens → base → animations → layout → components → late → accessibility.
+   Every class block (".focus", ".calm-breath" …) is styled in exactly one
+   module; src/tests/styles.test.ts keeps it that way. The few rules marked
+   "order-pinned" and everything in base/late.css depend on source order and
+   stay where they are. */
+@import './base/tokens.css';
+@import './base/base.css';
+@import './base/animations.css';
+@import './layout/shell.css';
+@import './layout/layouts.css';
+@import './components/controls.css';
+@import './components/report.css';
+@import './components/topbar.css';
+@import './components/greeting.css';
+@import './components/timeline.css';
+@import './components/active-session.css';
+@import './components/day-plan.css';
+@import './components/weather.css';
+@import './components/settings.css';
+@import './components/companion.css';
+@import './components/week-view.css';
+@import './components/toasts.css';
+@import './components/dialogs.css';
+@import './components/splash.css';
+@import './components/closing.css';
+@import './components/onboarding.css';
+@import './components/start-dialog.css';
+@import './components/winter.css';
+@import './components/standby.css';
+@import './components/overlay.css';
+@import './components/home-extras.css';
+@import './components/biolume.css';
+@import './components/pro.css';
+@import './components/companion-tour.css';
+@import './components/focus-progress.css';
+@import './components/workspace.css';
+@import './components/breathe.css';
+@import './components/first-tasks.css';
+@import './components/contact.css';
+@import './base/late.css';
+@import './base/accessibility.css';

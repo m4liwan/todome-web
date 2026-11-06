@@ -1,0 +1,170 @@
+/* ========================================================================
+   Standby screen
+   ======================================================================== */
+
+.standby__aura span {
+  position: absolute;
+  width: 54vmax;
+  height: 54vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.55;
+  animation: standby-drift 26s ease-in-out infinite alternate;
+}
+.standby__aura span:nth-child(1) {
+  left: -10vmax;
+  top: -14vmax;
+  background: rgb(var(--accent-rgb) / 0.6);
+}
+.standby__aura span:nth-child(2) {
+  right: -14vmax;
+  top: 10vh;
+  background: rgb(var(--accent-2-rgb) / 0.35);
+  animation-delay: -9s;
+}
+.standby__aura span:nth-child(3) {
+  left: 25vw;
+  bottom: -26vmax;
+  background: color-mix(in srgb, var(--accent-3) 50%, transparent);
+  animation-delay: -17s;
+}
+:root[data-theme='dark'] .standby__aura span {
+  opacity: 0.28;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .standby__aura span {
+    opacity: 0.28;
+  }
+}
+.standby__time {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 8rem);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.standby__date {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.standby__line {
+  max-width: 40ch;
+  font-size: 1.02rem;
+  font-weight: 550;
+  color: var(--ink-2);
+}
+.standby__aura {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.standby__buddy {
+  margin-top: 20px;
+}
+.standby--bigclock .standby__time {
+  font-size: clamp(6rem, 22vw, 16rem);
+  font-weight: 200;
+  letter-spacing: -0.06em;
+}
+.standby--breath .standby__orb {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 18px;
+}
+.standby__orb span,
+.standby__orb::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.standby__orb::before {
+  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.35), transparent 65%);
+  filter: blur(18px);
+  animation: rest-breathe 10s ease-in-out infinite;
+}
+.standby__orb span {
+  inset: 30px;
+  background: radial-gradient(circle at 40% 35%, var(--accent-mesh), var(--accent-2));
+  box-shadow: 0 0 60px rgb(var(--accent-rgb) / 0.55);
+  animation: rest-breathe 10s ease-in-out infinite;
+}
+.standby--breath .standby__time {
+  font-size: 2.2rem;
+  font-weight: 300;
+}
+.standby__drift {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  will-change: transform;
+  transition: color 1.4s ease, text-shadow 1.4s ease;
+}
+.standby__drift[data-hue='0'] {
+  color: var(--accent-mesh);
+  text-shadow: 0 0 40px rgb(var(--accent-rgb) / 0.45);
+}
+.standby__drift[data-hue='1'] {
+  color: var(--accent-2);
+  text-shadow: 0 0 40px rgb(var(--accent-2-rgb) / 0.45);
+}
+.standby__drift[data-hue='2'] {
+  color: #8ab4ff;
+  text-shadow: 0 0 40px rgba(138, 180, 255, 0.45);
+}
+.standby__drift[data-hue='3'] {
+  color: var(--accent-3);
+  text-shadow: 0 0 40px rgba(255, 180, 120, 0.4);
+}
+.standby__hint {
+  position: absolute;
+  bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--ink-3);
+  transition: color 0.5s ease;
+}
+.standby:hover .standby__hint {
+  color: var(--ink-2);
+}
+html.is-desktop .standby,
+html.is-desktop .standby *,
+html.is-desktop .pause-room {
+  -webkit-app-region: no-drag;
+}
+.standby {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  padding: 24px;
+  background: var(--bg);
+  overflow: hidden;
+  animation: fade-in 1.6s ease both;
+  cursor: pointer;
+  align-content: center;
+  justify-content: center;
+  display: grid;
+  place-items: center;
+}
+.standby__center {
+  position: relative;
+  gap: 10px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  text-align: center;
+  margin: 0;
+}

@@ -1,0 +1,635 @@
+/* ========================================================================
+   Shell: app frame, home grid, cards, view switches
+   ======================================================================== */
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  z-index: 100;
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+.skip-link:focus {
+  top: 12px;
+}
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient span {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+.ambient span:first-child {
+  left: -18vmax;
+  top: -24vmax;
+  background: radial-gradient(circle, var(--bg-tint-a), transparent 65%);
+  animation: ambient-a 40s ease-in-out infinite alternate;
+}
+.ambient span:last-child {
+  right: -20vmax;
+  bottom: -28vmax;
+  background: radial-gradient(circle, var(--bg-tint-b), transparent 65%);
+  animation: ambient-b 46s ease-in-out infinite alternate;
+}
+.app {
+  position: relative;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding-block: 0 140px;
+  padding-left: max(28px, env(safe-area-inset-left, 0px));
+  padding-right: max(28px, env(safe-area-inset-right, 0px));
+}
+.dash > * {
+  min-width: 0;
+}
+.rise {
+  animation: rise 0.7s var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+.card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.card__head p {
+  font-size: 0.84rem;
+  margin-top: 3px;
+}
+.type--deep_work {
+  --type-color: linear-gradient(135deg, var(--accent-2), var(--accent-mesh));
+}
+.type--communication {
+  --type-color: linear-gradient(135deg, #6fb6ff, #4a7dff);
+}
+.type--admin {
+  --type-color: linear-gradient(135deg, #b8bec9, #8b93a1);
+}
+.type--acquisition {
+  --type-color: linear-gradient(135deg, #ffb547, #ff7a59);
+}
+.type--learning {
+  --type-color: linear-gradient(135deg, #b39cff, #7a8cff);
+}
+.type--exploration {
+  --type-color: linear-gradient(135deg, #ff8fb4, #ffb23f);
+}
+.type--other {
+  --type-color: linear-gradient(135deg, #9ad8c9, #5fb3a1);
+}
+.gaps li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+@media (max-width: 600px) {
+  .app {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+}
+.ambient span:nth-child(1) {
+  left: -18vmax;
+  top: -24vmax;
+  right: auto;
+  bottom: auto;
+  background: radial-gradient(circle, var(--bg-tint-a), transparent 65%);
+  animation: ambient-a 40s ease-in-out infinite alternate;
+}
+.ambient span:nth-child(2) {
+  left: auto;
+  top: auto;
+  right: -20vmax;
+  bottom: -28vmax;
+  background: radial-gradient(circle, var(--bg-tint-b), transparent 65%);
+  animation: ambient-b 46s ease-in-out infinite alternate;
+}
+.ambient span:nth-child(3) {
+  left: 35vw;
+  top: 20vh;
+  width: 46vmax;
+  height: 46vmax;
+  background: radial-gradient(circle, var(--tint-c), transparent 65%);
+  animation: ambient-c 52s ease-in-out infinite alternate;
+}
+.gridlines {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center top;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 80%);
+}
+.ambience {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  animation: ambience-in 2.4s ease forwards;
+}
+.app {
+  padding-top: 4px;
+}
+.card {
+  position: relative;
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-edge);
+  overflow: hidden;
+  background: radial-gradient(520px circle at var(--mx, -600px) var(--my, -600px), var(--spot), transparent 45%),
+    linear-gradient(160deg, var(--glass-sheen), transparent 38%),
+    var(--surface);
+  box-shadow: var(--glass-inset), var(--shadow);
+  backdrop-filter: blur(28px) saturate(185%);
+  -webkit-backdrop-filter: blur(28px) saturate(185%);
+  transition: border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    opacity 0.5s ease,
+    filter 0.5s ease;
+}
+.card:hover {
+  border-color: color-mix(in srgb, var(--glass-edge) 60%, rgb(var(--accent-rgb) / 0.6));
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambience {
+    animation: none;
+    opacity: 1;
+  }
+}
+.view-fade {
+  display: grid;
+  gap: 20px;
+  animation: view-in 0.5s var(--ease-out) both;
+}
+.dash {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 20px;
+  align-items: stretch;
+  display: block;
+}
+.home {
+  display: grid;
+  gap: 20px;
+  align-items: stretch;
+}
+.panel--focus {
+  container-type: inline-size;
+}
+.home--classic {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+.home--classic .panel--greet,
+.home--classic .panel--tl,
+.home--classic .panel--week {
+  grid-column: 1 / -1;
+}
+.home--classic .panel--plan {
+  grid-column: span 5;
+}
+.home--classic .panel--weather,
+.home--classic .panel--water,
+.home--classic .panel--times,
+.home--classic .panel--impulse,
+.home--classic .panel--thoughts,
+.home--classic .panel--routines {
+  grid-column: span 4;
+}
+.home--sanctuary {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.15fr) minmax(0, 1fr);
+  grid-template-areas: 'greet greet greet'
+    'weather focus plan'
+    'water focus times'
+    'routines focus thoughts'
+    'impulse tl week';
+}
+.home--sanctuary .panel--greet {
+  grid-area: greet;
+}
+.home--sanctuary .panel--greet .hello__text {
+  display: grid;
+  justify-items: center;
+}
+.home--sanctuary .panel--focus {
+  grid-area: focus;
+}
+.home--sanctuary .panel--weather {
+  grid-area: weather;
+}
+.home--sanctuary .panel--water {
+  grid-area: water;
+}
+.home--sanctuary .panel--routines {
+  grid-area: routines;
+}
+.home--sanctuary .panel--plan {
+  grid-area: plan;
+}
+.home--sanctuary .panel--times {
+  grid-area: times;
+}
+.home--sanctuary .panel--thoughts {
+  grid-area: thoughts;
+}
+.home--sanctuary .panel--impulse {
+  grid-area: impulse;
+}
+.home--sanctuary .panel--tl {
+  grid-area: tl;
+}
+.home--sanctuary .panel--week {
+  grid-area: week;
+}
+.home--sanctuary .panel:not(.panel--focus):not(.panel--greet) {
+  opacity: 0.92;
+  transition: opacity 0.4s ease;
+}
+.home--sanctuary .panel:not(.panel--focus):not(.panel--greet):hover {
+  opacity: 1;
+}
+.home--hub {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr) minmax(0, 1fr);
+  grid-template-areas: 'greet greet greet'
+    'focus hub plan'
+    'focus hub water'
+    'tl tl tl'
+    'weather impulse times'
+    'thoughts week routines';
+}
+.home--hub .panel--greet {
+  grid-area: greet;
+}
+.home--hub .panel--focus {
+  grid-area: focus;
+}
+.home--hub .panel--hub {
+  grid-area: hub;
+}
+.home--hub .panel--plan {
+  grid-area: plan;
+}
+.home--hub .panel--water {
+  grid-area: water;
+}
+.home--hub .panel--tl {
+  grid-area: tl;
+}
+.home--hub .panel--weather {
+  grid-area: weather;
+}
+.home--hub .panel--impulse {
+  grid-area: impulse;
+}
+.home--hub .panel--times {
+  grid-area: times;
+}
+.home--hub .panel--thoughts {
+  grid-area: thoughts;
+}
+.home--hub .panel--week {
+  grid-area: week;
+}
+.home--hub .panel--routines {
+  grid-area: routines;
+}
+@media (max-width: 1180px) {
+  .home--classic .panel--focus,
+  .home--classic .panel--plan {
+    grid-column: 1 / -1;
+  }
+  .home--classic .panel--weather,
+  .home--classic .panel--water,
+  .home--classic .panel--times,
+  .home--classic .panel--impulse,
+  .home--classic .panel--thoughts,
+  .home--classic .panel--routines {
+    grid-column: span 6;
+  }
+  .home--sanctuary,
+  .home--hub {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: none;
+  }
+  .home--sanctuary .panel,
+  .home--hub .panel {
+    grid-area: auto;
+  }
+  .home--sanctuary .panel--greet,
+  .home--sanctuary .panel--focus,
+  .home--sanctuary .panel--tl,
+  .home--hub .panel--greet,
+  .home--hub .panel--focus,
+  .home--hub .panel--tl {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 760px) {
+  .home--classic .panel,
+  .home--sanctuary .panel,
+  .home--hub .panel {
+    grid-column: 1 / -1 !important;
+  }
+}
+.panel--focus > section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+.panel--focus .focus {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.panel--focus .stack {
+  flex: none;
+}
+.home--hub .one__buddy,
+.home--hub .focus__buddy {
+  display: none;
+}
+.home--hub .one {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.shell.is-focusing .panel:not(.panel--focus):not(.panel--greet):not(.panel--hub)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--bg) 62%, transparent), color-mix(in srgb, var(--bg) 48%, rgb(var(--tint-b-rgb) / 0.12)));
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.9s cubic-bezier(0.22, 0.8, 0.24, 1);
+}
+.shell.is-focusing .panel:not(.panel--focus):not(.panel--greet):not(.panel--hub):hover::after,
+.shell.is-focusing .panel:not(.panel--focus):not(.panel--greet):not(.panel--hub):focus-within::after {
+  opacity: 0;
+  transition-duration: 0.6s;
+}
+.home--sanctuary .panel--greet .hello {
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.home--sanctuary .panel--greet .hello__chips {
+  justify-content: center;
+}
+.home--sanctuary .panel--greet .vitals {
+  justify-content: center;
+}
+.home--sanctuary {
+  align-items: stretch;
+}
+.home--sanctuary .panel--impulse,
+.home--sanctuary .panel--tl,
+.home--sanctuary .panel--week {
+  align-self: stretch;
+}
+.home--sanctuary .panel--tl > * {
+  flex: 1 1 auto;
+}
+.home--classic .panel--focus .focus {
+  min-height: 0;
+}
+.home--classic .focus__row .focus__time {
+  font-size: clamp(3rem, 10cqi, 6rem);
+}
+.home--classic .panel--focus {
+  grid-column: span 7;
+  grid-row: span 2;
+}
+.home--classic .panel--plan,
+.home--classic .panel--impulse {
+  grid-column: span 5;
+}
+.home--classic .panel--thoughts,
+.home--classic .panel--routines {
+  grid-column: span 6;
+}
+.home--classic .plan .later__list li {
+  padding: 10px 12px;
+}
+.home--classic .plan .card__head {
+  margin-bottom: 12px;
+}
+@media (max-width: 1180px) {
+  .home--classic .panel--focus {
+    grid-row: auto;
+  }
+  .home--classic .panel--plan,
+  .home--classic .panel--impulse,
+  .home--classic .panel--thoughts,
+  .home--classic .panel--routines {
+    grid-column: span 6;
+  }
+}
+.home--sanctuary {
+  grid-template-areas: 'greet greet greet'
+    'weather focus plan'
+    'water focus times'
+    'routines tl thoughts'
+    'routines impulse thoughts'
+    'routines week thoughts';
+}
+.home--sanctuary .panel--focus .focus {
+  min-height: 0;
+}
+.home--sanctuary .focus__inner {
+  padding: 22px 24px;
+}
+.home--sanctuary .teaser {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.home--sanctuary .teaser__text {
+  flex: none;
+  justify-items: center;
+}
+.home--flow {
+  grid-template-columns: minmax(0, 1fr);
+  --slide-w: min(1120px, 72vw);
+  justify-items: center;
+}
+.home--flow .panel--greet .hello {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+.home--flow .panel--greet .hello__text {
+  display: grid;
+  justify-items: center;
+}
+.home--flow .panel--greet .hello__chips,
+.home--flow .panel--greet .vitals {
+  justify-content: center;
+}
+.home--flow .flow {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+.home--flow .flow__stage {
+  width: 100vw;
+}
+.home--flow .flow__track {
+  grid-auto-columns: var(--slide-w);
+  margin-inline: 0;
+  padding-inline: calc((100vw - var(--slide-w)) / 2);
+  scroll-padding-inline: calc((100vw - var(--slide-w)) / 2);
+  mask-image: linear-gradient(90deg, transparent 0, #000 9%, #000 91%, transparent 100%);
+}
+.home--flow .flow__slide {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+@media (max-height: 820px) {
+  .home--flow .panel--greet .hello {
+    gap: 8px;
+  }
+  .home--flow .panel--greet .hello h1 {
+    font-size: clamp(30px, 4.2vh, 44px);
+  }
+  .home--flow .panel--greet .vitals {
+    transform: scale(0.88);
+    margin-block: -6px;
+  }
+}
+.home--flow .flow__slide > .panel {
+  min-height: 0;
+  overflow: auto;
+}
+.home--flow .flow__arrow--prev {
+  left: calc((100vw - var(--slide-w)) / 2 - 76px);
+}
+.home--flow .flow__arrow--next {
+  right: calc((100vw - var(--slide-w)) / 2 - 76px);
+}
+.ambience--clouds {
+  filter: none;
+}
+.pro-blur__lock {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-inset), var(--shadow-sm);
+  color: var(--ink);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.pro-blur__lock--sm {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+}
+.shell.fs-breathe .panel:not(.panel--focus):not(.panel--greet),
+.shell.fs-micro .panel:not(.panel--focus):not(.panel--greet) {
+  filter: blur(4px) saturate(0.8);
+  opacity: 0.42;
+  transition: filter 1.2s ease,
+    opacity 1.2s ease;
+}
+.shell.fs-breathe .panel:not(.panel--focus):not(.panel--greet):hover,
+.shell.fs-micro .panel:not(.panel--focus):not(.panel--greet):hover {
+  filter: none;
+  opacity: 0.92;
+}
+.shell.fs-breathe .panel--focus .focus,
+.shell.fs-micro .panel--focus .focus {
+  animation: focus-shine 6s ease-in-out infinite;
+}
+.shell.fs-tunnel .home:not(.home--flow) > .panel:not(.panel--focus),
+.shell.fs-cocoon .home:not(.home--flow) > .panel:not(.panel--focus) {
+  display: none;
+}
+.shell.fs-tunnel .home:not(.home--flow),
+.shell.fs-cocoon .home:not(.home--flow) {
+  display: block;
+  padding-top: 3vh;
+}
+.shell.fs-tunnel .home:not(.home--flow) > .panel--focus {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 12px;
+  /* concentric with the card inside: 32px card radius + 12px ring */
+  border-radius: 44px;
+  background: linear-gradient(160deg, var(--glass-sheen), transparent 50%), rgb(var(--accent-rgb) / 0.08);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-inset), var(--shadow-lg);
+  backdrop-filter: blur(26px) saturate(1.6);
+  -webkit-backdrop-filter: blur(26px) saturate(1.6);
+  animation: tunnel-in 0.9s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.shell.fs-cocoon .home:not(.home--flow) > .panel--focus {
+  max-width: 720px;
+  margin: 6vh auto 0;
+  animation: tunnel-in 1.1s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+.shell.fs-tunnel .home--flow .panel:not(.panel--focus):not(.panel--greet),
+.shell.fs-cocoon .home--flow .panel:not(.panel--focus):not(.panel--greet) {
+  filter: blur(4px);
+  opacity: 0.4;
+}
+.home--custom {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  /* Small cards fill gaps next to big ones, no empty glass. */
+  grid-auto-flow: row dense;
+  gap: 20px;
+  align-items: stretch;
+}
+.home--custom > .panel {
+  grid-column: span var(--span, 12);
+}
+.home--custom > .panel--greet {
+  grid-column: 1 / -1;
+}
+@media (max-width: 1100px) {
+  .home--custom > .panel.is-s,
+  .home--custom > .panel.is-m {
+    grid-column: span 6;
+  }
+  .home--custom > .panel.is-l,
+  .home--custom > .panel.is-xl {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 760px) {
+  .home--custom > .panel {
+    grid-column: 1 / -1 !important;
+  }
+}

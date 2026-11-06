@@ -1,0 +1,310 @@
+/* ========================================================================
+   Dialog frame and shared dialog content
+   ======================================================================== */
+
+.dialog {
+  width: min(560px, calc(100vw - 24px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius-xl);
+  background: var(--surface-strong);
+  color: var(--ink);
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(30px) saturate(170%);
+  overflow: auto;
+}
+.dialog--wide {
+  width: min(820px, calc(100vw - 24px));
+}
+.dialog--focus .dialog__inner::before,
+.dialog--pause .dialog__inner::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: var(--g-work);
+}
+.dialog--pause .dialog__inner::before {
+  background: var(--g-pause);
+}
+.dialog__inner {
+  position: relative;
+  display: grid;
+}
+.dialog__body {
+  padding: 12px 26px 24px;
+}
+.dialog__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 26px 22px;
+  border-top: 1px solid var(--line);
+}
+.resources {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+.dialog {
+  background: linear-gradient(170deg, var(--glass-sheen), transparent 30%), var(--surface-strong);
+  box-shadow: var(--glass-inset), var(--shadow-lg);
+  backdrop-filter: blur(36px) saturate(180%);
+}
+.dialog::-webkit-scrollbar-track,
+.select__list::-webkit-scrollbar-track,
+.buddy__bubble::-webkit-scrollbar-track {
+  margin-block: 18px;
+}
+.energy {
+  display: grid;
+  gap: 22px;
+  margin-top: 18px;
+}
+.energy__scale {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px;
+}
+.energy__step {
+  aspect-ratio: 1 / 1.25;
+  min-height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface-sunk);
+  font-weight: 750;
+  font-size: 0.95rem;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: transform 0.2s var(--ease-spring),
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+}
+.energy__step.is-filled {
+  border-color: transparent;
+  background: color-mix(in oklab, #8ab4ff calc(100% - var(--n) * 10%), var(--accent-2));
+  color: #fff;
+}
+.energy__step.is-on {
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 10px 22px -10px color-mix(in oklab, #8ab4ff calc(100% - var(--n) * 10%), var(--accent-2));
+}
+.energy__step:hover:not(.is-on) {
+  transform: translateY(-2px);
+}
+.energy__readout {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  background: var(--surface-sunk);
+}
+.energy__word {
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--ink-2);
+}
+.energy__word strong {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--ink);
+  margin-right: 6px;
+}
+.energy__mode {
+  justify-self: start;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: var(--lime);
+  color: var(--lime-ink);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+.energy[data-mode='low'] .energy__mode {
+  background: #cfe2ff;
+  color: #0e2a5c;
+}
+.energy__headline {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 650;
+}
+@media (max-width: 760px) {
+  .energy__scale {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.dialog[open] .dialog__inner {
+  animation: none;
+}
+.dialog[open] {
+  animation: sheet-in 0.32s var(--ease-out) both;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  will-change: transform, opacity;
+}
+.dialog.is-closing[open] {
+  animation: sheet-out 0.18s cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+.dialog.is-closing[open]::backdrop {
+  animation: backdrop-out 0.18s ease both;
+}
+.dialog::backdrop {
+  backdrop-filter: none;
+  background: rgba(12, 13, 16, 0.34);
+  animation: backdrop-in 0.3s ease both;
+}
+.energy-note {
+  margin-bottom: 14px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-weight: 600;
+  background: radial-gradient(circle at 0% 0%, rgb(var(--accent-rgb) / 0.35), transparent 60%),
+    var(--surface-sunk);
+}
+.energy-note--low {
+  background: radial-gradient(circle at 0% 0%, rgba(138, 180, 255, 0.35), transparent 60%),
+    var(--surface-sunk);
+}
+html.is-desktop .dialog,
+html.is-desktop .select__list {
+  -webkit-app-region: no-drag;
+}
+.dialog--focus .dialog__inner::before,
+.dialog--pause .dialog__inner::before,
+.dialog--alert .dialog__inner::before {
+  content: none;
+  display: none;
+}
+.dialog--settings[open] {
+  display: flex;
+  flex-direction: column;
+  height: min(820px, calc(100dvh - 32px));
+  overflow: hidden;
+}
+.dialog--settings .dialog__inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dialog--settings .dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-bottom: 0;
+}
+.dialog--settings .settings {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dialog:focus,
+.dialog:focus-visible {
+  outline: none;
+}
+.dialog__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 24px 26px 6px;
+  align-items: center;
+}
+.dialog__header h2 {
+  font-size: 1.45rem;
+  font-weight: 650;
+  margin: 0;
+  line-height: 36px;
+}
+.dialog__header .icon-btn {
+  background: var(--surface-sunk);
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  align-self: center;
+}
+.dialog__header .icon-btn svg {
+  display: block;
+}
+.dialog--settings .settings__tabs button {
+  position: relative;
+  z-index: 1;
+  height: 38px;
+  min-height: 38px;
+  padding: 0 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: transparent !important;
+  font-weight: 650;
+  transition: color 0.3s ease;
+}
+.dialog--settings .settings__tabs button:hover {
+  color: var(--ink);
+}
+.dialog--settings .settings__tabs button.is-on {
+  color: var(--on-primary);
+}
+.dialog--settings .settings__panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 6px 26px 2px;
+  margin-right: -6px;
+  animation: none;
+}
+.dialog .segmented button,
+.dialog .pill,
+.dialog .btn,
+.dialog .chip {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+.dialog .segmented button {
+  min-height: 36px;
+}
+.dialog .palette,
+.dialog .layout-opt,
+.dialog .avatar-option {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.dialog--pro {
+  width: min(560px, calc(100vw - 32px));
+}
+.dialog--settings .settings__tabs {
+  margin: 0;
+  flex: none;
+  --tab-gap: 4px;
+  --tab-pad: 5px;
+  position: relative;
+  display: grid;
+  gap: var(--tab-gap);
+  padding: var(--tab-pad);
+  contain: layout paint;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+@media (max-width: 760px) {
+  .dialog--settings .settings__tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.dialog--storage {
+  width: min(620px, calc(100vw - 32px));
+  max-width: min(620px, calc(100vw - 32px));
+}

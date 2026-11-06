@@ -1,0 +1,657 @@
+/* ========================================================================
+   All keyframes (one definition per name)
+   ======================================================================== */
+
+@keyframes ambient-a {
+  to {
+    transform: translate(10vmax, 6vmax) scale(1.1);
+  }
+}
+
+@keyframes ambient-b {
+  to {
+    transform: translate(-8vmax, -6vmax) scale(1.15);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 160% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+
+@keyframes beacon {
+  0% {
+    box-shadow: 0 0 0 0 rgb(var(--accent-rgb) / 0.75);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgb(var(--accent-rgb) / 0);
+  }
+}
+
+@keyframes drift-a {
+  to {
+    transform: translate(12%, 8%) scale(1.12);
+  }
+}
+
+@keyframes drift-b {
+  to {
+    transform: translate(-10%, 14%) scale(1.18);
+  }
+}
+
+@keyframes drift-c {
+  to {
+    transform: translate(-16%, -10%) scale(1.1);
+  }
+}
+
+@keyframes beacon-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(14, 143, 83, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 9px rgba(14, 143, 83, 0);
+  }
+}
+
+@keyframes dot-pulse {
+  50% {
+    transform: scale(1.5);
+    background: var(--field-ink);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+}
+
+@keyframes ttl {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes peek-in {
+  from {
+    transform: translateY(110%) rotate(-8deg);
+  }
+}
+
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7) translateY(10px);
+  }
+}
+
+@keyframes peek-out {
+  to {
+    transform: translateY(120%);
+  }
+}
+
+@keyframes bubble-out {
+  to {
+    opacity: 0;
+    transform: scale(0.85) translateY(8px);
+  }
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-4px) scale(1.01, 0.99);
+  }
+}
+
+@keyframes shadow {
+  50% {
+    transform: scaleX(0.86);
+    opacity: 0.7;
+  }
+}
+
+@keyframes eye-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes twinkle {
+  50% {
+    transform: scale(0.6) rotate(20deg);
+    opacity: 0.6;
+  }
+}
+
+@keyframes ambient-c {
+  to {
+    transform: translate(-12vmax, 10vmax) scale(1.2);
+  }
+}
+
+@keyframes ambience-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orb-breathe {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.75;
+  }
+}
+
+@keyframes steam {
+  0% {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+
+@keyframes sip {
+  0%,
+  60%,
+  100% {
+    transform: none;
+  }
+  70%,
+  85% {
+    transform: rotate(5deg) translateX(2px);
+  }
+}
+
+@keyframes page {
+  0%,
+  70%,
+  100% {
+    transform: none;
+  }
+  80% {
+    transform: scaleX(-0.9);
+  }
+  90% {
+    transform: scaleX(-1);
+    opacity: 0;
+  }
+}
+
+@keyframes nod {
+  50% {
+    transform: rotate(-3deg) translateY(2px);
+  }
+}
+
+@keyframes write {
+  25% {
+    transform: translate(-3px, 1px) rotate(-6deg);
+  }
+  50% {
+    transform: translate(-6px, 0) rotate(2deg);
+  }
+  75% {
+    transform: translate(-2px, 2px) rotate(-4deg);
+  }
+}
+
+@keyframes ink {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes focus-tilt {
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes lift {
+  0%,
+  100% {
+    transform: translateY(14px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes squat {
+  0%,
+  100% {
+    transform: scale(1.03, 0.95);
+  }
+  50% {
+    transform: scale(0.98, 1.03) translateY(-3px);
+  }
+}
+
+@keyframes belt {
+  to {
+    stroke-dashoffset: 14;
+  }
+}
+
+@keyframes run {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+@keyframes sleep {
+  50% {
+    transform: scale(1.03, 0.98);
+  }
+}
+
+@keyframes zzz {
+  0% {
+    opacity: 0;
+    transform: translate(0, 6px);
+  }
+  30%,
+  60% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6px, -8px);
+  }
+}
+
+@keyframes leaf {
+  50% {
+    transform: rotate(-7deg);
+  }
+}
+
+@keyframes tail {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes breathe-guide {
+  0%,
+  100% {
+    transform: scale(0.45);
+    opacity: 0.75;
+  }
+  45%,
+  55% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+}
+
+@keyframes breathe-in-text {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes breathe-out-text {
+  0%,
+  45% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes wave {
+  to {
+    transform: translateX(50px);
+  }
+}
+
+@keyframes wave-back {
+  to {
+    transform: translateX(-50px);
+  }
+}
+
+@keyframes bubble {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes sunset {
+  to {
+    transform: translate(-6vmax, 4vmax) scale(1.1);
+  }
+}
+
+@keyframes standby-drift {
+  to {
+    transform: translate(8vmax, 6vmax) scale(1.18);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Soft closing: the mirror of sheet-in / backdrop-in (dialogs, tour, menus). */
+@keyframes sheet-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.975);
+  }
+}
+
+@keyframes backdrop-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes breathe-ring {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes rest-breathe {
+  0%,
+  100% {
+    transform: scale(0.72);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes prev-drift {
+  0% {
+    transform: translate(-50px, -14px);
+  }
+  33% {
+    transform: translate(40px, 10px);
+  }
+  66% {
+    transform: translate(-20px, 16px);
+  }
+  100% {
+    transform: translate(50px, -16px);
+  }
+}
+
+@keyframes eq {
+  0%,
+  100% {
+    height: 30%;
+  }
+  50% {
+    height: 100%;
+  }
+}
+
+@keyframes marquee {
+  0%,
+  15% {
+    transform: translateX(0);
+  }
+  85%,
+  100% {
+    transform: translateX(calc(-100% + 160px));
+  }
+}
+
+@keyframes cta-breathe {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.7;
+  }
+}
+
+@keyframes ticker {
+  0%,
+  12% {
+    transform: translateX(0);
+  }
+  88%,
+  100% {
+    transform: translateX(calc(-1 * var(--tick)));
+  }
+}
+
+@keyframes twinkle-bulb {
+  50% {
+    opacity: 0.35;
+    box-shadow: 0 0 4px 1px color-mix(in srgb, var(--c) 40%, transparent);
+  }
+}
+
+@keyframes tour-ring-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes tour-idle {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes tour-hop {
+  50% {
+    transform: translateY(-9px) rotate(-3deg);
+  }
+}
+
+@keyframes tl-drift {
+  to {
+    transform: translateX(-160px);
+  }
+}
+
+@keyframes tl-breathe {
+  50% {
+    transform: scaleY(0.78);
+  }
+}
+
+@keyframes tl-now {
+  50% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes focus-shine {
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.45),
+      0 0 0 1px rgb(var(--accent-rgb) / 0.35),
+      0 30px 90px -28px rgb(var(--accent-2-rgb) / 0.6);
+  }
+}
+
+@keyframes tunnel-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+
+@keyframes dot-breathe {
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 10px rgb(255 255 255 / 0.06);
+  }
+}
+
+@keyframes breathe-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes breath {
+  0%,
+  100% {
+    transform: scale(0.86);
+  }
+  40% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes cue-in {
+  0%,
+  36% {
+    opacity: 1;
+  }
+  44%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes cue-out {
+  0%,
+  38% {
+    opacity: 0;
+  }
+  46%,
+  94% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes onboard-out {
+  from {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
+@keyframes landing-in {
+  from {
+    opacity: 0;
+  }
+  35% {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -1,0 +1,149 @@
+/* ========================================================================
+   Weather card and dialog
+   ======================================================================== */
+
+.weather {
+  --w1: rgba(255, 190, 90, 0.55);
+  --w2: rgba(255, 120, 90, 0.25);
+}
+.weather[data-kind='cloudy'],
+.weather[data-kind='fog'] {
+  --w1: rgba(150, 170, 200, 0.45);
+  --w2: rgba(190, 200, 220, 0.3);
+}
+.weather[data-kind='rain'],
+.weather[data-kind='drizzle'],
+.weather[data-kind='storm'] {
+  --w1: rgba(90, 140, 255, 0.45);
+  --w2: rgba(140, 120, 255, 0.28);
+}
+.weather[data-kind='snow'] {
+  --w1: rgba(170, 220, 255, 0.55);
+  --w2: rgba(220, 235, 255, 0.4);
+}
+.weather__glow {
+  position: absolute;
+  inset: -40% -30% auto auto;
+  width: 90%;
+  height: 120%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 60% 40%, var(--w1), var(--w2) 45%, transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+  animation: drift-b 24s ease-in-out infinite alternate;
+}
+.weather__icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  color: #f59e0b;
+}
+.weather[data-kind='rain'] .weather__icon,
+.weather[data-kind='drizzle'] .weather__icon,
+.weather[data-kind='snow'] .weather__icon,
+.weather[data-kind='cloudy'] .weather__icon,
+.weather[data-kind='fog'] .weather__icon {
+  color: var(--blue);
+}
+.weather__now {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.weather__temp sup {
+  font-size: 0.45em;
+  font-weight: 400;
+  vertical-align: 0.95em;
+  margin-left: 2px;
+}
+.weather__temp {
+  font-size: 4rem;
+  font-weight: 200;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+.weather__desc {
+  font-weight: 650;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+.weather__advice {
+  position: relative;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.weather--empty p {
+  margin-bottom: 16px;
+}
+.weather--interactive {
+  cursor: pointer;
+}
+.weather--interactive:hover {
+  border-color: color-mix(in srgb, var(--glass-edge) 50%, rgb(var(--accent-rgb) / 0.7));
+}
+button.weather__icon:hover {
+  transform: scale(1.06) rotate(-4deg);
+}
+.wx {
+  display: grid;
+  gap: 14px;
+}
+.wx__now {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.wx__temp {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 300;
+  line-height: 1;
+}
+.wx__temp sup {
+  font-size: 0.9rem;
+  font-weight: 600;
+  vertical-align: top;
+  margin-left: 2px;
+}
+.wx__hours {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+  gap: 8px;
+}
+.wx__hours li {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 16px;
+  background: var(--surface-sunk);
+}
+.wx__h,
+.wx__p {
+  font-size: 0.74rem;
+  color: var(--ink-2);
+  font-weight: 650;
+  min-height: 1em;
+}
+.wx__t {
+  font-weight: 750;
+}
+.wx__p {
+  color: #4a8bff;
+}
+.wx__settings {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
