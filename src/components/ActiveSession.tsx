@@ -35,7 +35,7 @@ interface Props {
 /** The hero of the dashboard: the running session on a living colour field. */
 export function ActiveSession({ state, projections, foreground, now, onOpen, onShowPlan, onBreathe }: Props) {
   const stack = sessionStack(projections);
-  useTimerVoice(state, foreground);
+  useTimerAnnouncements(state, foreground);
   return (
     <section className="rise" style={{ '--i': 2 } as React.CSSProperties} aria-label="Aktuelle Session">
       {foreground ? (
@@ -96,7 +96,7 @@ function Mesh() {
  * THE one doable thing, never the full list.
  */
 /** Tells screen readers about the running block at calm moments only (see lib/a11y). */
-function useTimerVoice(state: AppState, p: SessionProjection | null) {
+function useTimerAnnouncements(state: AppState, p: SessionProjection | null) {
   const last = useRef<TimerSnapshot | null>(null);
   const snap: TimerSnapshot | null = p
     ? { sessionId: p.sessionId, status: p.status, remainingMs: p.effectiveTimeboxMin * MIN - p.netMs, task: state.tasks[p.taskId]?.title ?? 'Aufgabe' }

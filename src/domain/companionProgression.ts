@@ -23,7 +23,7 @@ import { addDays, dayKey } from '../lib/time';
 // Data model
 // ---------------------------------------------------------------------------
 
-export type FeatureId = 'advanced_stats' | 'focus_timer' | 'exclusive_themes' | 'sound_packs';
+export type FeatureId = 'advanced_stats' | 'focus_timer' | 'exclusive_themes';
 
 export interface CompanionStats {
   /** Total XP ever earned (source of truth for the level). */
@@ -137,12 +137,6 @@ export const FEATURE_UNLOCKS: readonly FeatureUnlock[] = [
     level: 15,
     title: 'Exklusive Themes',
     text: 'Farbwelten, die man sich verdient: ruhig, tief und nur für dich.',
-  },
-  {
-    feature: 'sound_packs',
-    level: 25,
-    title: 'Sound-Packs & Stimme',
-    text: 'Neue Klangwelten und eine eigene Stimme für deinen Begleiter.',
   },
 ];
 

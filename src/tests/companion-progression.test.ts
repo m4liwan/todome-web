@@ -217,18 +217,24 @@ describe('streak days, freezes and the welcome back', () => {
 });
 
 describe('feature gates', () => {
-  it('unlocks the Pro features at level 5, 10, 15 and 25', () => {
+  it('unlocks the Pro features at level 5, 10 and 15', () => {
     expect(FEATURE_UNLOCKS.map((u) => [u.feature, u.level])).toEqual([
       ['advanced_stats', 5],
       ['focus_timer', 10],
       ['exclusive_themes', 15],
-      ['sound_packs', 25],
     ]);
     const atLevel = (level: number) => ({ ...emptyProgression().stats, xp: totalXpForLevel(level), level });
     expect(isFeatureUnlocked(atLevel(4), 'advanced_stats')).toBe(false);
     expect(isFeatureUnlocked(atLevel(5), 'advanced_stats')).toBe(true);
     expect(isFeatureUnlocked(atLevel(9), 'focus_timer')).toBe(false);
-    expect(isFeatureUnlocked(atLevel(25), 'sound_packs')).toBe(true);
+  });
+
+  it('has no voice or sound unlock: level 25 brings the aura, and an old stored one is dropped', () => {
+    expect(JSON.stringify(FEATURE_UNLOCKS)).not.toMatch(/stimme|voice|sound|klang/i);
+    const at25 = rewardPath({ xp: totalXpForLevel(25), unlockedFeatures: [] }).find((s) => s.level === 25);
+    expect(at25?.rewards.map((r) => r.title)).toEqual(['Aura']);
+    const old = sanitizeProgression({ ...emptyProgression(), stats: { ...emptyProgression().stats, unlockedFeatures: ['advanced_stats', 'sound_packs'] } });
+    expect(old.stats.unlockedFeatures).toEqual(['advanced_stats']);
   });
 
   it('records the unlock in the stats once the level is reached', () => {

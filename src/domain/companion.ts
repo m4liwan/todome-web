@@ -45,7 +45,7 @@ export interface AvatarProfile {
   vibe: AvatarVibe;
   /** How the companion introduces itself (onboarding, hello). */
   intro: string;
-  /** A short, warm thank-you in its own voice (feedback sent, first tasks). */
+  /** A short, warm thank-you in its own words (feedback sent, first tasks). */
   thanks: string;
 }
 
