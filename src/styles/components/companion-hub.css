@@ -48,6 +48,55 @@
   z-index: 1;
   min-width: 0;
 }
+/* The "?" that replays the companion's intro. */
+.companion-hub__help {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--glass-edge);
+  background: var(--surface-strong);
+  box-shadow: var(--glass-inset);
+  color: var(--ink-2);
+  font: 750 0.95rem/1 var(--font-body);
+  cursor: pointer;
+  transition: color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.companion-hub__help:hover {
+  color: var(--ink);
+  border-color: rgb(var(--accent-rgb) / 0.6);
+  background: color-mix(in srgb, var(--surface-strong) 82%, rgb(var(--accent-rgb)));
+}
+
+/* ---------- intro: the part being explained stays bright ---------- */
+
+.companion-hub > .card {
+  /* Clear of the sticky header above and the speech bubble below. */
+  scroll-margin: 96px 0 230px;
+  outline: 2px solid transparent;
+  outline-offset: 5px;
+}
+@media (max-width: 760px) {
+  /* The header takes two rows here. */
+  .companion-hub > .card {
+    scroll-margin-top: 136px;
+  }
+}
+.companion-hub.is-touring > .card:not(.is-spot) {
+  opacity: 0.32;
+}
+.companion-hub.is-touring > .card.is-spot {
+  outline-color: rgb(var(--accent-rgb) / 0.7);
+}
+
 .companion-hub__title {
   display: grid;
   gap: 4px;

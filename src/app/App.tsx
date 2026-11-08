@@ -40,7 +40,7 @@ import { TaskDialog } from '../components/dialogs/TaskDialog';
 import { ProDialog } from '../components/dialogs/ProDialog';
 import { openCheckIns } from '../domain/checkinEngine';
 import { dayKey, MIN } from '../lib/time';
-import { useCompanion } from './companion';
+import { useCompanion, useUpdateCompanion } from './companion';
 import { useDocumentTitle, useIdleDetection, usePowerEvents, useProjections, useScheduler } from './hooks';
 import type { Modal } from './modal';
 import { useOverlaySync } from './overlay';
@@ -166,6 +166,7 @@ export function App() {
   useWeatherSync();
   useUpdateNotice();
   useCompanion(setModal);
+  useUpdateCompanion();
   useSpotlight();
 
   const { state, now, projections, foreground } = useProjections();
@@ -245,6 +246,11 @@ export function App() {
       setModalRaw({ kind: 'first_tasks' });
     }
   }, [services, bridgeNext]);
+  // The companion's intro in its hub: shown once, replayable from the hub and the settings.
+  const markIntroSeen = useCallback(() => {
+    services.store.dispatch({ type: 'settings/update', patch: { companionIntroSeen: true } });
+  }, [services]);
+  const showCompanion = useCallback(() => setView('companion'), []);
   // Short lock after waking, so the same key press can never reopen it.
   const restLock = useRef(0);
   const wakeUp = useCallback(() => {
@@ -430,7 +436,7 @@ export function App() {
           )}
           {view === 'companion' && (
             <div className="view-fade" key="companion">
-              <CompanionHub state={state} now={now} />
+              <CompanionHub state={state} now={now} introReady={!tour && !modal && !breathe && !routine && !splash && !onboarding && !landing} onIntroSeen={markIntroSeen} />
             </div>
           )}
           {view === 'closing' && (
@@ -471,6 +477,7 @@ export function App() {
         open={m?.kind === 'settings'}
         onClose={close}
         initialTab={m?.kind === 'settings' ? m.tab : undefined}
+        onShowCompanion={showCompanion}
       />
       <ProDialog />
 

@@ -57,7 +57,12 @@ export interface MediaInfo {
 }
 
 /** Auto-update (electron/updater.cjs). 'disabled' = no update channel in this build. */
-export type UpdateStatus = 'disabled' | 'idle' | 'checking' | 'none' | 'available' | 'downloading' | 'ready' | 'error';
+export type UpdateStatus = 'disabled' | 'idle' | 'checking' | 'none' | 'downloading' | 'ready' | 'error';
+
+/** Sent once per version when the update finished downloading (`todome:update-ready`). */
+export interface UpdateReady {
+  version?: string;
+}
 
 export interface UpdateState {
   status: UpdateStatus;
@@ -96,11 +101,13 @@ export interface DesktopBridge {
   contactSend(payload: { topic: ContactTopic; message: string; replyTo?: string }): Promise<ContactResult>;
   updateState(): Promise<UpdateState>;
   updateCheck(): Promise<UpdateState>;
-  /** Downloads the update found by the last check (status 'available'). */
-  updateDownload(): Promise<UpdateState>;
   updateSetAuto(auto: boolean): Promise<UpdateState>;
   updateInstall(): void;
   onUpdate(callback: (state: UpdateState) => void): () => void;
+  /** The update is downloaded and waits for a restart. Returns the unsubscribe function. */
+  onUpdateReady(callback: (ready: UpdateReady) => void): () => void;
+  /** Saves, quits and installs the downloaded update. False when none is waiting. */
+  restartAndInstall(): Promise<boolean>;
   setStatus(status: { text: string; attention: boolean }): void;
   setTheme(theme: ThemePreference): void;
   onPower(callback: (event: PowerEvent) => void): () => void;

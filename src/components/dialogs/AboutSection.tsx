@@ -8,7 +8,7 @@ import { TELEMETRY_LABEL } from '../../services/telemetry';
 
 /** Settings → Über: version, updates, privacy notice and Impressum. */
 export function AboutSection() {
-  const { state, check, download, setAuto, install } = useUpdates();
+  const { state, check, setAuto, install } = useUpdates();
   const services = useServices();
   const { settings } = useAppState();
   const [version, setVersion] = useState('');
@@ -41,10 +41,6 @@ export function AboutSection() {
           {state?.status === 'ready' ? (
             <button type="button" className="btn btn--primary btn--small" onClick={install}>
               Jetzt neu starten und installieren
-            </button>
-          ) : state?.status === 'available' ? (
-            <button type="button" className="btn btn--primary btn--small" onClick={download}>
-              Update herunterladen
             </button>
           ) : (
             <button type="button" className="btn btn--small" disabled={!active || busy} onClick={check}>

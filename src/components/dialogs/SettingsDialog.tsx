@@ -36,6 +36,8 @@ interface Props {
   onClose: () => void;
   /** Open on a specific tab (e.g. straight to the companion from the water card). */
   initialTab?: SettingsTab;
+  /** Switch to the "Begleiter" tab (its intro replays there). */
+  onShowCompanion?: () => void;
 }
 
 const TABS: Array<{ id: SettingsTab; label: string }> = [
@@ -88,7 +90,7 @@ const tabPill = (i: number) => ({ '--i': i, '--c4': i % 4, '--r4': Math.floor(i 
 
 const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minuten-Takt', fifteen: '15-Minuten-Takt' };
 
-export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props) {
+export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCompanion }: Props) {
   const [tab, setTab] = useState<SettingsTab>(initialTab);
   const [contactOpen, setContactOpen] = useState(false);
   // The companion tour can point to a tab without reopening the sheet.
@@ -224,7 +226,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
               {desktop && <DesktopSection />}
         <section className="feedback-sec">
           <h3>Hilfe</h3>
-          <p className="muted small">{avatarName(s.companion.avatar)} zeigt dir in einer Minute, wo alles ist.</p>
+          <p className="muted small">{avatarName(s.companion.avatar)} zeigt dir in einer Minute, wo alles ist, und erzählt dir im Begleiter-Reiter, wie ihr zusammen wachst.</p>
           <div className="row">
             <button
               type="button"
@@ -235,6 +237,17 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
               }}
             >
               Rundgang mit {avatarName(s.companion.avatar)} starten
+            </button>
+            <button
+              type="button"
+              className="pill pill--sm"
+              onClick={() => {
+                set({ companionIntroSeen: false });
+                onShowCompanion?.();
+                onClose();
+              }}
+            >
+              Begleiter-Intro erneut zeigen
             </button>
           </div>
         </section>

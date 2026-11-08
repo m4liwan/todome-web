@@ -1,0 +1,180 @@
+/* ========================================================================
+   Companion intro in the hub ("Begleiter"): the companion and its glass
+   speech bubble at the bottom edge, three short steps. The hub itself dims
+   everything but the part being talked about (companion-hub.css).
+   ======================================================================== */
+
+.hub-intro {
+  position: fixed;
+  inset: auto 0 clamp(16px, 4vh, 36px);
+  width: min(500px, calc(100vw - 32px));
+  max-width: none;
+  max-height: none;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  overflow: visible;
+  -webkit-app-region: no-drag;
+}
+/* Author styles beat the browser's own `dialog:not([open])`, so only an
+   open intro takes up room. */
+.hub-intro[open] {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: end;
+  gap: 14px;
+  animation: fade-up 0.45s var(--ease-out) both;
+}
+/* The hub does the dimming: the part being explained stays fully bright. */
+.hub-intro::backdrop {
+  background: transparent;
+}
+.hub-intro:focus {
+  outline: none;
+}
+.hub-intro.is-leaving {
+  animation: backdrop-out 0.18s ease both;
+  pointer-events: none;
+}
+
+.hub-intro__buddy {
+  position: relative;
+  width: 64px;
+  margin-bottom: 6px;
+  animation: tour-idle 3.6s ease-in-out infinite;
+}
+.hub-intro__buddy > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hub-intro__buddy::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 40px;
+  height: 8px;
+  margin-left: -20px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.22), transparent);
+}
+
+.hub-intro__bubble {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 18px 20px 16px;
+  border-radius: 22px;
+  /* Glass look on a solid base: the hub behind never shows through the text. */
+  background: linear-gradient(160deg, var(--glass-sheen), transparent 45%),
+    linear-gradient(var(--surface-strong), var(--surface-strong)),
+    var(--bg);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--glass-inset), var(--shadow-lg);
+}
+/* The little tail points at the companion. */
+.hub-intro__bubble::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  bottom: 26px;
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(var(--surface-strong), var(--surface-strong)), var(--bg);
+  border: 1px solid var(--glass-edge);
+  border-right: 0;
+  border-top: 0;
+  border-radius: 0 0 0 5px;
+  transform: rotate(45deg);
+}
+.hub-intro__who {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+.hub-intro__say {
+  display: grid;
+  gap: 8px;
+  animation: fade-in 0.35s ease both;
+}
+.hub-intro__title {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+.hub-intro__text {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+.hub-intro__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+.hub-intro__dots {
+  display: flex;
+  gap: 5px;
+  margin-right: auto;
+}
+.hub-intro__dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  transition: background-color 0.4s ease,
+    transform 0.4s var(--ease-out);
+}
+.hub-intro__dots i.is-done {
+  background: rgb(var(--accent-2-rgb) / 0.55);
+}
+.hub-intro__dots i.is-on {
+  background: var(--accent-2);
+  transform: scale(1.35);
+}
+.hub-intro__skip {
+  font-size: 0.84rem;
+  color: var(--ink-2);
+}
+.hub-intro__next {
+  min-width: 96px;
+}
+
+/* Calm (effects off, low battery) or reduced motion: everything just appears. */
+.hub-intro.is-still[open],
+.hub-intro.is-still .hub-intro__buddy,
+.hub-intro.is-still .hub-intro__say {
+  animation: none;
+}
+.hub-intro.is-still .hub-intro__dots i {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hub-intro[open],
+  .hub-intro__buddy,
+  .hub-intro__say {
+    animation: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .hub-intro[open] {
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .hub-intro__buddy {
+    width: 46px;
+  }
+  .hub-intro__bubble {
+    padding: 16px 16px 14px;
+  }
+}

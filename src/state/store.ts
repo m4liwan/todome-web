@@ -103,6 +103,8 @@ export function parseState(raw: string | null): AppState | null {
         ...settings,
         userContext: normalizeUserContext(settings.userContext),
         telemetryEnabled: settings.telemetryEnabled === true,
+        // Shown once to everyone, including people updating from before the hub.
+        companionIntroSeen: settings.companionIntroSeen === true,
         companion: {
           ...DEFAULT_COMPANION,
           ...(companion as Partial<AppState['settings']['companion']>),

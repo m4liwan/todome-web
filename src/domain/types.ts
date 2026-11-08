@@ -295,6 +295,8 @@ export interface Settings {
   onboarded: boolean;
   /** The companion's guided tour through the interface was shown. */
   tourDone: boolean;
+  /** The companion's short intro in the "Begleiter" hub was finished or skipped. */
+  companionIntroSeen: boolean;
   theme: ThemePreference;
   tone: Tone;
   /** HH:MM local time. */

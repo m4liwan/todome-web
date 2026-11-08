@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { hasPro } from '../app/pro';
 import { avatarName } from '../domain/companion';
 import {
@@ -19,6 +19,7 @@ import { useEffectsMode } from '../lib/effects';
 import { dayKey } from '../lib/time';
 import { Avatar } from './Avatar';
 import { AvatarFx, holoFor } from './AvatarFx';
+import { CompanionIntro, type IntroSpot } from './CompanionIntro';
 import { IconCheck, IconFlame, IconLock, IconSnowflake } from './icons';
 
 /**
@@ -77,7 +78,19 @@ const TIER_LINE: Record<EffectTier, (name: string) => string> = {
   shiny: (n) => `${n} schimmert legendär. Ihr seid ein eingespieltes Team.`,
 };
 
-export function CompanionHub({ state, now }: { state: AppState; now: Millis }) {
+/** The hub settles in first (its rise), then the companion starts talking. */
+export const INTRO_DELAY_MS = 700;
+
+interface HubProps {
+  state: AppState;
+  now: Millis;
+  /** Nothing else is asking for attention (tour, dialogs): the intro may start by itself. */
+  introReady?: boolean;
+  /** The intro was finished or skipped for the first time. */
+  onIntroSeen?: () => void;
+}
+
+export function CompanionHub({ state, now, introReady = false, onIntroSeen }: HubProps) {
   const { stats, daily } = state.progression;
   const avatar = state.settings.companion.avatar;
   const name = avatarName(avatar);
@@ -95,10 +108,23 @@ export function CompanionHub({ state, now }: { state: AppState; now: Millis }) {
   const trail = progressionTrail(path, stats.xp);
   // The energy pulses on the trail are an effect: only with effects on and nothing asking for calm.
   const live = useEffectsMode(fx) === 'full';
+  const intro = useHubIntro(introReady, state.settings.companionIntroSeen, onIntroSeen, live);
+  const spotOf = (part: IntroSpot) => (intro.spot === part ? ' is-spot' : '');
 
   return (
-    <section className="companion-hub rise" aria-label={`Dein Begleiter ${name}`}>
-      <div className={`companion-hub__hero card is-${tier}`}>
+    <section className={`companion-hub rise${intro.spot ? ' is-touring' : ''}`} aria-label={`Dein Begleiter ${name}`}>
+      <div ref={intro.refs.hero} className={`companion-hub__hero card is-${tier}${spotOf('hero')}`}>
+        <button
+          ref={intro.help}
+          type="button"
+          className="companion-hub__help"
+          onClick={intro.show}
+          aria-haspopup="dialog"
+          aria-label={`Was ist hier los? ${name} erklärt es dir`}
+          title={`${name} erklärt dir den Begleiter-Reiter`}
+        >
+          ?
+        </button>
         <div className="companion-hub__stage" aria-hidden="true">
           <AvatarFx level={progress.level} enabled={fx}>
             <Avatar id={avatar} mood="happy" size={184} holo={holoFor(progress.level, fx)} />
@@ -125,7 +151,7 @@ export function CompanionHub({ state, now }: { state: AppState; now: Millis }) {
         </div>
       </div>
 
-      <ul className="companion-hub__stats card" aria-label="Eure Zahlen">
+      <ul ref={intro.refs.stats} className={`companion-hub__stats card${spotOf('stats')}`} aria-label="Eure Zahlen">
         <li className={streak > 0 ? 'is-lit' : ''}>
           <span className="companion-hub__stat-label">
             <IconFlame size={16} /> Serie
@@ -167,7 +193,7 @@ export function CompanionHub({ state, now }: { state: AppState; now: Millis }) {
         </li>
       </ul>
 
-      <section className="companion-hub__path card" aria-labelledby="reward-path-title">
+      <section ref={intro.refs.path} className={`companion-hub__path card${spotOf('path')}`} aria-labelledby="reward-path-title">
         <header className="card__head">
           <div>
             <h2 id="reward-path-title">Euer Belohnungs-Pfad</h2>
@@ -180,8 +206,80 @@ export function CompanionHub({ state, now }: { state: AppState; now: Millis }) {
           ))}
         </ol>
       </section>
+
+      {intro.open && (
+        <CompanionIntro
+          avatar={avatar}
+          userName={state.settings.userName}
+          still={!live}
+          onStep={intro.onStep}
+          onSeen={intro.onSeen}
+          onClose={intro.hide}
+        />
+      )}
     </section>
   );
+}
+
+/**
+ * When the intro shows and what it lights up. It starts by itself once per
+ * visit while it was never seen and nothing else asks for attention; the `?`
+ * opens it any time. Afterwards the keyboard is back on the `?`.
+ */
+function useHubIntro(ready: boolean, seen: boolean, onSeenFirst: (() => void) | undefined, live: boolean) {
+  const [open, setOpen] = useState(false);
+  const [spot, setSpot] = useState<IntroSpot | null>(null);
+  const help = useRef<HTMLButtonElement>(null);
+  const hero = useRef<HTMLDivElement>(null);
+  const stats = useRef<HTMLUListElement>(null);
+  const path = useRef<HTMLElement>(null);
+  // Starting by itself happens once per visit, even if saving "seen" failed;
+  // a reset (settings) makes it eligible again.
+  const asked = useRef(false);
+  const wasOpen = useRef(false);
+
+  useEffect(() => {
+    if (seen) asked.current = false;
+  }, [seen]);
+
+  useEffect(() => {
+    if (seen || !ready || open || asked.current) return;
+    const t = window.setTimeout(() => {
+      asked.current = true;
+      setOpen(true);
+    }, INTRO_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [seen, ready, open]);
+
+  useEffect(() => {
+    if (open) {
+      wasOpen.current = true;
+      return;
+    }
+    if (!wasOpen.current) return;
+    wasOpen.current = false;
+    help.current?.focus({ preventScroll: true });
+  }, [open]);
+
+  const onStep = useCallback(
+    (part: IntroSpot) => {
+      setSpot(part);
+      const el = { hero, stats, path }[part].current;
+      // From its top edge, just below the header (scroll-margin); the bubble sits at the bottom.
+      if (el && 'scrollIntoView' in el) el.scrollIntoView({ block: 'start', behavior: live ? 'smooth' : 'auto' });
+    },
+    [live],
+  );
+  const onSeen = useCallback(() => {
+    if (!seen) onSeenFirst?.();
+  }, [seen, onSeenFirst]);
+  const show = useCallback(() => setOpen(true), []);
+  const hide = useCallback(() => {
+    setOpen(false);
+    setSpot(null);
+  }, []);
+
+  return { open, spot, help, refs: { hero, stats, path }, onStep, onSeen, show, hide };
 }
 
 /** Fills once from empty when the hub opens (and again after each level-up), then follows each gain. */

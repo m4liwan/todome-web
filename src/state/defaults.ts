@@ -49,6 +49,7 @@ export const DEFAULT_SETTINGS: Settings = {
   userName: '',
   onboarded: false,
   tourDone: false,
+  companionIntroSeen: false,
   // New installs follow Windows (light or dark) right from the first frame.
   theme: 'system',
   tone: 'direct',
