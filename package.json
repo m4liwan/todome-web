@@ -45,6 +45,19 @@
     ],
     "asar": true,
     "npmRebuild": false,
+    "electronLanguages": [
+      "de",
+      "en-US"
+    ],
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "onlyLoadAppFromAsar": true,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "enableCookieEncryption": true,
+      "grantFileProtocolExtraPrivileges": false
+    },
     "win": {
       "target": [
         {
@@ -100,6 +113,7 @@
     "globals": "^17.14.0",
     "jsdom": "^25.0.1",
     "postcss": "^8.5.32",
+    "posthog-js": "^1.438.19",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "typescript": "^5.9.3",
@@ -109,7 +123,6 @@
     "vitest": "^2.1.9"
   },
   "dependencies": {
-    "electron-updater": "^6.8.11",
-    "posthog-js": "1.438.19"
+    "electron-updater": "^6.8.11"
   }
 }

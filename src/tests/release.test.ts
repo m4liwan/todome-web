@@ -85,4 +85,20 @@ describe('release guard', () => {
     expect(JSON.stringify(config.win)).not.toMatch(/publisherName|signtoolOptions|azureSignOptions/);
     expect(config.publish[0]).toMatchObject({ provider: 'github', owner: 'm4liwan', repo: 'todome-web', releaseType: 'draft' });
   });
+
+  it('ships only what the main process needs, hardened (fuses) and with two locales', () => {
+    const pkg = require('../../package.json');
+    // The renderer bundles PostHog itself; as a runtime dependency it would copy ~25 MB into app.asar.
+    expect(Object.keys(pkg.dependencies)).toEqual(['electron-updater']);
+    expect(pkg.build.electronLanguages).toEqual(['de', 'en-US']);
+    expect(pkg.build.electronFuses).toMatchObject({
+      runAsNode: false,
+      enableNodeOptionsEnvironmentVariable: false,
+      enableNodeCliInspectArguments: false,
+      onlyLoadAppFromAsar: true,
+      enableEmbeddedAsarIntegrityValidation: true,
+    });
+    const config = loadReleaseConfig({ TODOME_ALLOW_UNSIGNED: 'true', TODOME_RELEASE_OWNER: 'm4liwan', TODOME_RELEASE_REPO: 'todome-web' });
+    expect(config.electronFuses).toEqual(pkg.build.electronFuses);
+  });
 });
