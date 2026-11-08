@@ -11,6 +11,8 @@ interface Props {
   title?: string;
   /** Tight, optically centred framing for small round badges (no floor shadow). */
   crop?: boolean;
+  /** Level 50 look: an iridescent foil, clipped exactly to the figure. */
+  holo?: boolean;
 }
 
 /**
@@ -18,7 +20,7 @@ interface Props {
  * (Spike, Mark, Bit, Spark, Kiki, Pixie) and two in Pro (Keimi, Woody).
  * Eyes and mouth change with the mood; bob and blink are CSS animations.
  */
-export function Avatar({ id, mood = 'happy', size = 96, animated = true, title, crop = false }: Props) {
+export function Avatar({ id, mood = 'happy', size = 96, animated = true, title, crop = false, holo = false }: Props) {
   const uid = useId().replace(/:/g, '');
   const g = (name: string) => `${name}-${uid}`;
   const label = title ?? avatarName(id);
@@ -94,6 +96,7 @@ export function Avatar({ id, mood = 'happy', size = 96, animated = true, title, 
       {!crop && <ellipse className="avatar__shadow" cx="60" cy="112" rx="30" ry="5" fill={`url(#${g('shadow')})`} />}
 
       <g className="avatar__body">
+        <g id={g('figure')}>
         {id === 'spike' && (
           <>
             {/* arms behind the body */}
@@ -253,7 +256,8 @@ export function Avatar({ id, mood = 'happy', size = 96, animated = true, title, 
             <Face mood={mood} cx={60} cy={80} spread={12} ink="#5A2E1C" />
           </>
         )}
-
+        </g>
+        {holo && <HoloFoil g={g} />}
       </g>
 
       {mood === 'sleepy' && (
@@ -263,6 +267,72 @@ export function Avatar({ id, mood = 'happy', size = 96, animated = true, title, 
         </g>
       )}
     </svg>
+  );
+}
+
+/**
+ * Holofoil: a rainbow foil and a slow sheen, masked by the figure's own
+ * silhouette (alpha mask of a <use> of the figure), so it never spills onto
+ * the background. Sits inside the body group and bobs along with it.
+ */
+function HoloFoil({ g }: { g: (name: string) => string }) {
+  return (
+    <>
+      <defs>
+        {/* Two rainbow cycles over a foil twice the figure's size: it can shift under the pointer without ever showing an edge. */}
+        <linearGradient id={g('holo')} gradientUnits="userSpaceOnUse" x1="-60" y1="-60" x2="180" y2="180">
+          <stop offset="0" stopColor="#FF8AD8" />
+          <stop offset="0.12" stopColor="#FFE27A" />
+          <stop offset="0.24" stopColor="#8CF5C4" />
+          <stop offset="0.36" stopColor="#7CC8FF" />
+          <stop offset="0.48" stopColor="#C49BFF" />
+          <stop offset="0.6" stopColor="#FF8AD8" />
+          <stop offset="0.72" stopColor="#FFE27A" />
+          <stop offset="0.84" stopColor="#8CF5C4" />
+          <stop offset="1" stopColor="#7CC8FF" />
+        </linearGradient>
+        <linearGradient id={g('holo-sheen')} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0.42" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.5" stopColor="#fff" stopOpacity="0.95" />
+          <stop offset="0.58" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        {/* Light that follows the pointer: a crisp streak with a soft edge, and a glare spot. */}
+        <linearGradient id={g('holo-streak')} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0.4" stopColor="#fff" stopOpacity="0" />
+          <stop offset="0.46" stopColor="#fff" stopOpacity="0.45" />
+          <stop offset="0.5" stopColor="#fff" stopOpacity="1" />
+          <stop offset="0.54" stopColor="#fff" stopOpacity="0.45" />
+          <stop offset="0.6" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id={g('holo-glare')}>
+          <stop offset="0" stopColor="#fff" stopOpacity="1" />
+          <stop offset="0.45" stopColor="#fff" stopOpacity="0.62" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </radialGradient>
+        <mask id={g('holo-mask')} maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="120" style={{ maskType: 'alpha' }}>
+          <use href={`#${g('figure')}`} />
+        </mask>
+      </defs>
+      {/*
+        Foil and sheen tint the figure (overlay); streak and glare are light
+        on top of it (screen). On its own the sheen sweeps by itself; inside
+        <AvatarFx> with the pointer near, the foil shifts against the pointer
+        while streak and glare follow it (CSS variables --fx-x/--fx-y).
+        The tilts live on groups: a CSS translate would replace a transform attribute.
+      */}
+      <g className="avatar__holo" mask={`url(#${g('holo-mask')})`}>
+        <rect className="avatar__holo-foil" x="-60" y="-60" width="240" height="240" fill={`url(#${g('holo')})`} opacity="0.6" />
+        <g transform="rotate(-18 60 60)">
+          <rect className="avatar__holo-sheen" x="-120" y="-20" width="240" height="160" fill={`url(#${g('holo-sheen')})`} />
+        </g>
+      </g>
+      <g className="avatar__holo-light" mask={`url(#${g('holo-mask')})`}>
+        <g transform="rotate(-18 60 60)">
+          <rect className="avatar__holo-streak" x="-120" y="-20" width="240" height="160" fill={`url(#${g('holo-streak')})`} />
+        </g>
+        <circle className="avatar__holo-glare" cx="60" cy="60" r="36" fill={`url(#${g('holo-glare')})`} />
+      </g>
+    </>
   );
 }
 

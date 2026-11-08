@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { hasPro, openPro } from '../app/pro';
+import { openPro } from '../app/pro';
+import { canUseFeature } from '../app/progression';
 import { calmStats } from '../domain/calm';
 import type { SessionProjection } from '../domain/session';
 import type { AppState, Millis } from '../domain/types';
@@ -7,12 +8,13 @@ import { formatDuration } from '../lib/time';
 import { IconLock } from './icons';
 
 /**
- * Anti-Hustle statistics (Pro): what you protected this week instead of how
- * many tasks you ticked off. Free users see a soft, frosted preview.
+ * Anti-Hustle statistics (Pro, or free from companion level 5): what you
+ * protected this week instead of how many tasks you ticked off. Until then a
+ * soft, frosted preview.
  */
 export function CalmStats({ state, projections, now }: { state: AppState; projections: SessionProjection[]; now: Millis }) {
   const s = useMemo(() => calmStats(state, projections, now), [state, projections, now]);
-  const pro = hasPro();
+  const pro = canUseFeature(state, 'advanced_stats');
   const tiles = [
     { label: 'Geschützte Fokuszeit', value: formatDuration(s.protectedMs), note: 'in Blöcken, in die nichts hineingeplatzt ist' },
     { label: 'Längster ruhiger Block', value: formatDuration(s.longestMs), note: 'am Stück, ohne Unterbrechung' },
@@ -48,7 +50,7 @@ export function CalmStats({ state, projections, now }: { state: AppState; projec
             <IconLock size={12} />
             Pro
           </span>
-          <p>Geschützte Fokuszeit, ruhige Blöcke, geparkte Gedanken und Atempausen auf einen Blick.</p>
+          <p>Geschützte Fokuszeit, ruhige Blöcke, geparkte Gedanken und Atempausen auf einen Blick. Ab Level 5 deines Begleiters frei, oder sofort mit Pro.</p>
           <button type="button" className="pill pill--sm" onClick={() => openPro('stats')}>
             Vorschau ansehen
           </button>

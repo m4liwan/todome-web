@@ -29,10 +29,12 @@ contextBridge.exposeInMainWorld('todome', {
   contactSend: (payload) => ipcRenderer.invoke('todome:contact-send', payload),
   updateState: () => ipcRenderer.invoke('todome:update-get'),
   updateCheck: () => ipcRenderer.invoke('todome:update-check'),
-  updateDownload: () => ipcRenderer.invoke('todome:update-download'),
   updateSetAuto: (auto) => ipcRenderer.invoke('todome:update-auto', auto === true),
   updateInstall: () => ipcRenderer.send('todome:update-install'),
   onUpdate: (callback) => subscribe('todome:update', callback),
+  // update-downloaded → companion offer; returns the unsubscribe function.
+  onUpdateReady: (callback) => subscribe('todome:update-ready', callback),
+  restartAndInstall: () => ipcRenderer.invoke('todome:restart-and-install'),
   setStatus: (status) => ipcRenderer.send('todome:status', status),
   setTheme: (theme) => ipcRenderer.send('todome:set-theme', theme),
   onPower: (callback) => subscribe('todome:power', callback),

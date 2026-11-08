@@ -12,6 +12,7 @@ import { dayKey, formatDuration, formatTime, HOUR } from '../lib/time';
 import { createTask } from '../state/commands';
 import { dissolveText } from '../lib/dissolve';
 import { AvatarScene } from './AvatarScene';
+import { AvatarFx, holoFor } from './AvatarFx';
 import { IconArrowUpRight, IconCheck, IconClose, IconPlus, IconChat } from './icons';
 
 /* ------------------------------------------------------------------------
@@ -459,7 +460,9 @@ export function CompanionHome({ state, now, fgTaskId, onCustomize }: { state: Ap
       <div className="home-hub__space" aria-hidden="true" />
       <div className="home-hub__house">
         <div className="home-hub__glow" aria-hidden="true" />
-        <AvatarScene avatar={avatar} activity={activity} size={190} />
+        <AvatarFx level={state.progression.stats.level} enabled={state.settings.appearance.companionFx}>
+          <AvatarScene avatar={avatar} activity={activity} size={190} holo={holoFor(state.progression.stats.level, state.settings.appearance.companionFx)} />
+        </AvatarFx>
         <div className="home-hub__floor" aria-hidden="true" />
       </div>
       <div className="home-hub__info">

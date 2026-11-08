@@ -655,3 +655,115 @@
     opacity: 1;
   }
 }
+
+/* Companion hub: the "+15" rising from the level badge, the level-up pop. */
+@keyframes xp-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -16px);
+  }
+}
+@keyframes level-pop {
+  40% {
+    transform: scale(1.25);
+  }
+}
+
+/* Avatar effects (level looks): only opacity and individual transforms. */
+@keyframes fx-aura {
+  0%,
+  100% {
+    opacity: 0.55;
+    scale: 0.94;
+  }
+  50% {
+    opacity: 0.9;
+    scale: 1.04;
+  }
+}
+@keyframes fx-wash {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes fx-dust {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+    scale: 0.4;
+  }
+  18% {
+    opacity: 1;
+    scale: 1;
+  }
+  50% {
+    translate: calc(var(--dx, 0) * -0.35cqmin) calc(var(--rise, 50) * -0.5cqmin);
+  }
+  72% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    translate: calc(var(--dx, 0) * 1cqmin) calc(var(--rise, 50) * -1cqmin);
+    scale: 0.55;
+  }
+}
+@keyframes trail-pulse {
+  0% {
+    translate: 0 -100%;
+  }
+  70%,
+  100% {
+    translate: 0 250%;
+  }
+}
+@keyframes badge-shine {
+  0% {
+    translate: -110% 0;
+  }
+  18%,
+  100% {
+    translate: 110% 0;
+  }
+}
+@keyframes fx-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes fx-sparkle {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+    scale: 0.2;
+  }
+  35% {
+    opacity: 1;
+    scale: var(--s, 1);
+  }
+  100% {
+    opacity: 0;
+    translate: 0 calc(var(--d, 45) * -1cqmin);
+    scale: 0.3;
+  }
+}
+@keyframes avatar-holo-sweep {
+  0% {
+    translate: -40px 0;
+  }
+  45%,
+  100% {
+    translate: 160px 0;
+  }
+}

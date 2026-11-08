@@ -1,4 +1,5 @@
 import type { AppState, AppearanceSettings, CompanionSettings, MediaSettings, OverlaySettings, Settings, Wellbeing } from '../domain/types';
+import { emptyProgression } from '../domain/companionProgression';
 
 export const DEFAULT_COMPANION: CompanionSettings = {
   enabled: true,
@@ -32,7 +33,7 @@ export const DEFAULT_WELLBEING: Wellbeing = {
   feelLog: {},
 };
 
-export const DEFAULT_APPEARANCE: AppearanceSettings = { palette: 'lime', ambience: 'none', layout: 'hub', standby: 'calm', xmas: 'december', focusStyle: 'breathe', sound: false, soundVolume: 0.5, timeline: 'wave' };
+export const DEFAULT_APPEARANCE: AppearanceSettings = { palette: 'lime', ambience: 'none', layout: 'hub', standby: 'calm', xmas: 'december', focusStyle: 'breathe', sound: false, soundVolume: 0.5, timeline: 'wave', companionFx: true };
 
 export const DEFAULT_MEDIA: MediaSettings = { enabled: true, inTopbar: false, rev: 2 };
 
@@ -48,6 +49,7 @@ export const DEFAULT_SETTINGS: Settings = {
   userName: '',
   onboarded: false,
   tourDone: false,
+  companionIntroSeen: false,
   // New installs follow Windows (light or dark) right from the first frame.
   theme: 'system',
   tone: 'direct',
@@ -95,5 +97,6 @@ export function emptyState(): AppState {
     weather: null,
     thoughts: [],
     archive: [],
+    progression: emptyProgression(),
   };
 }

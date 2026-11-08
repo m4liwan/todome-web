@@ -6,11 +6,15 @@ import type { AppState } from '../domain/types';
 import { desktop } from '../lib/desktop';
 import { dayKey } from '../lib/time';
 import { IconBell, IconBellOff, IconMoon, IconPlay, IconSettings, IconSun } from './icons';
+import { LevelBadge } from './LevelBadge';
 import { Logo } from './Logo';
 import { MediaControl } from './MediaControl';
 import { contextLabels } from '../domain/userContext';
 
-export type View = 'today' | 'times' | 'closing';
+export type View = 'today' | 'times' | 'companion' | 'closing';
+
+/** Position of each tab in the segmented nav (the sliding pill follows it). */
+const TAB_INDEX: Partial<Record<View, number>> = { today: 0, times: 1, companion: 2 };
 
 interface Props {
   state: AppState;
@@ -22,7 +26,7 @@ interface Props {
 }
 
 /**
- * Header in three equal columns: logo left, "Heute / Rückblick" in the exact
+ * Header in three equal columns: logo left, "Heute / Rückblick / Begleiter" in the exact
  * centre, the tools (one glass pill) and the main action right.
  */
 export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
@@ -47,13 +51,22 @@ export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
           )}
         </div>
 
-        <nav className="segnav" aria-label="Ansicht" data-active={view === 'times' ? 1 : view === 'today' ? 0 : -1}>
+        <nav className="segnav" aria-label="Ansicht" data-active={TAB_INDEX[view] ?? -1}>
           <span className="segnav__pill" aria-hidden="true" />
           <button type="button" className={view === 'today' ? 'is-active' : ''} aria-current={view === 'today' ? 'page' : undefined} onClick={() => onView('today')}>
             Heute
           </button>
           <button type="button" className={view === 'times' ? 'is-active' : ''} aria-current={view === 'times' ? 'page' : undefined} onClick={() => onView('times')}>
             Rückblick
+          </button>
+          <button
+            type="button"
+            className={view === 'companion' ? 'is-active' : ''}
+            aria-current={view === 'companion' ? 'page' : undefined}
+            onClick={() => onView('companion')}
+          >
+            Begleiter
+            <LevelBadge level={state.progression.stats.level} />
           </button>
         </nav>
 

@@ -5,6 +5,7 @@ import { normalizeUserContext } from '../domain/userContext';
 import { DEFAULT_APPEARANCE, DEFAULT_COMPANION, DEFAULT_MEDIA, DEFAULT_OVERLAY, DEFAULT_SETTINGS, DEFAULT_WELLBEING, emptyState } from './defaults';
 import type { Task } from '../domain/types';
 import { normalizeAvatar } from '../domain/companion';
+import { sanitizeProgression } from '../domain/companionProgression';
 import { reduceAll, type Action } from './reducer';
 
 export interface Store {
@@ -40,6 +41,8 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   if (!isRecord(raw) || !('layout' in raw)) a.layout = 'classic';
   const p = String(a.palette);
   a.palette = RETIRED_PALETTES[p] ?? (PALETTES.has(p) ? a.palette : 'lime');
+  // 2.x: level effects arrive switched on; only a real choice survives.
+  if (typeof a.companionFx !== 'boolean') a.companionFx = DEFAULT_APPEARANCE.companionFx;
   return a;
 }
 
@@ -100,6 +103,8 @@ export function parseState(raw: string | null): AppState | null {
         ...settings,
         userContext: normalizeUserContext(settings.userContext),
         telemetryEnabled: settings.telemetryEnabled === true,
+        // Shown once to everyone, including people updating from before the hub.
+        companionIntroSeen: settings.companionIntroSeen === true,
         companion: {
           ...DEFAULT_COMPANION,
           ...(companion as Partial<AppState['settings']['companion']>),
@@ -122,6 +127,8 @@ export function parseState(raw: string | null): AppState | null {
       archive: Array.isArray(data.archive)
         ? (data.archive as AppState['archive']).filter((a) => isRecord(a) && typeof a.day === 'string' && Number.isFinite(a.netMs))
         : [],
+      // Checked field by field: a broken progression never costs the rest of the data.
+      progression: sanitizeProgression(data.progression),
     };
   } catch {
     return null;

@@ -14,6 +14,9 @@ import {
   feelMessage,
   FEEL_REPLIES,
   avatarName,
+  canOfferUpdate,
+  updateReadyMessage,
+  UPDATE_RESTART,
 } from '../domain/companion';
 import { promptFor, type AnswerId } from '../domain/copy';
 import { foregroundSession, projectAll } from '../domain/session';
@@ -196,6 +199,20 @@ export function handleCompanionReply(services: Services, openModal: OpenModal, m
       }
       return;
     }
+    case 'update': {
+      if (optionId !== UPDATE_RESTART) {
+        services.announce('Alles klar. Das Update wird beim nächsten Beenden installiert.');
+        return;
+      }
+      // The main process asks the app to save first, then quits and installs.
+      void desktop
+        ?.restartAndInstall()
+        .then((started) => {
+          if (!started) services.announce('Das Update ist gerade nicht bereit. Unter Einstellungen → Über kannst du erneut nachsehen.');
+        })
+        .catch(() => services.announce('Der Neustart hat nicht geklappt. Das Update wird beim nächsten Beenden installiert.'));
+      return;
+    }
     default:
       return;
   }
@@ -249,5 +266,63 @@ export function useCompanion(openModal: OpenModal): void {
     };
     const timer = window.setInterval(tick, 3000);
     return () => window.clearInterval(timer);
+  }, [services]);
+}
+
+/** How often a waiting update offer looks for a free moment (companion busy, meeting). */
+const UPDATE_RETRY_MS = 5000;
+
+/**
+ * Update downloaded in the background → the companion offers the restart,
+ * once per version. If the companion is busy (an open check-in) or the user
+ * is in a meeting, the offer waits for the next free moment instead of
+ * pushing a question aside. With the companion off, useUpdateNotice speaks.
+ */
+export function useUpdateCompanion(): void {
+  const services = useServices();
+
+  useEffect(() => {
+    if (!desktop || isCompanionView) return;
+    const bridge = desktop;
+    let alive = true;
+    /** Version waiting for a free moment ('' = unknown version), or null. */
+    let pending: string | null = null;
+    /** Version already offered in this session. */
+    let offered: string | null = null;
+
+    const offer = () => {
+      if (!alive || pending === null) return;
+      const state = services.store.getState();
+      // Companion switched off meanwhile: the in-app notice takes over.
+      if (!state.settings.companion.enabled) {
+        pending = null;
+        return;
+      }
+      if (!canOfferUpdate(state, services.clock.now()) || isCompanionBusy(Date.now())) return;
+      deliverCompanion(services, updateReadyMessage(services.deps().newId(), state.settings.companion.avatar, pending || undefined));
+      offered = pending;
+      pending = null;
+    };
+
+    const onReady = (version: string | undefined) => {
+      const key = version ?? '';
+      if (key === offered || key === pending) return;
+      pending = key;
+      offer();
+    };
+
+    const unsubscribe = bridge.onUpdateReady((r) => onReady(r.version));
+    // Downloaded before this window (re)loaded? Then the event is long gone.
+    bridge
+      .updateState()
+      .then((s) => s.status === 'ready' && onReady(s.version))
+      .catch(() => undefined);
+    const timer = window.setInterval(offer, UPDATE_RETRY_MS);
+
+    return () => {
+      alive = false;
+      unsubscribe();
+      window.clearInterval(timer);
+    };
   }, [services]);
 }

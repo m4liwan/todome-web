@@ -4,7 +4,7 @@ import { useServices } from '../../app/services';
 import type { AmbienceId, Client, LayoutId, PaletteId, Rounding, Settings, Tone } from '../../domain/types';
 import { desktop } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
-import { freeState, hasPro, isProLayout, isProPalette, openPro } from '../../app/pro';
+import { freeState, hasPro, isProLayout, isProPalette, openPro, themesUnlocked } from '../../app/pro';
 import { IconChat, IconLock } from '../icons';
 import { companionHello } from '../../app/companion';
 import { avatarName } from '../../domain/companion';
@@ -20,7 +20,7 @@ import { Select } from '../Select';
 import { AboutSection } from './AboutSection';
 import { ContactDialog } from './ContactDialog';
 import { downloadBackup } from '../../app/backup';
-import { AmbienceSoundField, BrainSection, TimelineStyleField, MediaSection, MoodSection, OverlaySection, StandbySection } from './SettingsSections';
+import { AmbienceSoundField, BrainSection, CompanionFxSection, TimelineStyleField, MediaSection, MoodSection, OverlaySection, StandbySection } from './SettingsSections';
 import { USER_CONTEXTS, businessShown, contextLabels, normalizeUserContext, type ContextLabels } from '../../domain/userContext';
 
 export type SettingsTab = 'general' | 'companion' | 'design' | 'overlay' | 'media' | 'data' | 'about';
@@ -36,6 +36,8 @@ interface Props {
   onClose: () => void;
   /** Open on a specific tab (e.g. straight to the companion from the water card). */
   initialTab?: SettingsTab;
+  /** Switch to the "Begleiter" tab (its intro replays there). */
+  onShowCompanion?: () => void;
 }
 
 const TABS: Array<{ id: SettingsTab; label: string }> = [
@@ -88,7 +90,7 @@ const tabPill = (i: number) => ({ '--i': i, '--c4': i % 4, '--r4': Math.floor(i 
 
 const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minuten-Takt', fifteen: '15-Minuten-Takt' };
 
-export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props) {
+export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCompanion }: Props) {
   const [tab, setTab] = useState<SettingsTab>(initialTab);
   const [contactOpen, setContactOpen] = useState(false);
   // The companion tour can point to a tab without reopening the sheet.
@@ -104,6 +106,8 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
   const state = useAppState();
   const labels = contextLabels(state.settings.userContext);
   const s = state.settings;
+  // Level 15 of the companion opens the night worlds without Pro.
+  const themes = themesUnlocked(state);
   const set = (patch: Partial<Settings>) => services.store.dispatch({ type: 'settings/update', patch });
   const setCompanion = (patch: Partial<Settings['companion']>) => set({ companion: { ...s.companion, ...patch } });
   const fileRef = useRef<HTMLInputElement>(null);
@@ -222,7 +226,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
               {desktop && <DesktopSection />}
         <section className="feedback-sec">
           <h3>Hilfe</h3>
-          <p className="muted small">{avatarName(s.companion.avatar)} zeigt dir in einer Minute, wo alles ist.</p>
+          <p className="muted small">{avatarName(s.companion.avatar)} zeigt dir in einer Minute, wo alles ist, und erzählt dir im Begleiter-Reiter, wie ihr zusammen wachst.</p>
           <div className="row">
             <button
               type="button"
@@ -233,6 +237,17 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
               }}
             >
               Rundgang mit {avatarName(s.companion.avatar)} starten
+            </button>
+            <button
+              type="button"
+              className="pill pill--sm"
+              onClick={() => {
+                set({ companionIntroSeen: false });
+                onShowCompanion?.();
+                onClose();
+              }}
+            >
+              Begleiter-Intro erneut zeigen
             </button>
           </div>
         </section>
@@ -310,6 +325,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
             </button>
           </div>
         </section>
+              <CompanionFxSection />
             </>
           )}
           {tab === 'design' && (
@@ -337,10 +353,10 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
                 type="button"
                 role="radio"
                 aria-checked={s.appearance.palette === p.id}
-                aria-disabled={isProPalette(p.id) || undefined}
-                className={`palette${s.appearance.palette === p.id ? ' is-on' : ''}${isProPalette(p.id) ? ' is-pro' : ''}`}
+                aria-disabled={isProPalette(p.id, themes) || undefined}
+                className={`palette${s.appearance.palette === p.id ? ' is-on' : ''}${isProPalette(p.id, themes) ? ' is-pro' : ''}`}
                 onClick={() => {
-                  if (isProPalette(p.id)) return openPro('palettes');
+                  if (isProPalette(p.id, themes)) return openPro('palettes');
                   set({ appearance: { ...s.appearance, palette: p.id } });
                   // The cyber worlds are night worlds: they come with the dark design.
                   if (NIGHT_WORLDS.has(p.id) && s.theme !== 'dark') {
@@ -351,14 +367,14 @@ export function SettingsDialog({ open, onClose, initialTab = 'general' }: Props)
               >
                 <span className="palette__frame" aria-hidden="true">
                   <span className="palette__swatch" style={{ background: `radial-gradient(circle at 30% 30%, ${p.colors[1]}, transparent 60%), radial-gradient(circle at 75% 70%, ${p.colors[2]}, transparent 60%), ${p.colors[0]}` }} />
-                  {isProPalette(p.id) && (
+                  {isProPalette(p.id, themes) && (
                     <span className="pro-blur__lock">
                       <IconLock size={13} />
                     </span>
                   )}
                 </span>
                 <span>{p.label}</span>
-                {isProPalette(p.id) && <ProLock />}
+                {isProPalette(p.id, themes) && <ProLock />}
               </button>
             ))}
           </div>

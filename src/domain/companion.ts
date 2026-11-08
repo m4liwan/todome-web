@@ -11,7 +11,7 @@ import { atTimeOfDay, dayKey, MIN } from '../lib/time';
  * Planning is pure; delivery (desktop window or in-app bubble) lives in the app layer.
  */
 
-export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel';
+export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel' | 'update';
 export type Mood = 'happy' | 'curious' | 'calm' | 'alert' | 'sleepy';
 
 export interface CompanionOption {
@@ -45,7 +45,7 @@ export interface AvatarProfile {
   vibe: AvatarVibe;
   /** How the companion introduces itself (onboarding, hello). */
   intro: string;
-  /** A short, warm thank-you in its own voice (feedback sent, first tasks). */
+  /** A short, warm thank-you in its own words (feedback sent, first tasks). */
   thanks: string;
 }
 
@@ -321,6 +321,34 @@ export function helloMessage(id: Id, name: string, avatar: AvatarId): CompanionM
     options: [{ id: 'thanks', label: 'Hallo!', primary: true }],
     ttlMs: 15_000,
   };
+}
+
+/** Option ids of the update offer (routed in app/companion.ts). */
+export const UPDATE_RESTART = 'restart';
+export const UPDATE_LATER = 'later';
+
+/**
+ * The update finished downloading in the background: the companion offers a
+ * restart. "Später" is fine too, it then installs on the next quit.
+ */
+export function updateReadyMessage(id: Id, avatar: AvatarId, version?: string): CompanionMessage {
+  return {
+    id,
+    kind: 'update',
+    title: version ? `Update auf ${version}` : avatarName(avatar),
+    text: 'Hey! Ein neues Update ist bereit. Starte mich kurz neu! 🚀 Deine Daten werden vorher gespeichert.',
+    mood: 'happy',
+    options: [
+      { id: UPDATE_RESTART, label: 'Jetzt neu starten', primary: true },
+      { id: UPDATE_LATER, label: 'Später' },
+    ],
+    ttlMs: 120_000,
+  };
+}
+
+/** May the companion offer the update restart now? Never in a meeting (DND), never before the onboarding. */
+export function canOfferUpdate(state: AppState, now: Millis): boolean {
+  return state.settings.onboarded && state.settings.companion.enabled && quietReason(now, state.settings) !== 'dnd';
 }
 
 /** Motivation only after real progress, at most every 30 minutes. */

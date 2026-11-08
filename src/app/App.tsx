@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { ActiveSession } from '../components/ActiveSession';
 import { Ambience, resolveAmbience } from '../components/Ambience';
 import { ClosingView } from '../components/ClosingView';
+import { CompanionHub } from '../components/CompanionHub';
+import { useLegendaryShell } from '../components/AvatarFx';
 import { CompanionCard } from '../components/CompanionCard';
 import { InlineCompanion } from '../components/CompanionHost';
 import { DayPlan } from '../components/DayPlan';
@@ -38,7 +40,7 @@ import { TaskDialog } from '../components/dialogs/TaskDialog';
 import { ProDialog } from '../components/dialogs/ProDialog';
 import { openCheckIns } from '../domain/checkinEngine';
 import { dayKey, MIN } from '../lib/time';
-import { useCompanion } from './companion';
+import { useCompanion, useUpdateCompanion } from './companion';
 import { useDocumentTitle, useIdleDetection, usePowerEvents, useProjections, useScheduler } from './hooks';
 import type { Modal } from './modal';
 import { useOverlaySync } from './overlay';
@@ -164,6 +166,7 @@ export function App() {
   useWeatherSync();
   useUpdateNotice();
   useCompanion(setModal);
+  useUpdateCompanion();
   useSpotlight();
 
   const { state, now, projections, foreground } = useProjections();
@@ -243,6 +246,11 @@ export function App() {
       setModalRaw({ kind: 'first_tasks' });
     }
   }, [services, bridgeNext]);
+  // The companion's intro in its hub: shown once, replayable from the hub and the settings.
+  const markIntroSeen = useCallback(() => {
+    services.store.dispatch({ type: 'settings/update', patch: { companionIntroSeen: true } });
+  }, [services]);
+  const showCompanion = useCallback(() => setView('companion'), []);
   // Short lock after waking, so the same key press can never reopen it.
   const restLock = useRef(0);
   const wakeUp = useCallback(() => {
@@ -333,6 +341,8 @@ export function App() {
   // Focus style while a block runs: breathe / tunnel / cocoon / micro.
   const focusStyle = focusing ? state.settings.appearance.focusStyle : null;
   const winter = isWinterActive(state.settings.appearance.xmas, now);
+  // Level 50: the companion's shimmer touches the app (badge, header line), if the user wants it.
+  const legendary = useLegendaryShell(state.progression.stats.level, state.settings.appearance.companionFx);
   // Flow shows one calm stage: no vertical scrolling there.
   useEffect(() => {
     const lock = view === 'today' && layout === 'flow';
@@ -383,7 +393,7 @@ export function App() {
   );
 
   return (
-    <div className={`shell shell--${view} shell--${layout}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}`}>
+    <div className={`shell shell--${view} shell--${layout}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
       <div className="ambient" aria-hidden="true">
         <span />
         <span />
@@ -424,6 +434,11 @@ export function App() {
               <ReportPanel state={state} projections={projections} now={now} />
             </div>
           )}
+          {view === 'companion' && (
+            <div className="view-fade" key="companion">
+              <CompanionHub state={state} now={now} introReady={!tour && !modal && !breathe && !routine && !splash && !onboarding && !landing} onIntroSeen={markIntroSeen} />
+            </div>
+          )}
           {view === 'closing' && (
             <div className="view-fade" key="closing">
               <ClosingView state={state} projections={projections} foreground={foreground} now={now} onOpen={setModal} onBack={() => setView('today')} />
@@ -462,6 +477,7 @@ export function App() {
         open={m?.kind === 'settings'}
         onClose={close}
         initialTab={m?.kind === 'settings' ? m.tab : undefined}
+        onShowCompanion={showCompanion}
       />
       <ProDialog />
 

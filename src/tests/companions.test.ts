@@ -11,7 +11,7 @@ describe('companion line-up (1.12)', () => {
     expect(DEFAULT_AVATAR).toBe('spike');
   });
 
-  it('gives every companion its own intro and thank-you in the calm voice', () => {
+  it('gives every companion its own intro and thank-you in a calm tone', () => {
     for (const a of AVATARS) {
       expect(a.intro).toContain(a.name);
       expect(a.thanks.length).toBeGreaterThan(8);

@@ -19,6 +19,26 @@
   padding-left: max(28px, env(safe-area-inset-left, 0px));
   padding-right: max(28px, env(safe-area-inset-right, 0px));
 }
+/* Level 50 (shell.is-legendary): a fine holo hairline under the header, breathing slowly. */
+.shell.is-legendary .topbar-wrap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, #ff8ad8, #ffe27a, #8cf5c4, #7cc8ff, #c49bff, #ff8ad8);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  opacity: 0.7;
+  animation: fx-wash 9s ease-in-out infinite;
+}
+.shell.is-fx-calm .topbar-wrap::after {
+  animation: none;
+}
+.shell.is-focusing .topbar-wrap::after {
+  animation-play-state: paused;
+}
 .topbar-wrap::before {
   content: '';
   position: absolute;
@@ -67,7 +87,10 @@ html.is-desktop .topbar-wrap input {
   -webkit-app-region: no-drag;
 }
 .segnav {
-  display: inline-flex;
+  /* Equal tabs, as wide as the widest one (the companion tab carries a badge). */
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   gap: 4px;
   padding: 4px;
   border-radius: 999px;
@@ -89,7 +112,7 @@ html.is-desktop .topbar-wrap input {
   top: 4px;
   bottom: 4px;
   left: 4px;
-  width: calc(50% - 6px);
+  width: calc((100% - 16px) / 3);
   border-radius: 999px;
   background: var(--primary);
   box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.45);
@@ -103,6 +126,9 @@ html.is-desktop .topbar-wrap input {
 }
 .segnav[data-active='1'] {
   --seg-x: 1;
+}
+.segnav[data-active='2'] {
+  --seg-x: 2;
 }
 .segnav[data-active='-1'] .segnav__pill {
   opacity: 0;
@@ -118,8 +144,11 @@ html.is-desktop .topbar-wrap input {
   color: var(--ink-2);
   cursor: pointer;
   transition: background-color 0.25s, color 0.25s;
-  flex: 1 1 0;
   min-width: 110px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 html.is-desktop.has-modal .topbar-wrap,
 html.is-desktop.has-modal .topbar-wrap * {
@@ -332,5 +361,65 @@ html.is-desktop .topbar__actions {
   .shell.is-landing .app,
   .shell.is-landing .ws-fab {
     animation-duration: 0.4s;
+  }
+}
+@media (max-width: 520px) {
+  /* Three tabs on a phone: each as wide as its label (equal widths would not
+     fit "Begleiter Lv. 12"), so the active tab carries its own fill instead
+     of the sliding pill. */
+  .topbar .segnav {
+    grid-auto-columns: auto;
+  }
+  .topbar .segnav__pill {
+    display: none;
+  }
+  .topbar .segnav button {
+    min-width: 0;
+    padding: 6px 12px;
+    gap: 6px;
+    font-size: 0.86rem;
+  }
+  .topbar .segnav button.is-active {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+}
+@media (max-width: 420px) {
+  /* Narrow phones: logo, tools and the day-end button get compact, so the
+     first row fits side by side (at 360 px the logo was covered by ~30 px). */
+  .topbar__brand .logo {
+    /* Overrides the Logo's inline size (1200:225 wordmark). */
+    height: 18px !important;
+    width: 96px !important;
+  }
+  .topbar__actions {
+    gap: 6px;
+  }
+  .topbar .tool-pill {
+    height: 38px;
+    padding: 2px;
+  }
+  .topbar .tool-pill__btn {
+    width: 32px;
+    height: 32px;
+  }
+  .topbar .topbar__main.glass-cta {
+    min-height: 38px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 350px) {
+  /* Very narrow: the tools take their own row instead of covering the logo. */
+  .topbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .topbar__actions {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .topbar .segnav {
+    grid-row: 3;
   }
 }

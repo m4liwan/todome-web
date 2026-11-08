@@ -1,4 +1,5 @@
 import { dayKey } from '../lib/time';
+import { applyTaskTransition } from '../domain/companionProgression';
 import type {
   AppState,
   CheckIn,
@@ -58,9 +59,12 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'task/update': {
       const task = state.tasks[action.id];
       if (!task) return state;
+      const updated: Task = { ...task, ...action.patch, updatedAt: action.at };
       return {
         ...state,
-        tasks: { ...state.tasks, [action.id]: { ...task, ...action.patch, updatedAt: action.at } },
+        tasks: { ...state.tasks, [action.id]: updated },
+        // Completion hook: every path that finishes a task or ticks a step lands here.
+        progression: applyTaskTransition(state.progression, task, updated, action.at),
       };
     }
 

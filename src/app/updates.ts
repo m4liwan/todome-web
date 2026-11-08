@@ -14,8 +14,6 @@ export function updateLine(u: UpdateState | null): string {
       return 'Sucht nach einer neuen Version …';
     case 'none':
       return 'Du bist auf dem neuesten Stand.';
-    case 'available':
-      return `${named(u)} ist verfügbar. Du kannst sie jetzt herunterladen.`;
     case 'downloading':
       return `${named(u)} wird im Hintergrund geladen${typeof u.percent === 'number' ? ` (${u.percent} %)` : ''}.`;
     case 'ready':
@@ -49,35 +47,31 @@ export function useUpdates() {
   const setAuto = useCallback((auto: boolean) => {
     void desktop?.updateSetAuto(auto).then(setState).catch(() => undefined);
   }, []);
-  const download = useCallback(() => {
-    void desktop?.updateDownload().then(setState).catch(() => undefined);
-  }, []);
   const install = useCallback(() => desktop?.updateInstall(), []);
-  return { state, check, download, setAuto, install };
+  return { state, check, setAuto, install };
 }
 
-/** Says once per version, quietly, that an update can be downloaded or is ready. */
+/**
+ * Says once per version, quietly, that an update is ready. Only when the
+ * companion is off: otherwise the companion offers the restart
+ * (useUpdateCompanion in app/companion.ts).
+ */
 export function useUpdateNotice(): void {
   const services = useServices();
   const said = useRef<string | null>(null);
   useEffect(() => {
     if (!desktop) return;
     return desktop.onUpdate((s) => {
-      if ((s.status !== 'ready' && s.status !== 'available') || !s.version) return;
-      const key = `${s.status}:${s.version}`;
-      if (said.current === key) return;
-      said.current = key;
+      if (s.status !== 'ready' || !s.version || said.current === s.version) return;
+      if (services.store.getState().settings.companion.enabled) return;
+      said.current = s.version;
       try {
-        if (window.localStorage.getItem(ANNOUNCED_KEY) === key) return;
-        window.localStorage.setItem(ANNOUNCED_KEY, key);
+        if (window.localStorage.getItem(ANNOUNCED_KEY) === s.version) return;
+        window.localStorage.setItem(ANNOUNCED_KEY, s.version);
       } catch {
         /* say it anyway */
       }
-      services.announce(
-        s.status === 'available'
-          ? `Version ${s.version} ist verfügbar. Unter Einstellungen → Über kannst du sie herunterladen.`
-          : `Version ${s.version} ist bereit und wird beim nächsten Beenden installiert.`,
-      );
+      services.announce(`Version ${s.version} ist bereit und wird beim nächsten Beenden installiert.`);
     });
   }, [services]);
 }

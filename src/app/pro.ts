@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import type { AppearanceSettings, AppState, AvatarId, LayoutId, PaletteId } from '../domain/types';
 import { DEFAULT_AVATAR } from '../domain/companion';
+import { isFeatureUnlocked } from '../domain/companionProgression';
 
 /**
  * ToDoMe Pro (paywall markers for the MVP).
@@ -27,7 +28,7 @@ export const PRO_COPY: Record<ProFeature, { title: string; text: string }> = {
   },
   stats: {
     title: 'Anti-Hustle-Statistiken in Pro',
-    text: 'Statt Aufgaben zu zählen, zeigt ToDoMe. dir, was du geschützt hast: ungestörte Fokuszeit, deinen längsten ruhigen Block, geparkte Gedanken und jedes bewusste Durchatmen.',
+    text: 'Statt Aufgaben zu zählen, zeigt ToDoMe. dir, was du geschützt hast: ungestörte Fokuszeit, deinen längsten ruhigen Block, geparkte Gedanken und jedes bewusste Durchatmen. Ab Level 5 deines Begleiters sind sie auch ohne Pro für dich frei.',
   },
   workspace: {
     title: 'Workspace-Editor in Pro',
@@ -39,7 +40,7 @@ export const PRO_COPY: Record<ProFeature, { title: string; text: string }> = {
   },
   palettes: {
     title: 'Mehr Farbwelten in Pro',
-    text: 'Neon Pulse und Matrix Frost: zwei ruhige Nachtwelten für späte Stunden, augenschonend und tief.',
+    text: 'Neon Pulse und Matrix Frost: zwei ruhige Nachtwelten für späte Stunden, augenschonend und tief. Ab Level 15 deines Begleiters sind sie auch ohne Pro für dich frei.',
   },
   flow: {
     title: 'Flow & Focus in Pro',
@@ -56,22 +57,27 @@ export function hasPro(): boolean {
 }
 
 export const isProAvatar = (id: AvatarId) => !hasPro() && PRO_AVATARS.has(id);
-export const isProPalette = (id: PaletteId) => !hasPro() && PRO_PALETTES.has(id);
+/** Locked night world? `themesUnlocked`: the companion reached the "Exklusive Themes" level. */
+export const isProPalette = (id: PaletteId, themesUnlocked = false) => !hasPro() && !themesUnlocked && PRO_PALETTES.has(id);
+
+/** The companion level opens some Pro features on its own (see domain/companionProgression). */
+export const themesUnlocked = (state: Pick<AppState, 'progression'>) => isFeatureUnlocked(state.progression.stats, 'exclusive_themes');
 export const isProLayout = (id: LayoutId) => !hasPro() && PRO_LAYOUTS.has(id);
 
 /** Free fallbacks so a locked choice from an older version never sticks. */
-export function freeAppearance(a: AppearanceSettings, pro = hasPro()): AppearanceSettings {
-  if (pro || (!PRO_PALETTES.has(a.palette) && !PRO_LAYOUTS.has(a.layout))) return a;
+export function freeAppearance(a: AppearanceSettings, pro = hasPro(), themes = false): AppearanceSettings {
+  const lockedPalette = !themes && PRO_PALETTES.has(a.palette);
+  if (pro || (!lockedPalette && !PRO_LAYOUTS.has(a.layout))) return a;
   return {
     ...a,
-    palette: PRO_PALETTES.has(a.palette) ? 'neon' : a.palette,
+    palette: lockedPalette ? 'neon' : a.palette,
     layout: PRO_LAYOUTS.has(a.layout) ? 'hub' : a.layout,
   };
 }
 
 export function freeState(state: AppState, pro = hasPro()): AppState {
   if (pro) return state;
-  const appearance = freeAppearance(state.settings.appearance, pro);
+  const appearance = freeAppearance(state.settings.appearance, pro, themesUnlocked(state));
   const avatar = PRO_AVATARS.has(state.settings.companion.avatar) ? DEFAULT_AVATAR : state.settings.companion.avatar;
   if (appearance === state.settings.appearance && avatar === state.settings.companion.avatar) return state;
   return { ...state, settings: { ...state.settings, appearance, companion: { ...state.settings.companion, avatar } } };

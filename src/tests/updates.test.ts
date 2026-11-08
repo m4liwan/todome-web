@@ -13,9 +13,7 @@ describe('updates', () => {
     expect(updateLine(at('disabled'))).toMatch(/per Installer/);
     expect(updateLine(at('idle'))).toMatch(/im Hintergrund/);
     expect(updateLine(at('idle', { auto: false }))).toMatch(/automatische Suche ist aus/);
-    expect(updateLine(at('none'))).toBe('Du bist auf dem neuesten Stand.');
-    expect(updateLine(at('available', { version: '1.12.0' }))).toBe('Version 1.12.0 ist verfügbar. Du kannst sie jetzt herunterladen.');
-    expect(updateLine(at('downloading', { version: '1.12.0', percent: 40 }))).toBe('Version 1.12.0 wird im Hintergrund geladen (40 %).');
+    expect(updateLine(at('none'))).toBe('Du bist auf dem neuesten Stand.');    expect(updateLine(at('downloading', { version: '1.12.0', percent: 40 }))).toBe('Version 1.12.0 wird im Hintergrund geladen (40 %).');
     expect(updateLine(at('ready', { version: '1.12.0' }))).toMatch(/^Version 1\.12\.0 ist bereit\./);
     expect(updateLine(at('ready'))).toMatch(/^Die neue Version ist bereit\./);
     expect(updateLine(at('error'))).toMatch(/später noch einmal/);
@@ -33,19 +31,6 @@ describe('updates', () => {
     expect(u.state.status).toBe('disabled');
     expect(u.install()).toBe(false);
     expect(u.ready).toBe(false);
-    expect(u.available).toBe(false);
-    u.dispose();
-  });
-
-  it('does not download without an available update', async () => {
-    const { createUpdater } = require('../../electron/updater.cjs');
-    const u = createUpdater({
-      app: { isPackaged: false, getVersion: () => '1.11.0' },
-      readAuto: () => true,
-      writeAuto: () => undefined,
-      onChange: () => undefined,
-    });
-    await expect(u.download()).resolves.toMatchObject({ status: 'disabled' });
     u.dispose();
   });
 });

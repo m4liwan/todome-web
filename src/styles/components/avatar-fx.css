@@ -1,0 +1,164 @@
+/* ========================================================================
+   Avatar effects (level looks): sparkle burst, breathing aura, holofoil.
+   Only opacity and the individual transform properties animate.
+   The holofoil layer inside the SVG is styled with .avatar (companion.css).
+   ======================================================================== */
+
+.avatar-fx {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  isolation: isolate;
+  cursor: default;
+}
+
+/* ---------- aura (level 25+): three layers of light ----------
+   wash: wide and faint, it falls on the card around the companion
+   halo: a soft ring in the second accent, breathing out of step
+   core: the bright breath right behind the figure
+   With the pointer near (data-lit), the layers part a little: depth. */
+
+.avatar-fx__aura {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.avatar-fx__aura > i {
+  position: absolute;
+  border-radius: 50%;
+  transition: translate 0.6s var(--ease-out);
+}
+.avatar-fx__wash {
+  inset: -75%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.26), rgb(var(--accent-2-rgb) / 0.1) 55%, transparent);
+  animation: fx-wash 9s ease-in-out infinite;
+  will-change: opacity;
+}
+.avatar-fx__halo {
+  inset: -26%;
+  background: radial-gradient(closest-side, rgb(var(--accent-2-rgb) / 0.34), rgb(var(--accent-rgb) / 0.14) 62%, transparent);
+  animation: fx-aura 6.6s ease-in-out -2.2s infinite;
+  will-change: opacity, scale;
+}
+.avatar-fx__core {
+  inset: -8%;
+  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.6) 0%, rgb(var(--accent-rgb) / 0.22) 42%, transparent 70%);
+  animation: fx-aura 4.8s ease-in-out infinite;
+  will-change: opacity, scale;
+}
+.avatar-fx[data-lit] .avatar-fx__wash {
+  translate: calc(var(--fx-x, 0) * 22px) calc(var(--fx-y, 0) * 22px);
+}
+.avatar-fx[data-lit] .avatar-fx__halo {
+  translate: calc(var(--fx-x, 0) * -9px) calc(var(--fx-y, 0) * -9px);
+}
+.avatar-fx[data-lit] .avatar-fx__core {
+  translate: calc(var(--fx-x, 0) * 4px) calc(var(--fx-y, 0) * 4px);
+}
+
+/* Shiny (level 50+): the light turns iridescent. */
+.avatar-fx.is-shiny .avatar-fx__wash {
+  background: radial-gradient(closest-side, rgb(255 138 216 / 0.2), rgb(124 200 255 / 0.13) 50%, rgb(140 245 196 / 0.06) 72%, transparent);
+}
+.avatar-fx.is-shiny .avatar-fx__halo {
+  inset: -10%;
+  background: conic-gradient(from 0deg, #ff8ad8, #ffe27a, #8cf5c4, #7cc8ff, #c49bff, #ff8ad8);
+  filter: blur(22px);
+  opacity: 0.5;
+  animation: fx-aura 6.6s ease-in-out -2.2s infinite, fx-spin 22s linear infinite;
+  will-change: opacity, scale, rotate;
+}
+
+/* ---------- holofoil under the pointer (level 50+) ----------
+   The foil shifts against the pointer, streak and glare follow it;
+   the self-running sheen steps aside meanwhile. */
+
+.avatar-fx[data-lit] .avatar__holo-foil {
+  translate: calc(var(--fx-x, 0) * -26px) calc(var(--fx-y, 0) * -26px);
+}
+.avatar-fx[data-lit] .avatar__holo-sheen {
+  opacity: 0;
+}
+.avatar-fx[data-lit] .avatar__holo-streak {
+  opacity: 0.8;
+  translate: calc(60px + (var(--fx-x, 0) + var(--fx-y, 0) * 0.5) * 70px) 0;
+}
+.avatar-fx[data-lit] .avatar__holo-glare {
+  opacity: 0.95;
+  translate: calc(var(--fx-x, 0) * 46px) calc(var(--fx-y, 0) * 46px);
+}
+
+/* ---------- sparkle burst (level 10+) ---------- */
+
+.avatar-fx__burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  container-type: size;
+}
+.avatar-fx__burst > i {
+  position: absolute;
+  inset: 0;
+  rotate: var(--a);
+}
+.avatar-fx__burst > i::before {
+  /* A golden four-point star with a bright core: visible on light and dark. */
+  content: '';
+  position: absolute;
+  left: calc(50% - 12px);
+  top: calc(50% - 12px);
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle, #fff 0 14%, #ffd24a 36%, #f08c00 100%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  opacity: 0;
+  animation: fx-sparkle 0.8s var(--ease-out) var(--delay) both;
+}
+
+/* ---------- star dust (level 50+) ----------
+   A wave of glowing motes rises slowly from the companion, sways a little
+   and fades. Each wave is removed from the DOM when it has landed. */
+
+.avatar-fx__dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  container-type: size;
+}
+.avatar-fx__dust > i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 28%, var(--c) 60%, transparent 74%);
+  box-shadow: 0 0 calc(var(--size) * 1.8) var(--c);
+  opacity: 0;
+  animation: fx-dust var(--dur) cubic-bezier(0.22, 0.6, 0.36, 1) var(--delay) both;
+}
+
+/* ---------- performance guard ---------- */
+
+/* Calm (reduced motion, low battery): the looks stay, nothing moves. */
+.avatar-fx.is-calm .avatar-fx__aura > i {
+  animation: none;
+}
+/* Dust still in the air when calm sets in, or a focus block starts, goes at once. */
+.avatar-fx.is-calm .avatar-fx__dust,
+.shell.is-focusing .avatar-fx__dust {
+  display: none;
+}
+.avatar-fx.is-calm .avatar__holo-sheen {
+  animation: none;
+  translate: 60px 0;
+}
+/* Out of view or during a focus block: loops wait. */
+.avatar-fx.is-offscreen .avatar-fx__aura > i,
+.avatar-fx.is-offscreen .avatar__holo-sheen,
+.shell.is-focusing .avatar-fx__aura > i,
+.shell.is-focusing .avatar-fx .avatar__holo-sheen {
+  animation-play-state: paused;
+}
