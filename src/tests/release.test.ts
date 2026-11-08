@@ -7,6 +7,25 @@ const require = createRequire(import.meta.url);
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 
+/** Release variables a test must never inherit from the machine or CI (the workflow sets some). */
+const RELEASE_ENV = ['TODOME_ALLOW_UNSIGNED', 'WIN_PUBLISHER_NAME', 'AZURE_SIGNING_ENDPOINT', 'AZURE_SIGNING_ACCOUNT', 'AZURE_SIGNING_PROFILE', 'WIN_CSC_LINK', 'CSC_LINK', 'TODOME_RELEASE_OWNER', 'TODOME_RELEASE_REPO'];
+
+/** The release config, loaded fresh with exactly these variables. */
+function loadReleaseConfig(env: Record<string, string>) {
+  const file = require.resolve('../../electron-builder.release.cjs');
+  const saved = { ...process.env };
+  for (const k of RELEASE_ENV) delete process.env[k];
+  Object.assign(process.env, env);
+  delete require.cache[file];
+  try {
+    return require(file);
+  } finally {
+    for (const k of [...RELEASE_ENV, ...Object.keys(env)]) delete process.env[k];
+    Object.assign(process.env, saved);
+    delete require.cache[file];
+  }
+}
+
 describe('release guard', () => {
   const run = (env: Record<string, string>) => {
     try {
@@ -39,18 +58,7 @@ describe('release guard', () => {
   });
 
   it('builds the signed release config from the environment', () => {
-    const file = require.resolve('../../electron-builder.release.cjs');
-    const load = (env: Record<string, string>) => {
-      const saved = { ...process.env };
-      Object.assign(process.env, env);
-      delete require.cache[file];
-      try {
-        return require(file);
-      } finally {
-        for (const k of Object.keys(env)) delete process.env[k];
-        Object.assign(process.env, saved);
-      }
-    };
+    const load = loadReleaseConfig;
     const channel = { WIN_PUBLISHER_NAME: 'Konturia GmbH', TODOME_RELEASE_OWNER: 'konturia', TODOME_RELEASE_REPO: 'todome-releases' };
     const azure = load({
       ...channel,
@@ -73,20 +81,8 @@ describe('release guard', () => {
   });
 
   it('builds an unsigned release without any publisher, so electron-updater accepts its updates', () => {
-    const file = require.resolve('../../electron-builder.release.cjs');
-    const saved = { ...process.env };
-    const env = { WIN_PUBLISHER_NAME: 'Rocco Hanke', TODOME_ALLOW_UNSIGNED: 'true', TODOME_RELEASE_OWNER: 'm4liwan', TODOME_RELEASE_REPO: 'todome-web' };
-    for (const k of ['AZURE_SIGNING_ENDPOINT', 'WIN_CSC_LINK', 'CSC_LINK']) delete process.env[k];
-    Object.assign(process.env, env);
-    delete require.cache[file];
-    try {
-      const config = require(file);
-      expect(JSON.stringify(config.win)).not.toMatch(/publisherName|signtoolOptions|azureSignOptions/);
-      expect(config.publish[0]).toMatchObject({ provider: 'github', owner: 'm4liwan', repo: 'todome-web', releaseType: 'draft' });
-    } finally {
-      for (const k of Object.keys(env)) delete process.env[k];
-      Object.assign(process.env, saved);
-      delete require.cache[file];
-    }
+    const config = loadReleaseConfig({ WIN_PUBLISHER_NAME: 'Rocco Hanke', TODOME_ALLOW_UNSIGNED: 'true', TODOME_RELEASE_OWNER: 'm4liwan', TODOME_RELEASE_REPO: 'todome-web' });
+    expect(JSON.stringify(config.win)).not.toMatch(/publisherName|signtoolOptions|azureSignOptions/);
+    expect(config.publish[0]).toMatchObject({ provider: 'github', owner: 'm4liwan', repo: 'todome-web', releaseType: 'draft' });
   });
 });
