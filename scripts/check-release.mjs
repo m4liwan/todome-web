@@ -16,7 +16,9 @@ for (const field of legal.required[kind]) {
   if (!String(legal.operator[field] ?? '').trim()) gaps.push(`Impressum/Datenschutz: "${field}" in src/domain/legal.json ausfüllen`);
 }
 
-if (!has('WIN_PUBLISHER_NAME')) gaps.push('Signatur: WIN_PUBLISHER_NAME (exakt der CN des Zertifikats)');
+const allowUnsigned = /^(1|true|yes)$/i.test((env.TODOME_ALLOW_UNSIGNED || '').trim());
+const signed = has('AZURE_SIGNING_ENDPOINT') || has('WIN_CSC_LINK') || has('CSC_LINK');
+if (signed && !has('WIN_PUBLISHER_NAME')) gaps.push('Signatur: WIN_PUBLISHER_NAME (exakt der CN des Zertifikats)');
 if (has('AZURE_SIGNING_ENDPOINT')) {
   for (const k of ['AZURE_SIGNING_ACCOUNT', 'AZURE_SIGNING_PROFILE', 'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET']) {
     if (!has(k)) gaps.push(`Signatur (Azure): ${k}`);
@@ -24,8 +26,8 @@ if (has('AZURE_SIGNING_ENDPOINT')) {
   if (process.platform !== 'win32') gaps.push('Signatur (Azure): läuft nur auf Windows (lokal oder im GitHub-Workflow)');
 } else if (has('WIN_CSC_LINK') || has('CSC_LINK')) {
   if (!has('WIN_CSC_KEY_PASSWORD') && !has('CSC_KEY_PASSWORD')) gaps.push('Signatur (Zertifikat): WIN_CSC_KEY_PASSWORD');
-} else {
-  gaps.push('Signatur: AZURE_SIGNING_ENDPOINT (Azure Artifact Signing) oder WIN_CSC_LINK (Zertifikatsdatei)');
+} else if (!allowUnsigned) {
+  gaps.push('Signatur: AZURE_SIGNING_ENDPOINT (Azure Artifact Signing) oder WIN_CSC_LINK (Zertifikatsdatei), oder bewusst TODOME_ALLOW_UNSIGNED=true');
 }
 
 for (const k of ['TODOME_RELEASE_OWNER', 'TODOME_RELEASE_REPO', 'GH_TOKEN']) {
@@ -37,5 +39,8 @@ if (gaps.length) {
   for (const g of gaps) console.error(`  - ${g}`);
   console.error('');
   process.exit(1);
+}
+if (!signed) {
+  console.warn('Hinweis: Release wird UNSIGNIERT gebaut (TODOME_ALLOW_UNSIGNED). Windows zeigt beim Installieren eine SmartScreen-Warnung; Updates werden nur per SHA-512 geprüft, nicht per Herausgeber-Signatur.');
 }
 console.log('Release-Prüfung bestanden.');

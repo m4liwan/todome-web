@@ -45,7 +45,8 @@ describe('telemetry (opt-in only)', () => {
     await initTelemetry();
     expect(calls.init).toHaveLength(1);
     const [key, options] = calls.init[0] as [string, Record<string, unknown>];
-    expect(key).toBe(POSTHOG_KEY);
+    // Without a configured key (CI has no .env) the app never loads PostHog; the fake does, with ''.
+    expect(key).toBe(POSTHOG_KEY ?? '');
     expect(options.api_host).toBe(POSTHOG_HOST);
     expect(POSTHOG_HOST).toBe('https://eu.i.posthog.com');
     expect(options).toMatchObject({ disable_session_recording: true, ip: false, persistence: 'localStorage', autocapture: false, capture_pageview: false, disable_external_dependency_loading: true });

@@ -20,8 +20,22 @@ describe('release guard', () => {
   it('refuses a release without signing and update channel', () => {
     const r = run({});
     expect(r.ok).toBe(false);
-    expect(r.out).toContain('WIN_PUBLISHER_NAME');
+    expect(r.out).toContain('WIN_CSC_LINK');
+    expect(r.out).toContain('TODOME_ALLOW_UNSIGNED');
     expect(r.out).toContain('TODOME_RELEASE_REPO');
+  });
+
+  const updates = { TODOME_RELEASE_OWNER: 'm4liwan', TODOME_RELEASE_REPO: 'todome-web', GH_TOKEN: 'token' };
+
+  it('lets an unsigned release through only when it is allowed on purpose', () => {
+    expect(run(updates).ok).toBe(false);
+    expect(run({ ...updates, TODOME_ALLOW_UNSIGNED: 'true' }).ok).toBe(true);
+  });
+
+  it('still wants the publisher name as soon as there is a certificate', () => {
+    const r = run({ ...updates, TODOME_ALLOW_UNSIGNED: 'true', WIN_CSC_LINK: 'cert.pfx', WIN_CSC_KEY_PASSWORD: 'x' });
+    expect(r.ok).toBe(false);
+    expect(r.out).toContain('WIN_PUBLISHER_NAME');
   });
 
   it('builds the signed release config from the environment', () => {
@@ -56,5 +70,23 @@ describe('release guard', () => {
     expect(pfx.win.signtoolOptions.publisherName).toBe('Konturia GmbH');
     expect(pfx.win.signtoolOptions.signingHashAlgorithms).toEqual(['sha256']);
     expect(() => load(channel)).toThrow(/kein Signier-Weg/);
+  });
+
+  it('builds an unsigned release without any publisher, so electron-updater accepts its updates', () => {
+    const file = require.resolve('../../electron-builder.release.cjs');
+    const saved = { ...process.env };
+    const env = { WIN_PUBLISHER_NAME: 'Rocco Hanke', TODOME_ALLOW_UNSIGNED: 'true', TODOME_RELEASE_OWNER: 'm4liwan', TODOME_RELEASE_REPO: 'todome-web' };
+    for (const k of ['AZURE_SIGNING_ENDPOINT', 'WIN_CSC_LINK', 'CSC_LINK']) delete process.env[k];
+    Object.assign(process.env, env);
+    delete require.cache[file];
+    try {
+      const config = require(file);
+      expect(JSON.stringify(config.win)).not.toMatch(/publisherName|signtoolOptions|azureSignOptions/);
+      expect(config.publish[0]).toMatchObject({ provider: 'github', owner: 'm4liwan', repo: 'todome-web', releaseType: 'draft' });
+    } finally {
+      for (const k of Object.keys(env)) delete process.env[k];
+      Object.assign(process.env, saved);
+      delete require.cache[file];
+    }
   });
 });

@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Release build: signed installer + auto-update channel.
+ * Release build: installer + auto-update channel, signed when signing is set up.
  *
  * Local test builds (`npm run dist`) stay unsigned and have no update channel,
  * so they never offer updates. This file is used only by `npm run release`
@@ -13,9 +13,14 @@
  *      + AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET (read by Invoke-TrustedSigning)
  *   B) Classic certificate file (.pfx, e.g. cloud-HSM export or OV/EV via provider tooling):
  *      WIN_CSC_LINK (path or base64), WIN_CSC_KEY_PASSWORD
+ *   With A or B: WIN_PUBLISHER_NAME, exactly the CN of the certificate.
+ *   It is baked into the app: from then on electron-updater only accepts
+ *   updates signed by this publisher.
+ *   C) Unsigned, only with TODOME_ALLOW_UNSIGNED=true (set in the workflow
+ *      while there is no certificate): no publisher is baked in, so the
+ *      unsigned updates are accepted (checked by SHA-512 over HTTPS only).
+ *      Windows shows a SmartScreen warning on install.
  * Always:
- *   WIN_PUBLISHER_NAME  exactly the CN of the certificate (electron-updater
- *                       only accepts updates signed by this publisher)
  *   TODOME_RELEASE_OWNER / TODOME_RELEASE_REPO  GitHub repo for the releases
  *   GH_TOKEN            token with write access to that repo's releases
  */
@@ -30,12 +35,13 @@ function need(name) {
   return value;
 }
 
+const allowUnsigned = /^(1|true|yes)$/i.test((env.TODOME_ALLOW_UNSIGNED || '').trim());
+
 function signing() {
-  const publisherName = need('WIN_PUBLISHER_NAME');
   if (env.AZURE_SIGNING_ENDPOINT) {
     return {
       azureSignOptions: {
-        publisherName,
+        publisherName: need('WIN_PUBLISHER_NAME'),
         endpoint: need('AZURE_SIGNING_ENDPOINT'),
         codeSigningAccountName: need('AZURE_SIGNING_ACCOUNT'),
         certificateProfileName: need('AZURE_SIGNING_PROFILE'),
@@ -45,7 +51,7 @@ function signing() {
   if (env.WIN_CSC_LINK || env.CSC_LINK) {
     return {
       signtoolOptions: {
-        publisherName,
+        publisherName: need('WIN_PUBLISHER_NAME'),
         // Windows 10/11 only (Electron's own minimum): SHA-256, timestamped,
         // so the signature stays valid after the certificate expires.
         signingHashAlgorithms: ['sha256'],
@@ -53,7 +59,9 @@ function signing() {
       },
     };
   }
-  throw new Error('Release-Build: kein Signier-Weg gesetzt (AZURE_SIGNING_ENDPOINT oder WIN_CSC_LINK).');
+  // Unsigned on purpose: no publisherName, or electron-updater would refuse every update.
+  if (allowUnsigned) return {};
+  throw new Error('Release-Build: kein Signier-Weg gesetzt (AZURE_SIGNING_ENDPOINT oder WIN_CSC_LINK, oder TODOME_ALLOW_UNSIGNED=true).');
 }
 
 module.exports = {

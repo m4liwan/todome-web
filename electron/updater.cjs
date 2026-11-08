@@ -3,7 +3,7 @@
  * Calm auto-update (electron-updater, GitHub Releases or any provider set in
  * the release config).
  *
- *  - Only active in a signed release build: the release config bakes
+ *  - Only active in a release build: the release config bakes
  *    `app-update.yml` into resources. Local test builds have none, so the
  *    updater stays off there and the app says so plainly.
  *  - Checks 90 s after start and then every 6 hours, downloads quietly in the
