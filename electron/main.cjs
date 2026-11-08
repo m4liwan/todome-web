@@ -32,12 +32,18 @@ const { createMediaBridge } = require('./media.cjs');
 const { createUpdater } = require('./updater.cjs');
 const { attachZoom } = require('./zoom.cjs');
 const { createContact } = require('./contact.cjs');
+const { createVault } = require('./vault.cjs');
+const { createCrashGuard } = require('./crash-guard.cjs');
 
 let media = null;
 let revealMainWindow = null;
 /** @type {ReturnType<typeof createUpdater> | null} */ let updates = null;
 /** Set while an update waits for the renderer to save before installing. */
 let pendingInstall = null;
+/** @type {ReturnType<typeof createVault> | null} */ let vaultStore = null;
+/** Rotating state backups in <userData>/backups (electron/vault.cjs). */
+const vault = () => vaultStore || (vaultStore = createVault(path.join(app.getPath('userData'), 'backups')));
+const crashGuard = createCrashGuard();
 
 const APP_ID = 'de.konturia.todome';
 const SCHEME = 'app';
@@ -337,7 +343,10 @@ function createWindow(startHidden) {
   hardenContents(win.webContents);
   win.webContents.on('render-process-gone', (_e, details) => {
     console.error('[todome] renderer gone', details.reason);
-    if (details.reason !== 'clean-exit' && win && !win.isDestroyed()) win.reload();
+    if (details.reason === 'clean-exit' || !win || win.isDestroyed()) return;
+    // Reload, but never in an endless loop: after 3 crashes a minute, the recovery screen.
+    if (crashGuard.record() === 'reload') win.reload();
+    else void win.loadURL(appUrl('#recovery'));
   });
   void win.loadURL(appUrl());
 }
@@ -593,7 +602,7 @@ function installUpdateNow() {
   };
   if (!win || win.isDestroyed()) return go();
   pendingInstall = go;
-  win.webContents.send('todome:before-quit');
+  win.webContents.send('todome:before-quit', { update: true });
   setTimeout(() => pendingInstall && pendingInstall(), 1500);
 }
 
@@ -829,6 +838,29 @@ function registerIpc() {
     return media.send(cmd);
   });
 
+  // Datensafe: the app sends its serialized state; written atomically, rotated.
+  ipcMain.on('todome:vault-save', (event, payload) => {
+    if (!fromApp(event) || !payload || typeof payload !== 'object') return;
+    try {
+      vault().save(payload.kind, payload.json);
+    } catch (err) {
+      console.error('[todome] backup failed', err && err.message ? err.message : err);
+    }
+  });
+  ipcMain.handle('todome:vault-list', (event) => {
+    if (!fromApp(event)) throw new Error('untrusted sender');
+    return vault().list();
+  });
+  ipcMain.handle('todome:vault-read', (event, name) => {
+    if (!fromApp(event)) throw new Error('untrusted sender');
+    return vault().read(name);
+  });
+  ipcMain.handle('todome:vault-open', async (event) => {
+    if (!fromApp(event)) throw new Error('untrusted sender');
+    fs.mkdirSync(vault().dir, { recursive: true });
+    return (await shell.openPath(vault().dir)) === '';
+  });
+
   ipcMain.on('todome:flushed', (event) => {
     if (!fromApp(event)) return;
     if (pendingInstall) return pendingInstall();
@@ -887,7 +919,8 @@ if (!app.requestSingleInstanceLock()) {
       return;
     }
     event.preventDefault();
-    win.webContents.send('todome:before-quit');
+    // A downloaded update installs on this quit as well: the renderer keeps a pre-update copy.
+    win.webContents.send('todome:before-quit', { update: Boolean(updates && updates.ready) });
     setTimeout(() => {
       flushedBeforeQuit = true;
       app.quit();

@@ -76,6 +76,44 @@ function migrateMedia(settings: Partial<AppState['settings']>): Pick<AppState['s
   return { overlay, media };
 }
 
+/** The schema this build writes. Data with a higher version comes from a newer ToDoMe. */
+export const CURRENT_SCHEMA = 4;
+
+/** Keeps only object entries: one broken record never costs the rest (or crashes a view). */
+function records<T>(raw: unknown): Record<string, T> {
+  if (!isRecord(raw)) return {};
+  const out: Record<string, T> = {};
+  for (const [id, v] of Object.entries(raw)) if (isRecord(v)) out[id] = v as T;
+  return out;
+}
+
+export type StateCheck =
+  | { status: 'empty' }
+  | { status: 'ok'; state: AppState }
+  /** Stored data this build cannot read (broken JSON, unknown shape). */
+  | { status: 'unreadable' }
+  /** Written by a newer ToDoMe (e.g. after a manual downgrade). */
+  | { status: 'newer'; version: number };
+
+/**
+ * Like parseState, but says why stored data could not be read. The app never
+ * overwrites data in the 'unreadable' or 'newer' state (see main.tsx).
+ */
+export function inspectState(raw: string | null): StateCheck {
+  if (!raw) return { status: 'empty' };
+  const state = parseState(raw);
+  if (state) return { status: 'ok', state };
+  try {
+    const data: unknown = JSON.parse(raw);
+    if (isRecord(data) && typeof data.schemaVersion === 'number' && data.schemaVersion > CURRENT_SCHEMA) {
+      return { status: 'newer', version: data.schemaVersion };
+    }
+  } catch {
+    /* not even JSON */
+  }
+  return { status: 'unreadable' };
+}
+
 export function parseState(raw: string | null): AppState | null {
   if (!raw) return null;
   try {
@@ -85,7 +123,7 @@ export function parseState(raw: string | null): AppState | null {
     const coach = isRecord(data.coach) ? data.coach : {};
     const settings = isRecord(data.settings) ? (data.settings as Partial<AppState['settings']>) : {};
     const companion = isRecord(settings.companion) ? settings.companion : {};
-    const tasks = isRecord(data.tasks) ? (data.tasks as Record<string, Partial<Task>>) : {};
+    const tasks = records<Partial<Task>>(data.tasks);
     const migratedTasks: AppState['tasks'] = {};
     for (const [id, t] of Object.entries(tasks)) migratedTasks[id] = { priority: 'normal', ...t } as Task;
     return {
@@ -93,8 +131,12 @@ export function parseState(raw: string | null): AppState | null {
       ...(data as Partial<AppState>),
       schemaVersion: 4,
       tasks: migratedTasks,
-      events: Array.isArray(data.events) ? (data.events as AppState['events']) : [],
-      taskOrder: Array.isArray(data.taskOrder) ? (data.taskOrder as string[]) : [],
+      clients: records(data.clients),
+      sessions: records(data.sessions),
+      snapshots: records(data.snapshots),
+      checkIns: records(data.checkIns),
+      events: Array.isArray(data.events) ? (data.events as AppState['events']).filter((e) => isRecord(e) && typeof e.sessionId === 'string') : [],
+      taskOrder: Array.isArray(data.taskOrder) ? (data.taskOrder as unknown[]).filter((id): id is string => typeof id === 'string') : [],
       coach: { ...base.coach, ...(coach as Partial<AppState['coach']>) },
       settings: {
         ...DEFAULT_SETTINGS,

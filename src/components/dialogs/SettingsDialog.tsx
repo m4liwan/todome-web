@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
-import type { AmbienceId, Client, LayoutId, PaletteId, Rounding, Settings, Tone } from '../../domain/types';
+import type { AmbienceId, AppState, Client, LayoutId, PaletteId, Rounding, Settings, Tone } from '../../domain/types';
 import { desktop } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
 import { freeState, hasPro, isProLayout, isProPalette, openPro, themesUnlocked } from '../../app/pro';
@@ -14,7 +14,9 @@ import { LocationPicker } from '../LocationPicker';
 import { idleDetectionSupported, requestIdlePermission, requestNotificationPermission } from '../../lib/notifier';
 import { formatEuro } from '../../lib/time';
 import { upsertClient } from '../../state/commands';
-import { parseState } from '../../state/store';
+import { inspectState } from '../../state/store';
+import { describeState, snapshotState, vaultSupported } from '../../app/vault';
+import { VaultPicker } from '../Recovery';
 import { Dialog } from '../Dialog';
 import { Select } from '../Select';
 import { AboutSection } from './AboutSection';
@@ -114,11 +116,22 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
 
   const exportJson = () => downloadBackup(services.store.getState());
 
+  // Replacing all data is never one click: a summary first, and the safe keeps the current state.
+  const [pendingImport, setPendingImport] = useState<{ state: AppState; from: string } | null>(null);
+  const [vaultOpen, setVaultOpen] = useState(false);
   const importJson = async (file: File) => {
-    const parsed = parseState(await file.text());
-    if (!parsed) return services.announce('Die Datei ist kein gültiges ToDoMe-Backup.');
-    services.store.dispatch({ type: 'state/replace', state: freeState(parsed) });
-    services.announce('Backup wiederhergestellt.');
+    const check = inspectState(await file.text());
+    if (check.status === 'newer') return services.announce('Dieses Backup stammt aus einer neueren ToDoMe-Version. Aktualisiere ToDoMe zuerst.');
+    if (check.status !== 'ok') return services.announce('Die Datei ist kein gültiges ToDoMe-Backup.');
+    setPendingImport({ state: check.state, from: file.name });
+  };
+  const confirmImport = () => {
+    if (!pendingImport) return;
+    snapshotState('pre-import', services.store.getState());
+    services.store.dispatch({ type: 'state/replace', state: freeState(pendingImport.state) });
+    setPendingImport(null);
+    setVaultOpen(false);
+    services.announce(vaultSupported() ? 'Backup eingespielt. Dein vorheriger Stand liegt in den Sicherungen.' : 'Backup eingespielt.');
   };
 
   return (
@@ -476,7 +489,43 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             />
             <ResetButton demo={services.mode === 'demo'} onConfirm={services.resetData} />
           </div>
+          {pendingImport && (
+            <div className="recovery__confirm" role="group" aria-label="Einspielen bestätigen">
+              <p>
+                <strong>{pendingImport.from}</strong>
+                <br />
+                {describeState(pendingImport.state)}. Dieser Stand ersetzt alle aktuellen Daten
+                {vaultSupported() ? ', dein jetziger Stand kommt vorher in die Sicherungen.' : '.'}
+              </p>
+              <div className="row">
+                <button type="button" className="btn btn--small btn--primary" onClick={confirmImport}>
+                  Einspielen
+                </button>
+                <button type="button" className="btn btn--small btn--quiet" onClick={() => setPendingImport(null)}>
+                  Abbrechen
+                </button>
+              </div>
+            </div>
+          )}
         </section>
+        {vaultSupported() && services.mode === 'live' && (
+          <section>
+            <h3>Automatische Sicherungen</h3>
+            <p className="muted small">
+              ToDoMe. sichert deine Daten jeden Tag, vor jedem Update und bevor Daten ersetzt werden. Die letzten 14 Tage bleiben erhalten, nur auf diesem
+              Gerät.
+            </p>
+            <div className="row">
+              <button type="button" className="btn btn--small" onClick={() => setVaultOpen((v) => !v)} aria-expanded={vaultOpen}>
+                {vaultOpen ? 'Sicherungen ausblenden' : 'Frühere Sicherung laden'}
+              </button>
+              <button type="button" className="btn btn--small btn--quiet" onClick={() => void desktop?.vaultOpen()}>
+                Ordner öffnen
+              </button>
+            </div>
+            {vaultOpen && <VaultPicker onPick={(state, from) => setPendingImport({ state, from })} onProblem={services.announce} />}
+          </section>
+        )}
             </>
           )}
           {tab !== 'about' && <p className="settings__copyright">{COPYRIGHT}</p>}
@@ -541,7 +590,11 @@ function ResetButton({ demo, onConfirm }: { demo: boolean; onConfirm: () => void
   }
   return (
     <span className="row" role="group" aria-label="Löschen bestätigen" style={{ marginTop: 0 }}>
-      <span className="small">{demo ? 'Demo-Daten zurücksetzen?' : 'Alle Daten auf diesem Gerät löschen? Das lässt sich nicht rückgängig machen.'}</span>
+      <span className="small">{demo
+          ? 'Demo-Daten zurücksetzen?'
+          : vaultSupported()
+            ? 'Alle Daten auf diesem Gerät löschen? Eine Kopie bleibt in den automatischen Sicherungen.'
+            : 'Alle Daten auf diesem Gerät löschen? Das lässt sich nicht rückgängig machen.'}</span>
       <button type="button" className="btn btn--small btn--danger" onClick={onConfirm}>
         {demo ? 'Ja, neu starten' : 'Ja, endgültig löschen'}
       </button>

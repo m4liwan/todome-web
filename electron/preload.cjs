@@ -39,13 +39,18 @@ contextBridge.exposeInMainWorld('todome', {
   setTheme: (theme) => ipcRenderer.send('todome:set-theme', theme),
   onPower: (callback) => subscribe('todome:power', callback),
   onBeforeQuit: (callback) =>
-    subscribe('todome:before-quit', () => {
+    subscribe('todome:before-quit', (info) => {
       try {
-        callback();
+        callback({ update: Boolean(info && info.update) });
       } finally {
         ipcRenderer.send('todome:flushed');
       }
     }),
+  // Datensafe (electron/vault.cjs). `send` keeps the order: a pre-update copy lands before "flushed".
+  vaultSave: (kind, json) => ipcRenderer.send('todome:vault-save', { kind: String(kind), json: String(json) }),
+  vaultList: () => ipcRenderer.invoke('todome:vault-list'),
+  vaultRead: (name) => ipcRenderer.invoke('todome:vault-read', String(name)),
+  vaultOpen: () => ipcRenderer.invoke('todome:vault-open'),
   companionShow: (payload) => ipcRenderer.send('todome:companion-show', payload),
   companionHide: (messageId) => ipcRenderer.send('todome:companion-hide', messageId),
   onCompanionReply: (callback) => subscribe('todome:companion-reply', callback),

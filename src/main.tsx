@@ -5,7 +5,7 @@ import { ServicesContext, type AppMode, type Services } from './app/services';
 import { createClock, systemClock, type Clock, type ClockState } from './lib/clock';
 import { CompanionWindow } from './components/CompanionHost';
 import { OverlayWindow } from './components/OverlayWindow';
-import { desktop, isCompanionView, isOverlayView } from './lib/desktop';
+import { desktop, isCompanionView, isOverlayView, isRecoveryView } from './lib/desktop';
 import { browserStore, newId } from './lib/storage';
 import { toastStore } from './lib/toasts';
 import { atTimeOfDay } from './lib/time';
@@ -15,7 +15,11 @@ import { avatarName } from './domain/companion';
 import { progressionAnnouncements } from './domain/companionProgression';
 import { emptyState } from './state/defaults';
 import { buildDemoState } from './state/seed';
-import { createStore, parseState } from './state/store';
+import { createStore, inspectState } from './state/store';
+import type { AppState } from './domain/types';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Recovery, type RecoveryReason } from './components/Recovery';
+import { snapshotRaw, snapshotState, startDailySnapshots } from './app/vault';
 import './styles/index.css';
 import { installInputModality } from './lib/a11y';
 import { compactSessions } from './domain/archive';
@@ -68,11 +72,28 @@ function firstRunState() {
   return state;
 }
 
-function bootstrap(): Services {
+type Boot = { kind: 'app'; services: Services; key: string } | { kind: 'recovery'; reason: RecoveryReason; key: string };
+
+/**
+ * Datensafe: stored data that cannot be read is never replaced by a fresh
+ * start (the first save would overwrite it for good). It goes into the safe
+ * as it is, and the recovery screen offers earlier backups.
+ */
+function boot(): Boot {
   const mode = resolveMode();
-  const clock = mode === 'demo' ? loadDemoClock() : systemClock;
   const key = stateKey(mode);
-  const parsed = parseState(browserStore.get(key));
+  const raw = browserStore.get(key);
+  const check = inspectState(raw);
+  if (check.status === 'unreadable' || check.status === 'newer') {
+    if (raw) snapshotRaw('unreadable', raw);
+    console.error('[todome] stored data not readable:', check.status);
+    return { kind: 'recovery', reason: check.status, key };
+  }
+  return { kind: 'app', services: bootstrap(mode, key, check.status === 'ok' ? check.state : null), key };
+}
+
+function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Services {
+  const clock = mode === 'demo' ? loadDemoClock() : systemClock;
   // Pro choices from earlier versions fall back to their free neighbours.
   const persisted = parsed ? freeState(parsed) : null;
   const loaded = persisted ?? (mode === 'demo' ? buildDemoState(clock.now(), newId) : firstRunState());
@@ -127,8 +148,13 @@ function bootstrap(): Services {
   window.addEventListener('pagehide', persistAll);
   document.addEventListener('visibilitychange', () => document.visibilityState === 'hidden' && persistAll());
   if (mode === 'demo') window.setInterval(persistAll, 5000);
-  // Desktop: the shell asks us to persist before it quits.
-  desktop?.onBeforeQuit(persistAll);
+  // Desktop: the shell asks us to persist before it quits. Before an update, the safe keeps a copy.
+  desktop?.onBeforeQuit((info) => {
+    persistAll();
+    if (info.update && mode === 'live' && !resetting) snapshotState('pre-update', store.getState());
+  });
+  // One copy per day in the safe (desktop only).
+  if (mode === 'live') startDailySnapshots(store.getState);
 
   // Optional, anonymous usage data: only after the opt-in, never in the demo.
   const telemetryOn = () => mode === 'live' && store.getState().settings.telemetryEnabled === true;
@@ -160,6 +186,8 @@ function bootstrap(): Services {
     announce,
     resetData() {
       logApplicationDataReset();
+      // Even "Alle Daten löschen" stays recoverable from the safe for 14 days.
+      if (mode === 'live') snapshotState('pre-import', store.getState());
       resetting = true;
       store.disablePersistence();
       browserStore.remove(key);
@@ -194,11 +222,23 @@ if (isCompanionView) {
   announcer.setAttribute('aria-live', 'polite');
   document.body.appendChild(announcer);
 
+  // #recovery: the shell saw the window crash again and again (electron/crash-guard.cjs).
+  const started: Boot = isRecoveryView ? { kind: 'recovery', reason: 'crash', key: stateKey(resolveMode()) } : boot();
   createRoot(rootEl).render(
     <StrictMode>
-      <ServicesContext.Provider value={bootstrap()}>
-        <App />
-      </ServicesContext.Provider>
+      {started.kind === 'recovery' ? (
+        <Recovery reason={started.reason} storageKey={started.key} />
+      ) : (
+        <ErrorBoundary
+          storageKey={started.key}
+          onCrash={() => started.services.store.flush()}
+          onBeforeWrite={() => started.services.store.disablePersistence()}
+        >
+          <ServicesContext.Provider value={started.services}>
+            <App />
+          </ServicesContext.Provider>
+        </ErrorBoundary>
+      )}
     </StrictMode>,
   );
   // Tell the shell the first real frame is painted (tokens applied, fonts

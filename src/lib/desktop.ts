@@ -76,6 +76,16 @@ export interface UpdateState {
   checkedAt?: number;
 }
 
+/** Datensafe (electron/vault.cjs): rotating backups in the user profile. */
+export type VaultKind = 'daily' | 'pre-update' | 'pre-import' | 'unreadable';
+export interface VaultEntry {
+  name: string;
+  kind: VaultKind;
+  /** Written at (ms). */
+  at: number;
+  size: number;
+}
+
 /** Feedback & contact (electron/contact.cjs). */
 export type ContactTopic = 'idea' | 'bug' | 'question' | 'other';
 export interface ContactInfo {
@@ -111,7 +121,13 @@ export interface DesktopBridge {
   setStatus(status: { text: string; attention: boolean }): void;
   setTheme(theme: ThemePreference): void;
   onPower(callback: (event: PowerEvent) => void): () => void;
-  onBeforeQuit(callback: () => void): () => void;
+  /** The shell is about to quit; `update` = a downloaded update installs on this quit. */
+  onBeforeQuit(callback: (info: { update: boolean }) => void): () => void;
+  vaultSave(kind: VaultKind, json: string): void;
+  vaultList(): Promise<VaultEntry[]>;
+  vaultRead(name: string): Promise<string | null>;
+  /** Opens the backup folder in Explorer. */
+  vaultOpen(): Promise<boolean>;
   companionShow(payload: CompanionPayload): void;
   companionHide(messageId: string | null): void;
   onCompanionReply(callback: (reply: CompanionReply) => void): () => void;
@@ -144,3 +160,5 @@ export const desktop: DesktopBridge | null = typeof window !== 'undefined' && wi
 export const isDesktop = desktop !== null;
 export const isCompanionView = typeof window !== 'undefined' && window.location.hash === '#companion';
 export const isOverlayView = typeof window !== 'undefined' && window.location.hash === '#overlay';
+/** Opened by the shell after repeated renderer crashes (electron/crash-guard.cjs). */
+export const isRecoveryView = typeof window !== 'undefined' && window.location.hash === '#recovery';
