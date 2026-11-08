@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { ActiveSession } from '../components/ActiveSession';
 import { Ambience, resolveAmbience } from '../components/Ambience';
 import { ClosingView } from '../components/ClosingView';
+import { CompanionHub } from '../components/CompanionHub';
+import { useLegendaryShell } from '../components/AvatarFx';
 import { CompanionCard } from '../components/CompanionCard';
 import { InlineCompanion } from '../components/CompanionHost';
 import { DayPlan } from '../components/DayPlan';
@@ -333,6 +335,8 @@ export function App() {
   // Focus style while a block runs: breathe / tunnel / cocoon / micro.
   const focusStyle = focusing ? state.settings.appearance.focusStyle : null;
   const winter = isWinterActive(state.settings.appearance.xmas, now);
+  // Level 50: the companion's shimmer touches the app (badge, header line), if the user wants it.
+  const legendary = useLegendaryShell(state.progression.stats.level, state.settings.appearance.companionFx);
   // Flow shows one calm stage: no vertical scrolling there.
   useEffect(() => {
     const lock = view === 'today' && layout === 'flow';
@@ -383,7 +387,7 @@ export function App() {
   );
 
   return (
-    <div className={`shell shell--${view} shell--${layout}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}`}>
+    <div className={`shell shell--${view} shell--${layout}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
       <div className="ambient" aria-hidden="true">
         <span />
         <span />
@@ -422,6 +426,11 @@ export function App() {
               <WeekView state={state} projections={projections} now={now} />
               <CalmStats state={state} projections={projections} now={now} />
               <ReportPanel state={state} projections={projections} now={now} />
+            </div>
+          )}
+          {view === 'companion' && (
+            <div className="view-fade" key="companion">
+              <CompanionHub state={state} now={now} />
             </div>
           )}
           {view === 'closing' && (

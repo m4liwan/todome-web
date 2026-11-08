@@ -1,4 +1,5 @@
 import type { UserContext } from './userContext';
+import type { CompanionProgression } from './companionProgression';
 /**
  * ToDoMe domain model.
  *
@@ -208,6 +209,11 @@ export interface AppearanceSettings {
   soundVolume: number;
   /** How the running block shows its progress. */
   timeline: TimelineStyle;
+  /**
+   * The companion's earned level effects (sparkle, aura, holofoil) and their
+   * glow in the app. On by default; off shows the plain companion everywhere.
+   */
+  companionFx: boolean;
 }
 
 /**
@@ -429,4 +435,6 @@ export interface AppState {
   thoughts: Thought[];
   /** Condensed old sessions (see DaySummary). */
   archive: DaySummary[];
+  /** Companion XP, level, streak and unlocks (see domain/companionProgression). */
+  progression: CompanionProgression;
 }

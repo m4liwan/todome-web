@@ -8,6 +8,8 @@ interface Props {
   activity: Activity;
   size?: number;
   className?: string;
+  /** Level 50 holofoil look (see Avatar). */
+  holo?: boolean;
 }
 
 const MOOD: Record<Activity, Mood> = {
@@ -25,12 +27,12 @@ const MOOD: Record<Activity, Mood> = {
  * "working on" (tea, book, notepad, treadmill, dumbbells). Purely decorative,
  * so the props are hidden from assistive tech; the label lives next to it.
  */
-export function AvatarScene({ avatar, activity, size = 120, className = '' }: Props) {
+export function AvatarScene({ avatar, activity, size = 120, className = '', holo = false }: Props) {
   return (
     <div className={`scene scene--${activity} ${className}`} style={{ ['--scene-size' as string]: `${size}px` }}>
       {activity === 'treadmill' && <Treadmill />}
       <div className="scene__actor">
-        <Avatar id={avatar} mood={MOOD[activity]} size={size} />
+        <Avatar id={avatar} mood={MOOD[activity]} size={size} holo={holo} />
       </div>
       {activity === 'tea' && <Tea />}
       {activity === 'reading' && <Book />}

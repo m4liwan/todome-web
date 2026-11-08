@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
 import { BRAIN_PROFILES, brainPatch } from '../../domain/brain';
+import { effectTier } from '../../domain/companionProgression';
 import type { BrainProfile, Settings, TimelineStyle } from '../../domain/types';
 import { desktop } from '../../lib/desktop';
+import { useEffectsMode, type EffectsMode } from '../../lib/effects';
 import { setSoundVolume } from '../../lib/soundscape';
 import { FocusProgress } from '../FocusProgress';
 import { FOCUS_STYLES } from '../FocusStyle';
@@ -109,6 +111,40 @@ const STANDBY: Array<{ id: Settings['appearance']['standby']; label: string; tex
   { id: 'drift', label: 'Wandernde Uhr', text: 'Die Uhr gleitet sanft von Wand zu Wand' },
   { id: 'breath', label: 'Atmen', text: 'Ein leuchtender Kreis, der langsam atmet' },
 ];
+
+/** What the effects switch does right now, in one calm sentence. */
+function companionFxHint(mode: EffectsMode, earned: boolean): string {
+  if (mode === 'off') return 'Dein Begleiter und die App erscheinen überall schlicht. Alles Freigeschaltete bleibt dir erhalten.';
+  if (!earned) return 'Ab Level 10 funkelt dein Begleiter, ab Level 25 umgibt ihn eine Aura, ab Level 50 schimmert er holografisch und lässt Sternenstaub aufsteigen.';
+  if (mode === 'calm') return 'Gerade ruht alle Bewegung, weil dein System weniger Animation wünscht oder der Akku fast leer ist. Die Looks bleiben sichtbar.';
+  return 'Auf Level 50 schimmert auch die App ganz leise mit. Bei weniger Animation im System, bei fast leerem Akku und im Fokus halten die Effekte von selbst still.';
+}
+
+/** One switch for every level effect of the companion, everywhere in the app. */
+export function CompanionFxSection() {
+  const services = useServices();
+  const state = useAppState();
+  const a = state.settings.appearance;
+  const mode = useEffectsMode(a.companionFx);
+  const earned = effectTier(state.progression.stats.level) !== 'standard';
+  return (
+    <section aria-labelledby="settings-companion-fx">
+      <h3 id="settings-companion-fx">Effekte deines Begleiters</h3>
+      <label className="check">
+        <input
+          type="checkbox"
+          checked={a.companionFx}
+          aria-describedby="settings-companion-fx-hint"
+          onChange={(e) => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...a, companionFx: e.target.checked } } })}
+        />
+        <span>Glitzern, Aura, Holofoil und Sternenstaub zeigen</span>
+      </label>
+      <small className="hint" id="settings-companion-fx-hint">
+        {companionFxHint(mode, earned)}
+      </small>
+    </section>
+  );
+}
 
 export function StandbySection() {
   const services = useServices();

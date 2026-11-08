@@ -553,3 +553,28 @@ html.is-companion .ambient {
 .avatar-option {
   position: relative;
 }
+
+/* Level 50 holofoil (Avatar holo): rainbow foil and a slow sheen on the figure. */
+.avatar__holo {
+  mix-blend-mode: overlay;
+}
+.avatar__holo-light {
+  mix-blend-mode: screen;
+}
+.avatar__holo-sheen {
+  animation: avatar-holo-sweep 6.5s ease-in-out infinite;
+  transition: opacity 0.45s ease;
+}
+/* Pointer layers (driven from .avatar-fx): resting, the streak waits in the middle. */
+.avatar__holo-foil,
+.avatar__holo-streak,
+.avatar__holo-glare {
+  transition: translate 0.45s var(--ease-out), opacity 0.45s ease;
+}
+.avatar__holo-streak {
+  opacity: 0;
+  translate: 60px 0;
+}
+.avatar__holo-glare {
+  opacity: 0;
+}

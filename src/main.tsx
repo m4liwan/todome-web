@@ -10,6 +10,9 @@ import { browserStore, newId } from './lib/storage';
 import { toastStore } from './lib/toasts';
 import { atTimeOfDay } from './lib/time';
 import { freeState } from './app/pro';
+import { connectProgression, onProgression } from './app/progression';
+import { avatarName } from './domain/companion';
+import { progressionAnnouncements } from './domain/companionProgression';
 import { emptyState } from './state/defaults';
 import { buildDemoState } from './state/seed';
 import { createStore, parseState } from './state/store';
@@ -77,6 +80,8 @@ function bootstrap(): Services {
   const compacted = mode === 'live' ? compactSessions(loaded, clock.now()) : { state: loaded, condensed: 0 };
   const initial = compacted.state;
   const store = createStore({ storage: browserStore, key, initial });
+  // XP, level-ups and unlocks are announced to the UI (floating XP, companion hub).
+  connectProgression(store);
   if (compacted.state !== loaded) browserStore.set(key, JSON.stringify(initial));
   // The app may run in the tray for weeks: look again a few times a day.
   if (mode === 'live') {
@@ -107,6 +112,11 @@ function bootstrap(): Services {
     liveRegion.textContent = '';
     window.setTimeout(() => (liveRegion.textContent = message), 30);
   };
+  // Level-ups, unlocks, freezes and the welcome back get a short sentence.
+  onProgression((events) => {
+    const name = avatarName(store.getState().settings.companion.avatar);
+    progressionAnnouncements(events, name, clock.now()).forEach(announce);
+  });
 
   let resetting = false;
   const persistAll = () => {
