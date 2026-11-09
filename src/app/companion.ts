@@ -34,6 +34,7 @@ import { useServices, type Services } from './services';
 import { trackEvent } from '../services/telemetry';
 import { isGoodMoment, type CompanionKind } from '../domain/companion';
 import { currentMoment } from './attention';
+import { focusRhythm } from '../domain/rhythm';
 import { resolveTheme } from './theme';
 
 /**
@@ -289,7 +290,7 @@ export function useCompanion(openModal: OpenModal): void {
       const firstStep = dockInTask(state, projections, now);
       if (firstStep && isGoodMoment('dock_in', moment, 0)) {
         services.store.dispatch({ type: 'wellbeing/mark', patch: { dockedDay: dayKey(now) } });
-        deliverCompanion(services, dockInMessage(services.deps().newId(), state.settings.userName.trim(), firstStep));
+        deliverCompanion(services, dockInMessage(services.deps().newId(), state.settings.userName.trim(), firstStep, focusRhythm(state, now)));
         return;
       }
       const plan = planCompanionVisit(state, projections, now);

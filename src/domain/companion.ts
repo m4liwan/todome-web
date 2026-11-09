@@ -2,6 +2,7 @@ import { quietReason } from './checkinEngine';
 import { foregroundSession, type SessionProjection } from './session';
 import type { AppState, AvatarId, Id, Millis, SessionFeel, Task, TaskPriority, Tone } from './types';
 import { atTimeOfDay, dayKey, MIN } from '../lib/time';
+import { focusRhythmCached, inFocusWindow, windowLabel, type FocusWindow } from './rhythm';
 
 /**
  * The companion: a small avatar that drops by on the desktop edge.
@@ -170,7 +171,9 @@ export function planCompanionVisit(state: AppState, projections: readonly Sessio
       // Any recent interaction with the session counts as "checked in".
       const lastAnswer = Math.max(0, ...own.map((x) => x.answeredAt ?? 0));
       const base = Math.max(fg.phaseStartedAt, w.lastVisitAt ?? 0, lastAnswer);
-      plans.push({ kind: 'focus_check', dueAt: base + focusVisitIntervalMs(state, task.priority), sessionId: fg.sessionId });
+      // Inside the user's own flow window the companion trusts the flow: a third fewer visits.
+      const trust = inFocusWindow(focusRhythmCached(state, now), now) ? FLOW_TRUST : 1;
+      plans.push({ kind: 'focus_check', dueAt: base + focusVisitIntervalMs(state, task.priority) * trust, sessionId: fg.sessionId });
     }
   }
 
@@ -325,6 +328,9 @@ export function helloMessage(id: Id, name: string, avatar: AvatarId): CompanionM
   };
 }
 
+/** Visit spacing inside the learned flow window (see domain/rhythm). */
+export const FLOW_TRUST = 1.5;
+
 /** Option ids of the morning dock-in (routed in app/companion.ts). */
 export const DOCK_START = 'start';
 export const DOCK_LATER = 'later';
@@ -345,13 +351,14 @@ export function dockInTask(state: AppState, projections: readonly SessionProject
   return task && task.status === 'planned' ? task : null;
 }
 
-export function dockInMessage(id: Id, name: string, task: Pick<Task, 'id' | 'title'>): CompanionMessage {
+export function dockInMessage(id: Id, name: string, task: Pick<Task, 'id' | 'title'>, rhythm: FocusWindow | null = null): CompanionMessage {
+  const hint = rhythm ? ` Deine flüssigsten Blöcke liegen meist ${windowLabel(rhythm)}.` : '';
   return {
     id,
     kind: 'dock_in',
     taskId: task.id,
     title: name ? `Guten Morgen, ${name}` : 'Guten Morgen',
-    text: `Gestern hast du dir vorgenommen: „${task.title}“. Direkt damit loslegen?`,
+    text: `Gestern hast du dir vorgenommen: „${task.title}“. Direkt damit loslegen?${hint}`,
     mood: 'happy',
     options: [
       { id: DOCK_START, label: 'Loslegen', primary: true },
