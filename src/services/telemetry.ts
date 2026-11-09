@@ -110,6 +110,17 @@ export function trackEvent(eventName: string, props?: Props): void {
   });
 }
 
+/**
+ * Reports an error the app caught itself (e.g. the error boundary), only with
+ * the opt-in. Uncaught errors are already reported by `capture_exceptions`.
+ */
+export function trackError(error: unknown, props?: Props): void {
+  if (isEnabled() !== true) return;
+  const properties = { ...common(), ...props };
+  const err = error instanceof Error ? error : new Error(String(error));
+  void initTelemetry().then((ph) => ph?.captureException(err, properties));
+}
+
 /** The initialised client after the opt-in, else null (for the PostHog logs writer). */
 export function telemetryClient(): Promise<PostHog | null> {
   return initTelemetry();

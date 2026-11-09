@@ -49,6 +49,9 @@ export function ContactDialog({ open, onClose }: { open: boolean; onClose: () =>
   const [topic, setTopic] = useState<ContactTopic>('idea');
   const [message, setMessage] = useState('');
   const [replyTo, setReplyTo] = useState('');
+  // Bug reports: the technical log helps a lot, and the user sees and decides it.
+  const [attachLog, setAttachLog] = useState(true);
+  const offerLog = Boolean(desktop) && topic === 'bug';
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const field = useRef<HTMLTextAreaElement>(null);
@@ -80,7 +83,7 @@ export function ContactDialog({ open, onClose }: { open: boolean; onClose: () =>
   const submit = async () => {
     if (busy) return;
     setError(null);
-    const payload = { topic, message: message.trim(), ...(replyTo.trim() ? { replyTo: replyTo.trim() } : {}) };
+    const payload = { topic, message: message.trim(), ...(replyTo.trim() ? { replyTo: replyTo.trim() } : {}), ...(offerLog && attachLog ? { attachLog: true } : {}) };
     if (payload.message.length < 3) return setError(contactError('invalid', email));
     let result: ContactResult;
     if (viaForm && typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -152,6 +155,12 @@ export function ContactDialog({ open, onClose }: { open: boolean; onClose: () =>
             placeholder={topic === 'bug' ? 'Was ist passiert, und was hast du kurz davor gemacht?' : 'Schreib einfach drauflos.'}
           />
         </label>
+        {offerLog && (
+          <label className="check">
+            <input type="checkbox" checked={attachLog} onChange={(e) => setAttachLog(e.target.checked)} />
+            <span>Technisches Protokoll anhängen (App-Version, Fehlermeldungen der letzten Zeit, keine Aufgaben, Notizen oder Namen)</span>
+          </label>
+        )}
         <label className="field">
           <span>Deine E-Mail (optional, nur für eine Antwort)</span>
           <input type="email" value={replyTo} onChange={(e) => setReplyTo(e.target.value)} maxLength={254} autoComplete="email" placeholder="name@beispiel.de" />

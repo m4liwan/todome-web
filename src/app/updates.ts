@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { desktop, type UpdateState } from '../lib/desktop';
 import { useServices } from './services';
+import { trackEvent } from '../services/telemetry';
 
 const ANNOUNCED_KEY = 'todome:update-announced';
 
@@ -47,7 +48,10 @@ export function useUpdates() {
   const setAuto = useCallback((auto: boolean) => {
     void desktop?.updateSetAuto(auto).then(setState).catch(() => undefined);
   }, []);
-  const install = useCallback(() => desktop?.updateInstall(), []);
+  const install = useCallback(() => {
+    trackEvent('update_restart', { via: 'settings' });
+    desktop?.updateInstall();
+  }, []);
   return { state, check, setAuto, install };
 }
 

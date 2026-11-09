@@ -27,6 +27,8 @@ contextBridge.exposeInMainWorld('todome', {
   media: (cmd) => ipcRenderer.invoke('todome:media', cmd),
   contactInfo: () => ipcRenderer.invoke('todome:contact-info'),
   contactSend: (payload) => ipcRenderer.invoke('todome:contact-send', payload),
+  // Diagnostics: renderer errors into the local log (all windows).
+  log: (entry) => ipcRenderer.send('todome:log', entry),
   updateState: () => ipcRenderer.invoke('todome:update-get'),
   updateCheck: () => ipcRenderer.invoke('todome:update-check'),
   updateSetAuto: (auto) => ipcRenderer.invoke('todome:update-auto', auto === true),

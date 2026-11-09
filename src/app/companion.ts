@@ -28,6 +28,8 @@ import { handleAnswer } from '../state/promptHandlers';
 import { modalForFollowUp, type OpenModal } from './modal';
 import { promptVarsFor } from './promptVars';
 import { useServices, type Services } from './services';
+import { trackEvent } from '../services/telemetry';
+import type { CompanionKind } from '../domain/companion';
 import { resolveTheme } from './theme';
 
 /**
@@ -62,19 +64,37 @@ export const inlineCompanion = {
 // Messages currently on screen, so replies can be routed by id.
 const active = new Map<string, { message: CompanionMessage; shownAt: Millis }>();
 
+/**
+ * Companion engagement (opt-in telemetry): kind, fixed option id and a coarse
+ * reaction time, never the text. Shows whether the companion helps or annoys.
+ */
+export function responseBucket(ms: number): string {
+  if (ms < 10_000) return 'lt_10s';
+  if (ms < 30_000) return 'lt_30s';
+  if (ms < 60_000) return 'lt_1m';
+  if (ms < 5 * 60_000) return 'lt_5m';
+  return 'gte_5m';
+}
+const safeOption = (id: string) => (/^[a-z][a-z0-9_]{0,31}$/.test(id) ? id : 'other');
+const trackUnanswered = (kind: CompanionKind, reason: 'expired' | 'replaced') => trackEvent('companion_unanswered', { kind, reason });
+
 export function isCompanionBusy(now: Millis): boolean {
   for (const [id, { message, shownAt }] of active) {
     if (now - shownAt < message.ttlMs + 2000) return true;
     active.delete(id);
+    trackUnanswered(message.kind, 'expired');
   }
   return false;
 }
 
 export function deliverCompanion(services: Services, message: CompanionMessage): void {
   const s = services.store.getState();
+  const shownAt = Date.now();
   // A new message replaces whatever is showing.
+  for (const prev of active.values()) trackUnanswered(prev.message.kind, shownAt - prev.shownAt >= prev.message.ttlMs ? 'expired' : 'replaced');
   active.clear();
-  active.set(message.id, { message, shownAt: Date.now() });
+  active.set(message.id, { message, shownAt });
+  trackEvent('companion_shown', { kind: message.kind, surface: desktop && !isCompanionView ? 'window' : 'inline' });
   const avatar = s.settings.companion.avatar;
   const position = s.settings.companion.position;
   if (desktop && !isCompanionView) {
@@ -142,6 +162,7 @@ export function handleCompanionReply(services: Services, openModal: OpenModal, m
   active.delete(messageId);
   if (!entry) return;
   const { message } = entry;
+  trackEvent('companion_answered', { kind: message.kind, option: safeOption(optionId), response: responseBucket(Date.now() - entry.shownAt) });
   const { store } = services;
   const now = services.clock.now();
   const bringToFront = () => desktop?.focus();

@@ -20,13 +20,14 @@ function cleanMessage(input) {
   const replyTo = typeof input.replyTo === 'string' ? input.replyTo.trim() : '';
   if (!topic || message.length < 3 || message.length > MAX_MESSAGE) return { error: 'invalid' };
   if (replyTo && (replyTo.length > 254 || !EMAIL_RE.test(replyTo))) return { error: 'email' };
-  return { topic, topicLabel: TOPICS[topic], message, replyTo };
+  // The technical log goes along only with a bug report and the user's tick.
+  return { topic, topicLabel: TOPICS[topic], message, replyTo, attachLog: topic === 'bug' && input.attachLog === true };
 }
 
-/** mailto: link with subject and body (fallback without endpoint). */
-function mailtoFor(email, clean, meta) {
+/** mailto: link with subject and body (fallback without endpoint). Mail links stay short: only a few log lines. */
+function mailtoFor(email, clean, meta, log = '') {
   const subject = `ToDoMe.: ${clean.topicLabel}`;
-  const body = `${clean.message}\n\n---\nToDoMe. ${meta.version} · ${meta.platform}`;
+  const body = `${clean.message}\n\n---\nToDoMe. ${meta.version} · ${meta.platform}${log ? `\n\n${log}` : ''}`;
   return `mailto:${encodeURIComponent(email).replace(/%40/g, '@')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
@@ -50,7 +51,7 @@ function resolveEndpoint(raw) {
   }
 }
 
-function createContact({ config, fetch: doFetch, openExternal, meta, now = Date.now }) {
+function createContact({ config, fetch: doFetch, openExternal, meta, now = Date.now, diagnostics = null }) {
   const endpoint = resolveEndpoint(config.endpoint);
   const email = typeof config.email === 'string' && EMAIL_RE.test(config.email) ? config.email : '';
   const sent = [];
@@ -62,10 +63,18 @@ function createContact({ config, fetch: doFetch, openExternal, meta, now = Date.
     async send(input) {
       const clean = cleanMessage(input);
       if (clean.error) return { ok: false, reason: clean.error };
+      const report = (lines, chars) => {
+        if (!clean.attachLog || typeof diagnostics !== 'function') return '';
+        try {
+          return String(diagnostics(lines, chars));
+        } catch {
+          return '';
+        }
+      };
       if (!endpoint) {
         if (!email) return { ok: false, reason: 'not_configured' };
         try {
-          await openExternal(mailtoFor(email, clean, meta));
+          await openExternal(mailtoFor(email, clean, meta, report(12, 1200)));
           return { ok: true, via: 'mail' };
         } catch {
           return { ok: false, reason: 'mail' };
@@ -87,6 +96,7 @@ function createContact({ config, fetch: doFetch, openExternal, meta, now = Date.
             ...(clean.replyTo ? { email: clean.replyTo, _replyto: clean.replyTo } : {}),
             app: `ToDoMe. ${meta.version}`,
             platform: meta.platform,
+            ...(clean.attachLog ? { diagnostics: report(200, 20_000) } : {}),
           }),
           signal: controller.signal,
         });

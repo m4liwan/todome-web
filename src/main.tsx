@@ -24,13 +24,16 @@ import './styles/index.css';
 import { installInputModality } from './lib/a11y';
 import { compactSessions } from './domain/archive';
 import { logApplicationBootstrapped, logApplicationDataReset, logApplicationFramePainted } from './services/posthog-logs';
-import { connectTelemetry, stopTelemetry, trackEvent } from './services/telemetry';
+import { connectTelemetry, stopTelemetry, trackError, trackEvent } from './services/telemetry';
+import { installErrorLog, logError } from './lib/diagnostics';
 import '@fontsource-variable/manrope/index.css';
 import '@fontsource-variable/urbanist/index.css';
 
 const LEGACY_MODE_KEY = 'todome:mode';
 const stateKey = (mode: AppMode) => `todome:${mode}:state:v1`;
 const CLOCK_KEY = 'todome:demo:clock:v1';
+/** The version that ran last time: tells a completed update apart from a normal start. */
+const LAST_VERSION_KEY = 'todome:last-version';
 const DEMO_SPEED = 30;
 
 /**
@@ -86,7 +89,7 @@ function boot(): Boot {
   const check = inspectState(raw);
   if (check.status === 'unreadable' || check.status === 'newer') {
     if (raw) snapshotRaw('unreadable', raw);
-    console.error('[todome] stored data not readable:', check.status);
+    logError('boot', new Error(`stored data ${check.status}`), 'warn');
     return { kind: 'recovery', reason: check.status, key };
   }
   return { kind: 'app', services: bootstrap(mode, key, check.status === 'ok' ? check.state : null), key };
@@ -161,6 +164,16 @@ function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Service
   connectTelemetry(telemetryOn, () => ({ app_version: __APP_VERSION__, platform: desktop ? 'desktop' : 'web', context: store.getState().settings.userContext }));
   logApplicationBootstrapped(mode, desktop ? 'desktop' : 'web');
   trackEvent('app_opened');
+  // Update funnel: downloaded (update_ready) → restarted (companion_answered / update_restart) →
+  // started in the new version (app_updated). Adoption per version comes with app_opened.
+  if (mode === 'live') desktop?.onUpdateReady((r) => trackEvent('update_ready', { to_version: r.version ?? 'unknown' }));
+  if (mode === 'live') {
+    const last = browserStore.get(LAST_VERSION_KEY);
+    if (last !== __APP_VERSION__) {
+      if (last) trackEvent('app_updated', { from_version: last, to_version: __APP_VERSION__ });
+      browserStore.set(LAST_VERSION_KEY, __APP_VERSION__);
+    }
+  }
   let telemetryWas = telemetryOn();
   store.subscribe(() => {
     const on = telemetryOn();
@@ -199,6 +212,8 @@ function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Service
 
 const rootEl = document.getElementById('root');
 if (!rootEl) throw new Error('#root missing');
+// Every window writes its uncaught errors into the shell's local log file.
+installErrorLog(isCompanionView ? 'companion' : isOverlayView ? 'overlay' : isRecoveryView ? 'recovery' : 'app');
 
 if (isCompanionView) {
   // Transparent desktop companion window: renders messages only, no app state.
@@ -231,7 +246,11 @@ if (isCompanionView) {
       ) : (
         <ErrorBoundary
           storageKey={started.key}
-          onCrash={() => started.services.store.flush()}
+          onCrash={(error) => {
+            started.services.store.flush();
+            logError('render', error);
+            trackError(error, { scope: 'render' });
+          }}
           onBeforeWrite={() => started.services.store.disablePersistence()}
         >
           <ServicesContext.Provider value={started.services}>

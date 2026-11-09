@@ -108,7 +108,10 @@ export interface DesktopBridge {
   reportWindowBg(mode: 'light' | 'dark', color: string): void;
   media(cmd: MediaCommand): Promise<MediaInfo>;
   contactInfo(): Promise<ContactInfo>;
-  contactSend(payload: { topic: ContactTopic; message: string; replyTo?: string }): Promise<ContactResult>;
+  /** `attachLog`: with a bug report, the redacted technical log goes along (electron/log.cjs). */
+  contactSend(payload: { topic: ContactTopic; message: string; replyTo?: string; attachLog?: boolean }): Promise<ContactResult>;
+  /** Writes a renderer error into the local log file. */
+  log(entry: { level: 'error' | 'warn'; scope: string; message: string; stack?: string }): void;
   updateState(): Promise<UpdateState>;
   updateCheck(): Promise<UpdateState>;
   updateSetAuto(auto: boolean): Promise<UpdateState>;

@@ -15,6 +15,7 @@ const {
   Menu,
   Notification,
   Tray,
+  crashReporter,
   ipcMain,
   nativeImage,
   nativeTheme,
@@ -34,6 +35,31 @@ const { attachZoom } = require('./zoom.cjs');
 const { createContact } = require('./contact.cjs');
 const { createVault } = require('./vault.cjs');
 const { createCrashGuard } = require('./crash-guard.cjs');
+const { createLog, recentCrashDumps } = require('./log.cjs');
+
+// Diagnostics first, so even an early failure leaves a trace. All of it stays
+// on this device: crash dumps are never uploaded, the log leaves only with
+// "Protokoll anhängen" in "Problem melden" (electron/log.cjs).
+const log = createLog(path.join(app.getPath('userData'), 'logs'));
+log.captureConsole();
+try {
+  crashReporter.start({ uploadToServer: false, compress: true });
+} catch (err) {
+  console.warn('[todome] crash reporter unavailable', err);
+}
+process.on('uncaughtException', (err) => log.error('[main] uncaught exception', err));
+process.on('unhandledRejection', (reason) => log.error('[main] unhandled rejection', reason));
+
+/** What "Problem melden" may attach: versions, recent crashes, the redacted log tail. */
+function diagnosticsReport(lines = 200, maxChars = 20_000) {
+  const crashes = recentCrashDumps(app.getPath('crashDumps'));
+  const head = [
+    `ToDoMe ${app.getVersion()} · Electron ${process.versions.electron} · ${process.platform} ${process.getSystemVersion?.() ?? ''} ${process.arch}`,
+    `Paket: ${app.isPackaged ? 'installiert' : 'Entwicklung'} · Laufzeit: ${Math.round(process.uptime() / 60)} min · Abstürze (7 Tage): ${crashes.length}`,
+    `Update: ${updates ? updates.state.status : 'aus'}`,
+  ].join('\n');
+  return `${head}\n---\n${log.tail(lines, maxChars)}`;
+}
 
 let media = null;
 let revealMainWindow = null;
@@ -342,7 +368,7 @@ function createWindow(startHidden) {
 
   hardenContents(win.webContents);
   win.webContents.on('render-process-gone', (_e, details) => {
-    console.error('[todome] renderer gone', details.reason);
+    console.error('[todome] renderer gone', details.reason, details.exitCode);
     if (details.reason === 'clean-exit' || !win || win.isDestroyed()) return;
     // Reload, but never in an endless loop: after 3 crashes a minute, the recovery screen.
     if (crashGuard.record() === 'reload') win.reload();
@@ -572,6 +598,10 @@ function startUpdater() {
     readAuto: () => readShellState().autoUpdate !== false,
     writeAuto: (auto) => writeShellState({ autoUpdate: auto }),
     onChange: (state) => {
+      if (state.status !== lastUpdateStatus) {
+        lastUpdateStatus = state.status;
+        log.info(`[update] ${state.status}${state.version ? ` ${state.version}` : ''}`);
+      }
       if (win && !win.isDestroyed()) {
         win.webContents.send('todome:update', state);
         // update-downloaded: tell the app once per version, so the companion
@@ -588,6 +618,7 @@ function startUpdater() {
 
 /** Version the app was last told about via `todome:update-ready`. */
 let readyAnnouncedFor = null;
+let lastUpdateStatus = null;
 
 /** Let the app save first (like a normal quit), then install and restart. */
 function installUpdateNow() {
@@ -643,6 +674,7 @@ function registerIpc() {
       fetch: (url, init) => net.fetch(url, init),
       openExternal: (url) => shell.openExternal(url),
       meta: { version: app.getVersion(), platform: `${process.platform} ${process.getSystemVersion?.() ?? ''}`.trim() },
+      diagnostics: diagnosticsReport,
     });
     return contact;
   };
@@ -861,6 +893,18 @@ function registerIpc() {
     return (await shell.openPath(vault().dir)) === '';
   });
 
+  // Renderer errors (all three windows) go into the local log, length-limited.
+  ipcMain.on('todome:log', (event, entry) => {
+    const trusted = fromApp(event) || fromCompanion(event) || (overlay && !overlay.isDestroyed() && event.sender === overlay.webContents);
+    if (!trusted || !entry || typeof entry !== 'object') return;
+    const level = entry.level === 'warn' ? 'warn' : 'error';
+    const scope = String(entry.scope || 'renderer').replace(/[^\w:-]/g, '').slice(0, 40);
+    const message = String(entry.message || '').slice(0, 1000);
+    const stack = String(entry.stack || '').slice(0, 3000);
+    // A stack trace starts with the message already: write it once.
+    log[level](`[renderer:${scope}]`, stack.startsWith(message) ? stack : `${message}\n${stack}`.trim());
+  });
+
   ipcMain.on('todome:flushed', (event) => {
     if (!fromApp(event)) return;
     if (pendingInstall) return pendingInstall();
@@ -899,6 +943,10 @@ if (!app.requestSingleInstanceLock()) {
     // Start in the theme the user picked last time: no bright flash on launch.
     const savedTheme = readShellState().theme;
     if (['system', 'light', 'dark'].includes(savedTheme)) nativeTheme.themeSource = savedTheme;
+    log.info(`[start] ToDoMe ${app.getVersion()} · Electron ${process.versions.electron} · ${process.platform} ${process.arch}${START_HIDDEN ? ' · autostart' : ''}`);
+    const crashes = recentCrashDumps(app.getPath('crashDumps'), 1);
+    if (crashes.length) log.warn(`[start] ${crashes.length} crash dump(s) in the last 24 h`);
+    app.on('child-process-gone', (_e, d) => log.warn('[main] child process gone', d.type, d.reason, d.exitCode));
     registerAppProtocol();
     registerIpc();
     registerPowerEvents();
@@ -910,6 +958,7 @@ if (!app.requestSingleInstanceLock()) {
 
   // Let the renderer persist pending state before quitting.
   app.on('before-quit', (event) => {
+    if (!quitting) log.info(`[quit]${updates && updates.ready ? ' installing update' : ''}`);
     quitting = true;
     if (flushedBeforeQuit || !win || win.isDestroyed()) {
       if (companion && !companion.isDestroyed()) companion.destroy();
