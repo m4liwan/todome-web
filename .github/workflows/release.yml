@@ -4,6 +4,10 @@
 # Start: push a tag like v1.11.0 (git tag v1.11.0 && git push --tags).
 # After the draft is checked, publish it on GitHub: from then on the
 # installed apps find the update on their own.
+# Staged rollout: before publishing, `node scripts/rollout.mjs <version> 10`
+# offers the update to 10 % of the installations; raise it step by step
+# (25, 50, 100). `... <version> 0` stops a bad update for everyone who has
+# not installed it yet.
 name: Release
 
 on:
@@ -22,6 +26,15 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Electron, NSIS and 7-Zip come from GitHub downloads. Cached, a release
+      # still builds while those servers answer 504 (seen on v1.15.2).
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: electron-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: electron-${{ runner.os }}-
       # Create the draft before electron-builder uploads: it uploads its files in
       # parallel, and with no release yet each upload created its own draft
       # (seen on v1.15.1: one draft with only the blockmap).
