@@ -15,6 +15,7 @@ export interface TimeEntry {
   clientName: string;
   billable: boolean;
   netMs: Millis;
+  /** Pause counted for the look back: each pause at most `maxPauseMs` (see countedPauseMs). */
   pauseMs: Millis;
   interruptions: number;
   outcome: string | null;
@@ -23,7 +24,27 @@ export interface TimeEntry {
   archived?: { sessions: number; billableMin: number };
 }
 
-export function toTimeEntries(state: AppState, projections: readonly SessionProjection[]): TimeEntry[] {
+/**
+ * A pause longer than this was no break: the session was parked (overnight,
+ * over a weekend, or while the computer slept, which pauses a running
+ * session at the moment it went to sleep). The event log keeps the real
+ * length; the look back counts each pause at most this long.
+ */
+export const MAX_COUNTED_PAUSE_MS = 90 * MIN;
+/** Highest pause index shown: 200 % (twice as much pause as focus). */
+export const MAX_PAUSE_RATIO = 2;
+
+export interface ReportOptions {
+  /** Longest pause counted per pause (default MAX_COUNTED_PAUSE_MS). */
+  maxPauseMs?: Millis;
+}
+
+/** Pause time of one session as the look back counts it: every single pause capped. */
+export function countedPauseMs(p: Pick<SessionProjection, 'pauseIntervals'>, maxPauseMs: Millis = MAX_COUNTED_PAUSE_MS): Millis {
+  return p.pauseIntervals.reduce((sum, [start, end]) => sum + Math.min(Math.max(0, end - start), maxPauseMs), 0);
+}
+
+export function toTimeEntries(state: AppState, projections: readonly SessionProjection[], opts: ReportOptions = {}): TimeEntry[] {
   return projections
     .map((p): TimeEntry | null => {
       const task = state.tasks[p.taskId];
@@ -40,19 +61,20 @@ export function toTimeEntries(state: AppState, projections: readonly SessionProj
         clientName: client?.name ?? 'Intern',
         billable: task.billable && Boolean(client),
         netMs: p.netMs,
-        pauseMs: p.pauseMs,
+        pauseMs: countedPauseMs(p, opts.maxPauseMs),
         interruptions: p.interruptionCount,
         outcome: p.outcome,
         open: p.status !== 'stopped',
       };
     })
     .filter((e): e is TimeEntry => e !== null)
-    .concat(archivedEntries(state))
+    .concat(archivedEntries(state, opts))
     .sort((a, b) => a.start - b.start);
 }
 
 /** Condensed sessions as one entry per day and task (placed at noon of that day). */
-export function archivedEntries(state: Pick<AppState, 'archive'>): TimeEntry[] {
+export function archivedEntries(state: Pick<AppState, 'archive'>, opts: ReportOptions = {}): TimeEntry[] {
+  const cap = opts.maxPauseMs ?? MAX_COUNTED_PAUSE_MS;
   return (state.archive ?? []).map((a) => {
     const noon = new Date(`${a.day}T12:00:00`).getTime();
     return {
@@ -66,7 +88,8 @@ export function archivedEntries(state: Pick<AppState, 'archive'>): TimeEntry[] {
       clientName: a.clientName,
       billable: a.billable,
       netMs: a.netMs,
-      pauseMs: a.pauseMs,
+      // Summaries condensed before the cap existed: at most one capped pause per session.
+      pauseMs: Math.min(a.pauseMs, a.sessions * cap),
       interruptions: a.interruptions,
       outcome: a.achieved > 0 ? 'achieved' : null,
       open: false,
@@ -221,7 +244,7 @@ export interface WeekSummary {
 }
 
 /** The last seven days ending today. */
-export function weekSummary(state: AppState, projections: readonly SessionProjection[], now: Millis): WeekSummary {
+export function weekSummary(state: AppState, projections: readonly SessionProjection[], now: Millis, opts: ReportOptions = {}): WeekSummary {
   const days: string[] = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(now);
@@ -229,7 +252,7 @@ export function weekSummary(state: AppState, projections: readonly SessionProjec
     days.push(dayKey(d.getTime()));
   }
   const inWeek = new Set(days);
-  const entries = toTimeEntries(state, projections).filter((e) => inWeek.has(e.day));
+  const entries = toTimeEntries(state, projections, opts).filter((e) => inWeek.has(e.day));
   const doneTitles: string[] = [];
   const weekDays: WeekDay[] = days.map((day) => {
     const list = entries.filter((e) => e.day === day);
@@ -291,7 +314,8 @@ export function careSummary(state: AppState, week: WeekSummary): CareSummary {
   const w = state.wellbeing;
   const days = week.days.map((d) => d.day);
   const active = Math.max(1, week.activeDays);
-  const pauseRatio = week.focusMs > 0 ? week.pauseMs / week.focusMs : 0;
+  // A few minutes of focus next to a long pause would make any ratio explode: capped at 200 %.
+  const pauseRatio = week.focusMs > 0 ? Math.min(MAX_PAUSE_RATIO, week.pauseMs / week.focusMs) : 0;
   const share = (n: number) => Math.min(1, n / active);
   const parts: CarePart[] = [
     { id: 'pauses', label: 'Pausen gegönnt', value: Math.min(1, pauseRatio / 0.12) },

@@ -1,5 +1,5 @@
 import { projectAll } from './session';
-import { roundMinutes } from './reports';
+import { countedPauseMs, roundMinutes } from './reports';
 import type { AppState, DaySummary, Id, Millis } from './types';
 import { dayKey, MIN } from '../lib/time';
 
@@ -73,7 +73,8 @@ export function compactSessions(state: AppState, now: Millis, months = ARCHIVE_A
       achieved: 0,
     };
     sum.netMs += p.netMs;
-    sum.pauseMs += p.pauseMs;
+    // Same pause rule as the look back: a parked session is no break.
+    sum.pauseMs += countedPauseMs(p);
     if (billable && client) sum.billableMin += roundMinutes(p.netMs / MIN, client.rounding);
     sum.sessions += 1;
     sum.interruptions += p.interruptionCount;
