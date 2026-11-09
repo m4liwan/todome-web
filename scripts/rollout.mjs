@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * Staged rollout for a GitHub release (electron-updater `stagingPercentage`).
  *
