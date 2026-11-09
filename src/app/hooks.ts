@@ -12,6 +12,7 @@ import { formatClock, MIN } from '../lib/time';
 import { tick } from '../state/scheduler';
 import { useServices } from './services';
 import { contextLabels, type ContextLabels } from '../domain/userContext';
+import { currentMoment } from './attention';
 
 export function useAppState(): AppState {
   const { store } = useServices();
@@ -68,7 +69,8 @@ export function useScheduler(): void {
       // First start: no coach prompts until the setup is done.
       if (!state.settings.onboarded) return;
       const deps = services.deps();
-      const result = tick(state, deps);
+      // Typing right now: the next focus pulse waits for the pause after it.
+      const result = tick(state, deps, { focusSignalActive: currentMoment() === 'typing' });
       if (result.actions.length === 0) return;
       store.dispatch(result.actions);
       for (const c of result.sent) {

@@ -29,7 +29,8 @@ import { modalForFollowUp, type OpenModal } from './modal';
 import { promptVarsFor } from './promptVars';
 import { useServices, type Services } from './services';
 import { trackEvent } from '../services/telemetry';
-import type { CompanionKind } from '../domain/companion';
+import { isGoodMoment, type CompanionKind } from '../domain/companion';
+import { currentMoment } from './attention';
 import { resolveTheme } from './theme';
 
 /**
@@ -94,7 +95,7 @@ export function deliverCompanion(services: Services, message: CompanionMessage):
   for (const prev of active.values()) trackUnanswered(prev.message.kind, shownAt - prev.shownAt >= prev.message.ttlMs ? 'expired' : 'replaced');
   active.clear();
   active.set(message.id, { message, shownAt });
-  trackEvent('companion_shown', { kind: message.kind, surface: desktop && !isCompanionView ? 'window' : 'inline' });
+  trackEvent('companion_shown', { kind: message.kind, surface: desktop && !isCompanionView ? 'window' : 'inline', moment: currentMoment() ?? 'unknown' });
   const avatar = s.settings.companion.avatar;
   const position = s.settings.companion.position;
   if (desktop && !isCompanionView) {
@@ -266,13 +267,17 @@ export function useCompanion(openModal: OpenModal): void {
       }
 
       if (!state.settings.onboarded || isCompanionBusy(Date.now())) return;
-      if (shouldOfferSoftCheck(state, now, energyToday(state, now))) {
+      const moment = currentMoment();
+      // The afternoon check has a two-hour window: it can always wait for a pause.
+      if (shouldOfferSoftCheck(state, now, energyToday(state, now)) && isGoodMoment('soft_check', moment, 0)) {
         services.store.dispatch({ type: 'wellbeing/mark', patch: { softCheckDay: dayKey(now) } });
         deliverCompanion(services, softCheckMessage(services.deps().newId(), state.settings.userName.trim()));
         return;
       }
       const plan = planCompanionVisit(state, projectAll(state, now), now);
       if (!plan || plan.dueAt > now) return;
+      // Never in the middle of a sentence: wait for a micro-pause (at most 3 minutes).
+      if (!isGoodMoment(plan.kind, moment, now - plan.dueAt)) return;
       const id = services.deps().newId();
       if (plan.kind === 'focus_check') {
         const fg = foregroundSession(projectAll(state, now));
@@ -310,6 +315,8 @@ export function useUpdateCompanion(): void {
     let pending: string | null = null;
     /** Version already offered in this session. */
     let offered: string | null = null;
+    /** Since when the offer waits (for the 3-minute cap of the pause rule). */
+    let pendingSince = 0;
 
     const offer = () => {
       if (!alive || pending === null) return;
@@ -320,6 +327,7 @@ export function useUpdateCompanion(): void {
         return;
       }
       if (!canOfferUpdate(state, services.clock.now()) || isCompanionBusy(Date.now())) return;
+      if (!isGoodMoment('update', currentMoment(), Date.now() - pendingSince)) return;
       deliverCompanion(services, updateReadyMessage(services.deps().newId(), state.settings.companion.avatar, pending || undefined));
       offered = pending;
       pending = null;
@@ -329,6 +337,7 @@ export function useUpdateCompanion(): void {
       const key = version ?? '';
       if (key === offered || key === pending) return;
       pending = key;
+      pendingSince = Date.now();
       offer();
     };
 

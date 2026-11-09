@@ -43,6 +43,7 @@ import { dayKey, MIN } from '../lib/time';
 import { useCompanion, useUpdateCompanion } from './companion';
 import { undoLast } from './undo';
 import { useQuickCapture } from './quickCapture';
+import { useAttention } from './attention';
 import { useDocumentTitle, useIdleDetection, usePowerEvents, useProjections, useScheduler } from './hooks';
 import type { Modal } from './modal';
 import { useOverlaySync } from './overlay';
@@ -170,6 +171,7 @@ export function App() {
   useCompanion(setModal);
   useUpdateCompanion();
   useQuickCapture();
+  useAttention();
   useSpotlight();
 
   const { state, now, projections, foreground } = useProjections();

@@ -123,6 +123,21 @@ describe('update offer through the companion', () => {
     expect(bridge.shown).toHaveLength(1);
   });
 
+  it('waits for a pause in typing before it asks for the restart', async () => {
+    const { setAttentionSample } = await import('../app/attention');
+    services = fakeServices(() => ready()).services;
+    renderHook(() => useUpdateCompanion());
+    await flush();
+    setAttentionSample(0);
+    act(() => bridge.fireReady({ version: '1.15.0' }));
+    expect(bridge.shown).toHaveLength(0);
+
+    setAttentionSample(8);
+    act(() => vi.advanceTimersByTime(5000));
+    expect(bridge.shown).toHaveLength(1);
+    setAttentionSample(null);
+  });
+
   it('picks up an update that was downloaded before the window loaded', async () => {
     bridge.state = { status: 'ready', auto: true, current: '1.14.1', version: '1.15.0' };
     services = fakeServices(() => ready()).services;

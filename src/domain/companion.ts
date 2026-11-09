@@ -351,6 +351,35 @@ export function canOfferUpdate(state: AppState, now: Millis): boolean {
   return state.settings.onboarded && state.settings.companion.enabled && quietReason(now, state.settings) !== 'dnd';
 }
 
+/**
+ * Interruption intelligence: when may a visit appear? Interruptions at a
+ * natural break (the hands pause for a few seconds) cost far less re-entry
+ * than ones in the middle of a sentence. So visits that are not tied to the
+ * session's timing wait for a micro-pause, but never longer than 3 minutes,
+ * and nobody talks to an empty chair.
+ *   typing       input within the last 4 s
+ *   micro_pause  4 s … 2 min without input
+ *   away         2 min or more (the idle detection takes over from there)
+ */
+export type Moment = 'typing' | 'micro_pause' | 'away';
+export const MICRO_PAUSE_SEC = 4;
+export const AWAY_SEC = 120;
+export const MAX_WAIT_FOR_PAUSE_MS = 3 * MIN;
+/** Tied to the session's timing or asked for right now: never held back. */
+const RIGHT_NOW: ReadonlySet<CompanionKind> = new Set<CompanionKind>(['checkin', 'hello', 'feel', 'motivation']);
+
+export function momentFromIdle(idleSeconds: number): Moment {
+  if (idleSeconds >= AWAY_SEC) return 'away';
+  return idleSeconds < MICRO_PAUSE_SEC ? 'typing' : 'micro_pause';
+}
+
+/** `moment` null = no input signal (browser): deliver as before. */
+export function isGoodMoment(kind: CompanionKind, moment: Moment | null, waitingMs: number): boolean {
+  if (moment === null || RIGHT_NOW.has(kind)) return true;
+  if (moment === 'away') return false;
+  return moment === 'micro_pause' || waitingMs >= MAX_WAIT_FOR_PAUSE_MS;
+}
+
 /** Motivation only after real progress, at most every 30 minutes. */
 export function canMotivate(state: AppState, now: Millis): boolean {
   const c = state.settings.companion;
