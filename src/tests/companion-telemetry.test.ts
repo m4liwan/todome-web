@@ -54,11 +54,11 @@ describe('companion engagement telemetry (opt-in)', () => {
     await settle();
 
     expect(events).toEqual([
-      ['companion_shown', { kind: 'focus_check', surface: 'window' }],
+      ['companion_shown', { kind: 'focus_check', surface: 'window', moment: 'unknown' }],
       ['companion_answered', { kind: 'focus_check', option: 'on_track', response: 'lt_30s' }],
-      ['companion_shown', { kind: 'hydration', surface: 'window' }],
+      ['companion_shown', { kind: 'hydration', surface: 'window', moment: 'unknown' }],
       ['companion_unanswered', { kind: 'hydration', reason: 'replaced' }],
-      ['companion_shown', { kind: 'motivation', surface: 'window' }],
+      ['companion_shown', { kind: 'motivation', surface: 'window', moment: 'unknown' }],
       ['companion_unanswered', { kind: 'motivation', reason: 'expired' }],
     ]);
     expect(JSON.stringify(events)).not.toContain('Geheimer Text');
