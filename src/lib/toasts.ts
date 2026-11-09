@@ -1,7 +1,13 @@
 /** Minimal visible toast queue (errors and confirmations). */
+export interface ToastAction {
+  label: string;
+  run: () => void;
+}
+
 export interface Toast {
   id: number;
   message: string;
+  action?: ToastAction;
 }
 
 let toasts: Toast[] = [];
@@ -15,9 +21,9 @@ export const toastStore = {
     listeners.add(listener);
     return () => listeners.delete(listener);
   },
-  push(message: string, ttlMs = 5000) {
+  push(message: string, ttlMs = 5000, action?: ToastAction) {
     const id = ++seq;
-    toasts = [...toasts.slice(-2), { id, message }];
+    toasts = [...toasts.slice(-2), action ? { id, message, action } : { id, message }];
     emit();
     setTimeout(() => toastStore.dismiss(id), ttlMs);
   },

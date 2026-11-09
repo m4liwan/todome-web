@@ -286,6 +286,8 @@ export interface WeatherLocation {
   longitude: number;
 }
 
+export type QuickCaptureKey = 'ctrl_alt_space' | 'ctrl_alt_t' | 'alt_shift_n' | 'off';
+
 export interface Settings {
   userName: string;
   /** What ToDoMe is used for; only changes wording (see domain/userContext). */
@@ -297,6 +299,8 @@ export interface Settings {
   tourDone: boolean;
   /** The companion's short intro in the "Begleiter" hub was finished or skipped. */
   companionIntroSeen: boolean;
+  /** Global shortcut for quick capture (desktop), or off. */
+  quickCapture: QuickCaptureKey;
   theme: ThemePreference;
   tone: Tone;
   /** HH:MM local time. */

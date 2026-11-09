@@ -25,6 +25,7 @@ import type {
 } from '../domain/types';
 import type { Action } from './reducer';
 import { dayKey } from '../lib/time';
+import { parseQuickAdd, plannedDayFor, resolveClient } from '../domain/quickAdd';
 
 /**
  * Commands validate invariants against the current state and return the
@@ -99,6 +100,30 @@ export function createTask(state: AppState, deps: Deps, input: TaskInput, positi
     updatedAt: deps.now,
   };
   return { ...ok([{ type: 'task/add', task, position }]), taskId: id };
+}
+
+/** Estimate when the quick line names none: a small, honest default. */
+export const QUICK_DEFAULT_MIN = 30;
+
+/**
+ * One line from quick capture becomes a task (see domain/quickAdd). An
+ * unknown @client stays in the title instead of disappearing.
+ */
+export function quickAddTask(state: AppState, deps: Deps, line: string): CommandResult & { taskId?: Id; plannedDay?: string; clientName?: string } {
+  const draft = parseQuickAdd(line);
+  const client = resolveClient(draft.clientQuery, state.clients);
+  const title = draft.clientQuery && !client ? `${draft.title} @${draft.clientQuery}` : draft.title;
+  const plannedDay = plannedDayFor(draft, dayKey(deps.now));
+  const result = createTask(state, deps, {
+    title,
+    type: 'deep_work',
+    clientId: client?.id ?? null,
+    estimateMin: Math.min(600, Math.max(5, draft.estimateMin ?? QUICK_DEFAULT_MIN)),
+    intention: '',
+    priority: draft.priority ?? 'normal',
+    plannedDay,
+  });
+  return result.ok ? { ...result, plannedDay, ...(client ? { clientName: client.name } : {}) } : result;
 }
 
 export function updateTask(state: AppState, deps: Deps, id: Id, patch: Partial<Omit<Task, 'id' | 'createdAt'>>): CommandResult {

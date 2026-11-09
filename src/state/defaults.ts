@@ -50,6 +50,7 @@ export const DEFAULT_SETTINGS: Settings = {
   onboarded: false,
   tourDone: false,
   companionIntroSeen: false,
+  quickCapture: 'ctrl_alt_space',
   // New installs follow Windows (light or dark) right from the first frame.
   theme: 'system',
   tone: 'direct',

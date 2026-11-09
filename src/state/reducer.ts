@@ -22,6 +22,8 @@ export type Action =
   | { type: 'task/add'; task: Task; position?: 'start' | 'end' }
   | { type: 'task/update'; id: Id; patch: Partial<Omit<Task, 'id' | 'createdAt'>>; at: Millis }
   | { type: 'task/reorder'; order: Id[] }
+  /** Undo of a fresh capture only: a task with sessions is never removed. */
+  | { type: 'task/remove'; id: Id }
   | { type: 'session/create'; session: Session }
   | { type: 'session/event'; event: SessionEvent }
   | { type: 'snapshot/save'; snapshot: ContextSnapshot }
@@ -155,6 +157,13 @@ export function reducer(state: AppState, action: Action): AppState {
       const day = dayKey(action.thought.createdAt);
       const parkedLog = { ...state.wellbeing.parkedLog, [day]: (state.wellbeing.parkedLog[day] ?? 0) + 1 };
       return { ...state, thoughts: [action.thought, ...state.thoughts].slice(0, 60), wellbeing: { ...state.wellbeing, parkedLog } };
+    }
+
+    case 'task/remove': {
+      if (!state.tasks[action.id] || Object.values(state.sessions).some((s) => s.taskId === action.id)) return state;
+      const tasks = { ...state.tasks };
+      delete tasks[action.id];
+      return { ...state, tasks, taskOrder: state.taskOrder.filter((id) => id !== action.id) };
     }
 
     case 'thought/remove':

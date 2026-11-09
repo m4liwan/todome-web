@@ -41,6 +41,8 @@ import { ProDialog } from '../components/dialogs/ProDialog';
 import { openCheckIns } from '../domain/checkinEngine';
 import { dayKey, MIN } from '../lib/time';
 import { useCompanion, useUpdateCompanion } from './companion';
+import { undoLast } from './undo';
+import { useQuickCapture } from './quickCapture';
 import { useDocumentTitle, useIdleDetection, usePowerEvents, useProjections, useScheduler } from './hooks';
 import type { Modal } from './modal';
 import { useOverlaySync } from './overlay';
@@ -167,6 +169,7 @@ export function App() {
   useUpdateNotice();
   useCompanion(setModal);
   useUpdateCompanion();
+  useQuickCapture();
   useSpotlight();
 
   const { state, now, projections, foreground } = useProjections();
@@ -270,6 +273,12 @@ export function App() {
     const onKey = (e: KeyboardEvent) => {
       const r = restKeys.current;
       if (e.repeat) return;
+      // Ctrl+Z undoes the last crossing-out or quick capture, but never steals undo from a text field.
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') {
+        const t = e.target as HTMLElement | null;
+        if (!t?.closest?.('input, textarea, [contenteditable="true"]') && undoLast()) e.preventDefault();
+        return;
+      }
       if (r.standby && (e.key === 'Enter' || e.key === 'Escape')) {
         e.preventDefault();
         (document.activeElement as HTMLElement | null)?.blur?.();

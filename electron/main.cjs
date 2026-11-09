@@ -16,6 +16,7 @@ const {
   Notification,
   Tray,
   crashReporter,
+  globalShortcut,
   ipcMain,
   nativeImage,
   nativeTheme,
@@ -620,6 +621,89 @@ function startUpdater() {
 let readyAnnouncedFor = null;
 let lastUpdateStatus = null;
 
+// ---------------------------------------------------------------------------
+// Quick capture: a global shortcut opens a small input over everything
+// (also while ToDoMe sits in the tray). The line goes to the app window,
+// which creates the task and answers; the window then says "Gemerkt".
+// ---------------------------------------------------------------------------
+const QUICK_KEYS = { ctrl_alt_space: 'Control+Alt+Space', ctrl_alt_t: 'Control+Alt+T', alt_shift_n: 'Alt+Shift+N' };
+const QUICK_SIZE = { width: 600, height: 176 };
+/** @type {BrowserWindow | null} */ let quick = null;
+let quickAccel = null;
+let quickSeq = 0;
+/** Replies the app owes the quick window, by request id. */
+const quickPending = new Map();
+const fromQuick = (event) => Boolean(quick) && !quick.isDestroyed() && event.sender === quick.webContents && isTrustedUrl(event.senderFrame?.url ?? '');
+
+function createQuick() {
+  quick = new BrowserWindow({
+    ...QUICK_SIZE,
+    show: false,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    backgroundColor: '#00000000',
+    title: 'ToDoMe. Schnellerfassung',
+    icon: path.join(ASSETS_DIR, 'icon.png'),
+    webPreferences: { ...secureWebPreferences, spellcheck: true },
+  });
+  quick.setAlwaysOnTop(true, 'pop-up-menu');
+  hardenContents(quick.webContents);
+  // Clicking elsewhere puts it away, like any launcher.
+  quick.on('blur', hideQuick);
+  quick.on('closed', () => {
+    quick = null;
+  });
+  void quick.loadURL(appUrl('#quick'));
+}
+
+function hideQuick() {
+  if (quick && !quick.isDestroyed() && quick.isVisible()) quick.hide();
+}
+
+function openQuick() {
+  if (!quick || quick.isDestroyed()) createQuick();
+  // The same keys close it again.
+  if (quick.isVisible()) return hideQuick();
+  const { workArea: a } = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+  quick.setBounds({ x: Math.round(a.x + (a.width - QUICK_SIZE.width) / 2), y: Math.round(a.y + a.height * 0.24), ...QUICK_SIZE });
+  const announce = () => quick && !quick.isDestroyed() && quick.webContents.send('quick:open', { theme: nativeTheme.shouldUseDarkColors ? 'dark' : 'light' });
+  if (quick.webContents.isLoading()) quick.webContents.once('did-finish-load', announce);
+  else announce();
+  quick.show();
+  quick.focus();
+}
+
+/** Registers the chosen shortcut (or none). `ok: false` = taken by another app. */
+function setQuickKey(key) {
+  if (quickAccel) globalShortcut.unregister(quickAccel);
+  quickAccel = null;
+  const accelerator = QUICK_KEYS[key];
+  if (!accelerator) return { ok: key === 'off', active: false };
+  let ok = false;
+  try {
+    ok = globalShortcut.register(accelerator, openQuick);
+  } catch (err) {
+    console.warn('[quick] shortcut failed', err);
+  }
+  if (!ok) {
+    console.warn(`[quick] shortcut taken: ${accelerator}`);
+    return { ok: false, active: false };
+  }
+  quickAccel = accelerator;
+  log.info(`[quick] ${accelerator}`);
+  // Load it in the background, so the first use opens without a wait.
+  setTimeout(() => {
+    if (quickAccel && !quick && !quitting) createQuick();
+  }, 15_000);
+  return { ok: true, active: true };
+}
+
 /** Let the app save first (like a normal quit), then install and restart. */
 function installUpdateNow() {
   if (!updates || !updates.ready) return;
@@ -629,6 +713,7 @@ function installUpdateNow() {
     flushedBeforeQuit = true;
     if (companion && !companion.isDestroyed()) companion.destroy();
     if (overlay && !overlay.isDestroyed()) overlay.destroy();
+    if (quick && !quick.isDestroyed()) quick.destroy();
     if (!updates.install()) quitting = false;
   };
   if (!win || win.isDestroyed()) return go();
@@ -870,6 +955,41 @@ function registerIpc() {
     return media.send(cmd);
   });
 
+  // Quick capture: the app picks the shortcut; the quick window sends one line.
+  ipcMain.handle('todome:quick-config', (event, key) => {
+    if (!fromApp(event)) throw new Error('untrusted sender');
+    return setQuickKey(String(key));
+  });
+  ipcMain.handle('quick:submit', (event, text) => {
+    if (!fromQuick(event) || typeof text !== 'string') return { ok: false, message: 'Das hat nicht geklappt.' };
+    const line = text.replace(/\s+/g, ' ').trim().slice(0, 300);
+    if (!line) return { ok: false, message: 'Schreib kurz, was du dir merken willst.' };
+    if (!win || win.isDestroyed()) return { ok: false, message: 'ToDoMe. startet gerade. Versuch es gleich noch einmal.' };
+    const id = ++quickSeq;
+    const target = win;
+    return new Promise((resolve) => {
+      const timer = setTimeout(() => {
+        quickPending.delete(id);
+        resolve({ ok: false, message: 'ToDoMe. antwortet gerade nicht. Versuch es gleich noch einmal.' });
+      }, 4000);
+      quickPending.set(id, (result) => {
+        clearTimeout(timer);
+        resolve(result);
+      });
+      target.webContents.send('todome:quick-add', { id, text: line });
+    });
+  });
+  ipcMain.on('todome:quick-result', (event, result) => {
+    if (!fromApp(event) || !result || typeof result !== 'object') return;
+    const done = quickPending.get(result.id);
+    if (!done) return;
+    quickPending.delete(result.id);
+    done({ ok: result.ok === true, message: String(result.message || '').slice(0, 200) });
+  });
+  ipcMain.on('quick:close', (event) => {
+    if (fromQuick(event)) hideQuick();
+  });
+
   // Datensafe: the app sends its serialized state; written atomically, rotated.
   ipcMain.on('todome:vault-save', (event, payload) => {
     if (!fromApp(event) || !payload || typeof payload !== 'object') return;
@@ -963,6 +1083,7 @@ if (!app.requestSingleInstanceLock()) {
     if (flushedBeforeQuit || !win || win.isDestroyed()) {
       if (companion && !companion.isDestroyed()) companion.destroy();
       if (overlay && !overlay.isDestroyed()) overlay.destroy();
+      if (quick && !quick.isDestroyed()) quick.destroy();
       if (media) media.dispose();
       if (updates) updates.dispose();
       return;
@@ -977,6 +1098,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('window-all-closed', () => app.quit());
+  app.on('will-quit', () => globalShortcut.unregisterAll());
 }
 
 app.on('web-contents-created', (_e, contents) => {

@@ -14,6 +14,7 @@ import { hasPro, openPro } from '../../app/pro';
 import { IconLock } from '../icons';
 import { businessShown, contextLabels } from '../../domain/userContext';
 import { trackEvent } from '../../services/telemetry';
+import { announceWithUndo } from '../../app/undo';
 
 type Props = { modal: Extract<Modal, { kind: 'task' }> | null; onClose: () => void };
 
@@ -130,9 +131,11 @@ export function TaskDialog({ modal, onClose }: Props) {
               type="button"
               className="btn btn--quiet btn--danger"
               onClick={() => {
-                if (services.run(updateTask(state, services.deps(), editing.id, { status: 'dropped' }))) {
+                const { id, status, title } = editing;
+                if (services.run(updateTask(state, services.deps(), id, { status: 'dropped' }))) {
                   trackEvent('task_dropped', { task_type: editing.type });
                   onClose();
+                  announceWithUndo(services, `„${title}“ gestrichen.`, () => services.run(updateTask(services.store.getState(), services.deps(), id, { status })));
                 }
               }}
             >

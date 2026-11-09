@@ -72,6 +72,15 @@ contextBridge.exposeInMainWorld('todome', {
   overlayDragMove: (delta) => ipcRenderer.send('overlay:drag-move', delta),
   overlayDragEnd: () => ipcRenderer.send('overlay:drag-end'),
 
+  // Quick capture: the app sets the shortcut and answers each line
+  quickConfig: (key) => ipcRenderer.invoke('todome:quick-config', String(key)),
+  onQuickAdd: (callback) => subscribe('todome:quick-add', callback),
+  quickResult: (result) => ipcRenderer.send('todome:quick-result', result),
+  // Quick capture window
+  onQuickOpen: (callback) => subscribe('quick:open', callback),
+  quickSubmit: (text) => ipcRenderer.invoke('quick:submit', String(text)),
+  quickClose: () => ipcRenderer.send('quick:close'),
+
   // Companion window
   onCompanionMessage: (callback) => subscribe('companion:message', callback),
   onCompanionDismiss: (callback) => subscribe('companion:dismiss', callback),

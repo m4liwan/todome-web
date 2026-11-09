@@ -5,9 +5,11 @@ import { ServicesContext, type AppMode, type Services } from './app/services';
 import { createClock, systemClock, type Clock, type ClockState } from './lib/clock';
 import { CompanionWindow } from './components/CompanionHost';
 import { OverlayWindow } from './components/OverlayWindow';
-import { desktop, isCompanionView, isOverlayView, isRecoveryView } from './lib/desktop';
+import { desktop, isCompanionView, isOverlayView, isQuickView, isRecoveryView } from './lib/desktop';
+import { QuickCaptureWindow } from './components/QuickCapture';
 import { browserStore, newId } from './lib/storage';
-import { toastStore } from './lib/toasts';
+import { toastStore, type ToastAction } from './lib/toasts';
+import { UNDO_MS } from './app/undo';
 import { atTimeOfDay } from './lib/time';
 import { freeState } from './app/pro';
 import { connectProgression, onProgression } from './app/progression';
@@ -130,8 +132,8 @@ function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Service
   if (import.meta.env.DEV) Object.assign(window, { __todome: { store, clock } });
 
   const liveRegion = document.getElementById('announcer');
-  const announce = (message: string) => {
-    toastStore.push(message);
+  const announce = (message: string, action?: ToastAction) => {
+    toastStore.push(message, action ? UNDO_MS : 5000, action);
     if (!liveRegion) return;
     liveRegion.textContent = '';
     window.setTimeout(() => (liveRegion.textContent = message), 30);
@@ -139,7 +141,7 @@ function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Service
   // Level-ups, unlocks, freezes and the welcome back get a short sentence.
   onProgression((events) => {
     const name = avatarName(store.getState().settings.companion.avatar);
-    progressionAnnouncements(events, name, clock.now()).forEach(announce);
+    progressionAnnouncements(events, name, clock.now()).forEach((m) => announce(m));
   });
 
   let resetting = false;
@@ -213,13 +215,20 @@ function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Service
 const rootEl = document.getElementById('root');
 if (!rootEl) throw new Error('#root missing');
 // Every window writes its uncaught errors into the shell's local log file.
-installErrorLog(isCompanionView ? 'companion' : isOverlayView ? 'overlay' : isRecoveryView ? 'recovery' : 'app');
+installErrorLog(isCompanionView ? 'companion' : isOverlayView ? 'overlay' : isQuickView ? 'quick' : isRecoveryView ? 'recovery' : 'app');
 
 if (isCompanionView) {
   // Transparent desktop companion window: renders messages only, no app state.
   createRoot(rootEl).render(
     <StrictMode>
       <CompanionWindow />
+    </StrictMode>,
+  );
+} else if (isQuickView) {
+  // Quick capture: one input line; the app window creates the task.
+  createRoot(rootEl).render(
+    <StrictMode>
+      <QuickCaptureWindow />
     </StrictMode>,
   );
 } else if (isOverlayView) {

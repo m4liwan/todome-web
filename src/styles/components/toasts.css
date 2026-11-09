@@ -39,3 +39,27 @@
   background: rgb(var(--accent-2-rgb) / 0.14);
   color: var(--ink);
 }
+.toast--action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 8px 8px 18px;
+  text-align: left;
+}
+.toast__action {
+  flex: none;
+  min-height: 32px;
+  padding: 6px 14px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.toast__action:hover,
+.toast__action:focus-visible {
+  background: rgb(127 127 127 / 0.18);
+}

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
-import type { AmbienceId, AppState, Client, LayoutId, PaletteId, Rounding, Settings, Tone } from '../../domain/types';
+import type { AmbienceId, AppState, Client, LayoutId, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
+import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
 import { desktop } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
 import { freeState, hasPro, isProLayout, isProPalette, openPro, themesUnlocked } from '../../app/pro';
@@ -195,6 +196,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             <NumberField label="Pause vorschlagen nach (min Fokus)" value={s.focusBudgetMin} min={30} max={240} step={5} onChange={(v) => set({ focusBudgetMin: v })} />
           </div>
         </section>
+        {desktop && <QuickCaptureSection value={s.quickCapture} onChange={(quickCapture) => set({ quickCapture })} />}
         <section>
           <h3>Nachfragen</h3>
           <div className="form--grid">
@@ -579,6 +581,31 @@ function DesktopSection() {
 }
 
 /** Two-step confirmation inside the page (no blocking browser dialogs). */
+/** Global shortcut for quick capture; says plainly when another program owns it. */
+function QuickCaptureSection({ value, onChange }: { value: QuickCaptureKey; onChange: (key: QuickCaptureKey) => void }) {
+  const active = useQuickStatus();
+  return (
+    <section>
+      <h3>Schnellerfassung</h3>
+      <p className="muted small">
+        Ein Tastenkürzel öffnet überall ein kleines Eingabefeld, auch wenn ToDoMe. im Infobereich liegt. Am Ende der Zeile kannst du ergänzen: 45m, !hoch, @Kunde,
+        morgen.
+      </p>
+      <div className="field">
+        <span>Tastenkürzel</span>
+        <Select value={value} onChange={(v) => onChange(v as QuickCaptureKey)} aria-label="Tastenkürzel für die Schnellerfassung">
+          {(Object.keys(QUICK_KEY_LABELS) as QuickCaptureKey[]).map((k) => (
+            <option key={k} value={k}>
+              {QUICK_KEY_LABELS[k]}
+            </option>
+          ))}
+        </Select>
+      </div>
+      {value !== 'off' && active === false && <p className="small">Dieses Kürzel ist schon von einem anderen Programm belegt. Wähle bitte ein anderes.</p>}
+    </section>
+  );
+}
+
 function ResetButton({ demo, onConfirm }: { demo: boolean; onConfirm: () => void }) {
   const [armed, setArmed] = useState(false);
   if (!armed) {

@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import type { Clock } from '../lib/clock';
 import type { CommandResult, Deps } from '../state/commands';
 import type { Store } from '../state/store';
+import type { ToastAction } from '../lib/toasts';
 
 export type AppMode = 'live' | 'demo';
 
@@ -12,7 +13,8 @@ export interface Services {
   deps(): Deps;
   /** Runs a command; on failure the error is announced. Returns success. */
   run(result: CommandResult): boolean;
-  announce(message: string): void;
+  /** A short toast plus the screen reader live region; `action` adds a button (e.g. "Rückgängig"). */
+  announce(message: string, action?: ToastAction): void;
   resetData(): void;
 }
 

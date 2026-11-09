@@ -1,6 +1,6 @@
 import type { CompanionMessage } from '../domain/companion';
 import type { Activity } from '../domain/energy';
-import type { AvatarId, OverlaySettings, PaletteId, ThemePreference } from '../domain/types';
+import type { AvatarId, OverlaySettings, PaletteId, QuickCaptureKey, ThemePreference } from '../domain/types';
 
 /**
  * Bridge to the Electron shell (`electron/preload.cjs`). In a normal browser
@@ -150,6 +150,13 @@ export interface DesktopBridge {
   overlayDragMove(delta: { dx: number; dy: number }): void;
   overlayDragEnd(): void;
   companionHover(hovering: boolean): void;
+  /** Registers the global quick-capture shortcut (or none with 'off'). `ok: false` = taken by another app. */
+  quickConfig(key: QuickCaptureKey): Promise<{ ok: boolean; active: boolean }>;
+  onQuickAdd(callback: (request: { id: number; text: string }) => void): () => void;
+  quickResult(result: { id: number; ok: boolean; message: string }): void;
+  onQuickOpen(callback: (info: { theme: 'light' | 'dark' }) => void): () => void;
+  quickSubmit(text: string): Promise<{ ok: boolean; message: string }>;
+  quickClose(): void;
   companionClosed(): void;
 }
 
@@ -163,5 +170,7 @@ export const desktop: DesktopBridge | null = typeof window !== 'undefined' && wi
 export const isDesktop = desktop !== null;
 export const isCompanionView = typeof window !== 'undefined' && window.location.hash === '#companion';
 export const isOverlayView = typeof window !== 'undefined' && window.location.hash === '#overlay';
+/** The small quick-capture window (global shortcut). */
+export const isQuickView = typeof window !== 'undefined' && window.location.hash === '#quick';
 /** Opened by the shell after repeated renderer crashes (electron/crash-guard.cjs). */
 export const isRecoveryView = typeof window !== 'undefined' && window.location.hash === '#recovery';

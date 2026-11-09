@@ -147,6 +147,7 @@ export function parseState(raw: string | null): AppState | null {
         telemetryEnabled: settings.telemetryEnabled === true,
         // Shown once to everyone, including people updating from before the hub.
         companionIntroSeen: settings.companionIntroSeen === true,
+        quickCapture: (['ctrl_alt_space', 'ctrl_alt_t', 'alt_shift_n', 'off'] as const).find((k) => k === settings.quickCapture) ?? DEFAULT_SETTINGS.quickCapture,
         companion: {
           ...DEFAULT_COMPANION,
           ...(companion as Partial<AppState['settings']['companion']>),
