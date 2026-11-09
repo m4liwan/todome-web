@@ -366,6 +366,10 @@ export interface Wellbeing {
   parkedLog: Record<string, number>;
   /** "Wie hat sich das angefühlt?" after a block, per session. */
   feelLog: Record<string, { at: Millis; feel: SessionFeel }>;
+  /** Tomorrow's first step, chosen at the Feierabend (picked up by the morning dock-in). */
+  firstStep: { day: string; taskId: Id } | null;
+  /** Day the companion offered the first step in the morning (once per day). */
+  dockedDay: string | null;
 }
 
 export type SessionFeel = 'smooth' | 'tough' | 'neutral';

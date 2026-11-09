@@ -69,8 +69,9 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
     if (proud.trim()) services.store.dispatch({ type: 'wellbeing/mark', patch: { proud: { ...state.wellbeing.proud, [today]: proud.trim().slice(0, 280) } } });
     if (chosen) {
       services.run(deferTask(services.store.getState(), services.deps(), chosen, tomorrow));
-      // Tomorrow's first step leads the plan.
+      // Tomorrow's first step leads the plan, and the companion offers it in the morning.
       services.store.dispatch({ type: 'task/reorder', order: [chosen] });
+      services.store.dispatch({ type: 'wellbeing/mark', patch: { firstStep: { day: tomorrow, taskId: chosen } } });
     }
     services.store.dispatch({ type: 'coach/closeDay', day: today });
     const w = services.store.getState().wellbeing;

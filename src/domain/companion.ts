@@ -1,6 +1,6 @@
 import { quietReason } from './checkinEngine';
 import { foregroundSession, type SessionProjection } from './session';
-import type { AppState, AvatarId, Id, Millis, SessionFeel, TaskPriority, Tone } from './types';
+import type { AppState, AvatarId, Id, Millis, SessionFeel, Task, TaskPriority, Tone } from './types';
 import { atTimeOfDay, dayKey, MIN } from '../lib/time';
 
 /**
@@ -11,7 +11,7 @@ import { atTimeOfDay, dayKey, MIN } from '../lib/time';
  * Planning is pure; delivery (desktop window or in-app bubble) lives in the app layer.
  */
 
-export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel' | 'update';
+export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel' | 'update' | 'dock_in';
 export type Mood = 'happy' | 'curious' | 'calm' | 'alert' | 'sleepy';
 
 export interface CompanionOption {
@@ -31,6 +31,8 @@ export interface CompanionMessage {
   checkInId?: Id;
   /** For kind "feel": the block that just ended. */
   sessionId?: Id;
+  /** For kind "dock_in": the task chosen as the first step. */
+  taskId?: Id;
   /** Auto-hide after this many ms. */
   ttlMs: number;
 }
@@ -320,6 +322,42 @@ export function helloMessage(id: Id, name: string, avatar: AvatarId): CompanionM
     mood: 'happy',
     options: [{ id: 'thanks', label: 'Hallo!', primary: true }],
     ttlMs: 15_000,
+  };
+}
+
+/** Option ids of the morning dock-in (routed in app/companion.ts). */
+export const DOCK_START = 'start';
+export const DOCK_LATER = 'later';
+
+/**
+ * Morning dock-in: the first step chosen at yesterday's Feierabend, offered
+ * once at the first calm moment of the working day. Nothing when the day
+ * already started (a running session), the task is gone or done, or it is
+ * quiet time.
+ */
+export function dockInTask(state: AppState, projections: readonly SessionProjection[], now: Millis): Task | null {
+  const step = state.wellbeing.firstStep;
+  const today = dayKey(now);
+  if (!step || step.day !== today || state.wellbeing.dockedDay === today) return null;
+  if (!state.settings.onboarded || !state.settings.companion.enabled || quietReason(now, state.settings) !== null) return null;
+  if (foregroundSession(projections)) return null;
+  const task = state.tasks[step.taskId];
+  return task && task.status === 'planned' ? task : null;
+}
+
+export function dockInMessage(id: Id, name: string, task: Pick<Task, 'id' | 'title'>): CompanionMessage {
+  return {
+    id,
+    kind: 'dock_in',
+    taskId: task.id,
+    title: name ? `Guten Morgen, ${name}` : 'Guten Morgen',
+    text: `Gestern hast du dir vorgenommen: „${task.title}“. Direkt damit loslegen?`,
+    mood: 'happy',
+    options: [
+      { id: DOCK_START, label: 'Loslegen', primary: true },
+      { id: DOCK_LATER, label: 'Erst planen' },
+    ],
+    ttlMs: 120_000,
   };
 }
 

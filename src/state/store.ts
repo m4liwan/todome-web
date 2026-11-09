@@ -159,6 +159,9 @@ export function parseState(raw: string | null): AppState | null {
       },
       wellbeing: (() => {
         const w = { ...DEFAULT_WELLBEING, ...(isRecord(data.wellbeing) ? (data.wellbeing as Partial<AppState['wellbeing']>) : {}) };
+        const fs = w.firstStep as unknown;
+        if (!isRecord(fs) || typeof fs.day !== 'string' || typeof fs.taskId !== 'string') w.firstStep = null;
+        if (typeof w.dockedDay !== 'string') w.dockedDay = null;
         // Keep the counter of the last recorded day in the log (v2 had no history).
         if (w.waterDay && !(w.waterDay in w.waterLog)) w.waterLog = { ...w.waterLog, [w.waterDay]: w.waterCount };
         // v3 knew only today's energy; seed the curve with it.

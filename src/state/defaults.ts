@@ -28,6 +28,8 @@ export const DEFAULT_WELLBEING: Wellbeing = {
   closedLog: {},
   routines: {},
   softCheckDay: null,
+  firstStep: null,
+  dockedDay: null,
   breathLog: {},
   parkedLog: {},
   feelLog: {},

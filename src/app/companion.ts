@@ -17,6 +17,9 @@ import {
   canOfferUpdate,
   updateReadyMessage,
   UPDATE_RESTART,
+  dockInMessage,
+  dockInTask,
+  DOCK_START,
 } from '../domain/companion';
 import { promptFor, type AnswerId } from '../domain/copy';
 import { foregroundSession, projectAll } from '../domain/session';
@@ -221,6 +224,13 @@ export function handleCompanionReply(services: Services, openModal: OpenModal, m
       }
       return;
     }
+    case 'dock_in': {
+      // "Loslegen": straight into the start dialog of yesterday's first step.
+      if (optionId !== DOCK_START || !message.taskId || !store.getState().tasks[message.taskId]) return;
+      bringToFront();
+      openModal({ kind: 'start', taskId: message.taskId });
+      return;
+    }
     case 'update': {
       if (optionId !== UPDATE_RESTART) {
         services.announce('Alles klar. Das Update wird beim nächsten Beenden installiert.');
@@ -274,13 +284,21 @@ export function useCompanion(openModal: OpenModal): void {
         deliverCompanion(services, softCheckMessage(services.deps().newId(), state.settings.userName.trim()));
         return;
       }
-      const plan = planCompanionVisit(state, projectAll(state, now), now);
+      const projections = projectAll(state, now);
+      // Morning: yesterday's first step, once, at the first calm moment of the working day.
+      const firstStep = dockInTask(state, projections, now);
+      if (firstStep && isGoodMoment('dock_in', moment, 0)) {
+        services.store.dispatch({ type: 'wellbeing/mark', patch: { dockedDay: dayKey(now) } });
+        deliverCompanion(services, dockInMessage(services.deps().newId(), state.settings.userName.trim(), firstStep));
+        return;
+      }
+      const plan = planCompanionVisit(state, projections, now);
       if (!plan || plan.dueAt > now) return;
       // Never in the middle of a sentence: wait for a micro-pause (at most 3 minutes).
       if (!isGoodMoment(plan.kind, moment, now - plan.dueAt)) return;
       const id = services.deps().newId();
       if (plan.kind === 'focus_check') {
-        const fg = foregroundSession(projectAll(state, now));
+        const fg = foregroundSession(projections);
         const task = fg ? state.tasks[fg.taskId] : undefined;
         if (!task) return;
         services.store.dispatch({ type: 'wellbeing/mark', patch: { lastVisitAt: now } });
