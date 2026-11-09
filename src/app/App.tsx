@@ -43,6 +43,9 @@ import { dayKey, MIN } from '../lib/time';
 import { useCompanion, useUpdateCompanion } from './companion';
 import { undoLast } from './undo';
 import { useQuickCapture } from './quickCapture';
+import { usePomodoro } from './pomodoro';
+import { effectiveFocusStyle, focusTimerOn } from './focusTimer';
+import { pomodoroPhase } from '../domain/pomodoro';
 import { useAttention } from './attention';
 import { useDocumentTitle, useIdleDetection, usePowerEvents, useProjections, useScheduler } from './hooks';
 import type { Modal } from './modal';
@@ -171,6 +174,8 @@ export function App() {
   useCompanion(setModal);
   useUpdateCompanion();
   useQuickCapture();
+  // Focus timer (level 10): starts its breaks and lets the companion comment.
+  usePomodoro();
   useAttention();
   useSpotlight();
 
@@ -187,7 +192,8 @@ export function App() {
 
   const open = useMemo(() => openCheckIns(Object.values(state.checkIns)), [state.checkIns]);
   const fgTask = foreground ? state.tasks[foreground.taskId] : undefined;
-  useDocumentTitle(foreground, fgTask?.title ?? null, open.length);
+  const timer = foreground && focusTimerOn(state) ? pomodoroPhase(state, foreground, now) : null;
+  useDocumentTitle(foreground, fgTask?.title ?? null, open.length, timer);
 
   const onboarding = !splash && !state.settings.onboarded;
   // Soft landing: the onboarding fades out while the home fades in underneath.
@@ -350,7 +356,9 @@ export function App() {
   const settingsKey = useOpeningKey('settings', m?.kind === 'settings', m?.kind === 'settings' ? m.tab ?? 'general' : null);
   const focusing = view === 'today' && foreground?.status === 'running';
   // Focus style while a block runs: breathe / tunnel / cocoon / micro.
-  const focusStyle = focusing ? state.settings.appearance.focusStyle : null;
+  // The focus timer keeps the calm look of the breathing focus around its card.
+  const style = focusing ? effectiveFocusStyle(state) : null;
+  const focusStyle = style === 'pomodoro' ? 'breathe fs-pomodoro' : style;
   const winter = isWinterActive(state.settings.appearance.xmas, now);
   // Level 50: the companion's shimmer touches the app (badge, header line), if the user wants it.
   const legendary = useLegendaryShell(state.progression.stats.level, state.settings.appearance.companionFx);

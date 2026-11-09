@@ -3,6 +3,7 @@ import { foregroundSession, type SessionProjection } from './session';
 import type { AppState, AvatarId, Id, Millis, SessionFeel, Task, TaskPriority, Tone } from './types';
 import { atTimeOfDay, dayKey, MIN } from '../lib/time';
 import { focusRhythmCached, inFocusWindow, windowLabel, type FocusWindow } from './rhythm';
+import { pomodoroPhase } from './pomodoro';
 
 /**
  * The companion: a small avatar that drops by on the desktop edge.
@@ -12,7 +13,7 @@ import { focusRhythmCached, inFocusWindow, windowLabel, type FocusWindow } from 
  * Planning is pure; delivery (desktop window or in-app bubble) lives in the app layer.
  */
 
-export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel' | 'update' | 'dock_in';
+export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel' | 'update' | 'dock_in' | 'pomodoro';
 export type Mood = 'happy' | 'curious' | 'calm' | 'alert' | 'sleepy';
 
 export interface CompanionOption {
@@ -153,8 +154,11 @@ export interface PlannedVisit {
   sessionId: Id | null;
 }
 
-/** Next companion visit (focus check or hydration), or null. Due may lie in the future. */
-export function planCompanionVisit(state: AppState, projections: readonly SessionProjection[], now: Millis): PlannedVisit | null {
+/**
+ * Next companion visit (focus check or hydration), or null. Due may lie in the future.
+ * `focusTimer`: the focus timer is on; while a round runs nobody visits, the water reminder waits for the break.
+ */
+export function planCompanionVisit(state: AppState, projections: readonly SessionProjection[], now: Millis, opts: { focusTimer?: boolean } = {}): PlannedVisit | null {
   const c = state.settings.companion;
   if (!c.enabled) return null;
   const quiet = quietReason(now, state.settings);
@@ -163,6 +167,7 @@ export function planCompanionVisit(state: AppState, projections: readonly Sessio
   const plans: PlannedVisit[] = [];
 
   const fg = foregroundSession(projections);
+  if (opts.focusTimer && fg && pomodoroPhase(state, fg, now).kind === 'focus') return null;
   if (c.visitIntervalMin > 0 && fg && fg.status === 'running') {
     const task = state.tasks[fg.taskId];
     const own = Object.values(state.checkIns).filter((x) => x.sessionId === fg.sessionId);

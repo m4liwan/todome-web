@@ -3,12 +3,13 @@ import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
 import { BRAIN_PROFILES, brainPatch } from '../../domain/brain';
 import { effectTier } from '../../domain/companionProgression';
-import type { BrainProfile, Settings, TimelineStyle } from '../../domain/types';
+import type { BrainProfile, PomodoroSettings, Settings, TimelineStyle } from '../../domain/types';
 import { desktop } from '../../lib/desktop';
 import { useEffectsMode, type EffectsMode } from '../../lib/effects';
 import { setSoundVolume } from '../../lib/soundscape';
 import { FocusProgress } from '../FocusProgress';
-import { FOCUS_STYLES } from '../FocusStyle';
+import { FOCUS_STYLES, FOCUS_TIMER_LOCKED, TimerLock } from '../FocusStyle';
+import { focusTimerUnlocked } from '../../app/focusTimer';
 import { MediaControl } from '../MediaControl';
 
 type Modules = Settings['overlay']['modules'];
@@ -229,11 +230,20 @@ const XMAS: Array<[Settings['appearance']['xmas'], string]> = [
   ['always', 'Immer'],
 ];
 
+const TIMER_LENGTHS: Array<{ key: keyof PomodoroSettings; label: string; options: number[] }> = [
+  { key: 'focusMin', label: 'Fokus-Runde', options: [15, 20, 25, 30, 45, 50] },
+  { key: 'breakMin', label: 'Kurze Pause', options: [3, 5, 10] },
+  { key: 'longBreakMin', label: 'Lange Pause', options: [10, 15, 20, 30] },
+];
+
 /** Seasonal magic and the focus styles. */
 export function MoodSection() {
   const services = useServices();
-  const a = useAppState().settings.appearance;
+  const state = useAppState();
+  const a = state.settings.appearance;
+  const timerUnlocked = focusTimerUnlocked(state);
   const setA = (patch: Partial<Settings['appearance']>) => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...a, ...patch } } });
+  const setTimer = (patch: Partial<PomodoroSettings>) => services.store.dispatch({ type: 'settings/update', patch: { pomodoro: { ...state.settings.pomodoro, ...patch } } });
   return (
     <section>
       <h3>Stimmung & Fokus</h3>
@@ -248,20 +258,56 @@ export function MoodSection() {
       <small className="hint">Leise Schneeflocken, warme Lichter oben am Rand und ein adventlicher Gruß. Ganz dezent.</small>
       <p className="settings__label">Fokus-Stil, während ein Block läuft</p>
       <div className="focus-styles" role="radiogroup" aria-label="Fokus-Stil">
-        {FOCUS_STYLES.map((f) => (
-          <button key={f.id} type="button" role="radio" aria-checked={a.focusStyle === f.id} className={`layout-opt focus-style-opt${a.focusStyle === f.id ? ' is-on' : ''}`} onClick={() => setA({ focusStyle: f.id })}>
-            <span className={`focus-style-opt__preview focus-style-opt__preview--${f.id}`} aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            <strong>{f.label}</strong>
-            <span>
-              {f.level}. {f.text}
-            </span>
-          </button>
-        ))}
+        {FOCUS_STYLES.map((f) => {
+          const locked = f.id === 'pomodoro' && !timerUnlocked;
+          return (
+            <button
+              key={f.id}
+              type="button"
+              role="radio"
+              aria-checked={a.focusStyle === f.id}
+              aria-disabled={locked || undefined}
+              className={`layout-opt focus-style-opt${a.focusStyle === f.id ? ' is-on' : ''}${locked ? ' is-locked' : ''}`}
+              onClick={() => (locked ? services.announce(FOCUS_TIMER_LOCKED) : setA({ focusStyle: f.id }))}
+            >
+              <span className={`focus-style-opt__preview focus-style-opt__preview--${f.id}`} aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              <strong>{f.label}</strong>
+              {locked && <TimerLock />}
+              <span>
+                {f.level}. {f.text}
+              </span>
+            </button>
+          );
+        })}
       </div>
+      {timerUnlocked && a.focusStyle === 'pomodoro' && (
+        <div className="timer-lengths">
+          {TIMER_LENGTHS.map((row) => (
+            <div key={row.key}>
+              <p className="settings__label">{row.label}</p>
+              <div className="segmented" role="radiogroup" aria-label={row.label}>
+                {row.options.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    role="radio"
+                    aria-checked={state.settings.pomodoro[row.key] === n}
+                    className={state.settings.pomodoro[row.key] === n ? 'is-on' : ''}
+                    onClick={() => setTimer({ [row.key]: n })}
+                  >
+                    {n} min
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <small className="hint">Die Pause beginnt, sobald deine Hände kurz ruhen. Während einer Runde bleiben Besuche und Nachfragen still, nur ein Überzug wird noch gemeldet.</small>
+        </div>
+      )}
     </section>
   );
 }

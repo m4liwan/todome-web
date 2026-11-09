@@ -1,4 +1,4 @@
-import type { AppState, AppearanceSettings, CompanionSettings, MediaSettings, OverlaySettings, Settings, Wellbeing } from '../domain/types';
+import type { AppState, AppearanceSettings, CompanionSettings, MediaSettings, OverlaySettings, PomodoroSettings, Settings, Wellbeing } from '../domain/types';
 import { emptyProgression } from '../domain/companionProgression';
 
 export const DEFAULT_COMPANION: CompanionSettings = {
@@ -47,6 +47,9 @@ export const DEFAULT_OVERLAY: OverlaySettings = {
   modules: { avatar: true, anchor: true, progress: true, media: true },
 };
 
+/** Classic Pomodoro: 25 minutes focus, 5 minutes break, 15 after four rounds. */
+export const DEFAULT_POMODORO: PomodoroSettings = { focusMin: 25, breakMin: 5, longBreakMin: 15 };
+
 export const DEFAULT_SETTINGS: Settings = {
   userName: '',
   onboarded: false,
@@ -81,6 +84,7 @@ export const DEFAULT_SETTINGS: Settings = {
   oneStep: false,
   uiSounds: true,
   breathBeforeStart: false,
+  pomodoro: { ...DEFAULT_POMODORO },
   workspace: {},
 };
 
@@ -95,7 +99,7 @@ export function emptyState(): AppState {
     snapshots: {},
     checkIns: {},
     coach: { lastRaised: {}, snoozedUntil: {}, closedDay: null, secondShiftDay: null },
-    settings: { ...DEFAULT_SETTINGS, companion: { ...DEFAULT_COMPANION }, appearance: { ...DEFAULT_APPEARANCE }, overlay: { ...DEFAULT_OVERLAY }, media: { ...DEFAULT_MEDIA } },
+    settings: { ...DEFAULT_SETTINGS, pomodoro: { ...DEFAULT_POMODORO }, companion: { ...DEFAULT_COMPANION }, appearance: { ...DEFAULT_APPEARANCE }, overlay: { ...DEFAULT_OVERLAY }, media: { ...DEFAULT_MEDIA } },
     wellbeing: { ...DEFAULT_WELLBEING },
     weather: null,
     thoughts: [],

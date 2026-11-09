@@ -576,6 +576,13 @@
 .fstyle__menu button:hover {
   background: var(--surface-sunk);
 }
+.fstyle__menu button.is-locked {
+  opacity: 0.62;
+}
+.fstyle__menu button .pro-lock {
+  margin-left: 6px;
+  vertical-align: middle;
+}
 .fstyle__menu strong {
   font-size: 0.88rem;
 }

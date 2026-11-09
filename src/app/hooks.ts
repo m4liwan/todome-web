@@ -2,6 +2,7 @@ import { effectiveTone } from '../domain/energy';
 import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { promptFor } from '../domain/copy';
 import { foregroundSession, projectAll, type SessionProjection } from '../domain/session';
+import { pomodoroStatus, type PomodoroPhase } from '../domain/pomodoro';
 import type { AppState, CheckIn, Millis } from '../domain/types';
 import { notify } from '../lib/notifier';
 import { promptVarsFor } from './promptVars';
@@ -13,6 +14,7 @@ import { tick } from '../state/scheduler';
 import { useServices } from './services';
 import { contextLabels, type ContextLabels } from '../domain/userContext';
 import { currentMoment } from './attention';
+import { focusTimerOn } from './focusTimer';
 
 export function useAppState(): AppState {
   const { store } = useServices();
@@ -70,7 +72,8 @@ export function useScheduler(): void {
       if (!state.settings.onboarded) return;
       const deps = services.deps();
       // Typing right now: the next focus pulse waits for the pause after it.
-      const result = tick(state, deps, { focusSignalActive: currentMoment() === 'typing' });
+      // Focus timer round: pulses and milestones wait for the break.
+      const result = tick(state, deps, { focusSignalActive: currentMoment() === 'typing', focusTimer: focusTimerOn(state) });
       if (result.actions.length === 0) return;
       store.dispatch(result.actions);
       for (const c of result.sent) {
@@ -205,14 +208,22 @@ export function raiseIdlePrompt(services: ReturnType<typeof useServices>, from: 
   if (sent) announceCheckIn(store.getState(), sent, deps.now);
 }
 
-/** Tab title as "live activity": remaining time and state of the foreground session. */
-export function useDocumentTitle(foreground: SessionProjection | null, label: string | null, openPrompts: number): void {
-  const remaining = foreground ? foreground.effectiveTimeboxMin * MIN - foreground.netMs : 0;
-  const text = foreground
-    ? `${openPrompts > 0 ? '● ' : ''}${foreground.status === 'paused' ? 'Pause · ' : ''}${formatClock(remaining)} · ${label ?? 'ToDoMe.'}`
-    : openPrompts > 0
-      ? '● ToDoMe.'
-      : 'ToDoMe.';
+/**
+ * Window title and tray tooltip: remaining time and state of the foreground
+ * session; with the focus timer its phase ("Fokus 2/4 · 18:30", "Pause · 4:00").
+ */
+export function sessionTitle(foreground: SessionProjection | null, label: string | null, openPrompts: number, timer: PomodoroPhase | null): string {
+  const dot = openPrompts > 0 ? '● ' : '';
+  if (!foreground) return `${dot}ToDoMe.`;
+  const clock = timer
+    ? pomodoroStatus(timer)
+    : `${foreground.status === 'paused' ? 'Pause · ' : ''}${formatClock(foreground.effectiveTimeboxMin * MIN - foreground.netMs)}`;
+  return `${dot}${clock} · ${label ?? 'ToDoMe.'}`;
+}
+
+/** Tab title as "live activity", mirrored into the tray tooltip. */
+export function useDocumentTitle(foreground: SessionProjection | null, label: string | null, openPrompts: number, timer: PomodoroPhase | null = null): void {
+  const text = sessionTitle(foreground, label, openPrompts, timer);
   const attention = openPrompts > 0;
   useEffect(() => {
     document.title = text;

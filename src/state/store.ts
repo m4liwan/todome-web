@@ -1,8 +1,8 @@
-import type { AppearanceSettings, AppState } from '../domain/types';
+import type { AppearanceSettings, AppState, PomodoroSettings } from '../domain/types';
 import type { KeyValueStore } from '../lib/storage';
 import type { CommandResult } from './commands';
 import { normalizeUserContext } from '../domain/userContext';
-import { DEFAULT_APPEARANCE, DEFAULT_COMPANION, DEFAULT_MEDIA, DEFAULT_OVERLAY, DEFAULT_SETTINGS, DEFAULT_WELLBEING, emptyState } from './defaults';
+import { DEFAULT_APPEARANCE, DEFAULT_COMPANION, DEFAULT_MEDIA, DEFAULT_OVERLAY, DEFAULT_POMODORO, DEFAULT_SETTINGS, DEFAULT_WELLBEING, emptyState } from './defaults';
 import type { Task } from '../domain/types';
 import { normalizeAvatar } from '../domain/companion';
 import { sanitizeProgression } from '../domain/companionProgression';
@@ -74,6 +74,18 @@ function migrateMedia(settings: Partial<AppState['settings']>): Pick<AppState['s
     overlay.modules = { ...overlay.modules, media: true };
   }
   return { overlay, media };
+}
+
+/** Focus timer lengths: each field on its own, whole minutes within sane bounds, else the default. */
+function normalizePomodoro(raw: unknown): PomodoroSettings {
+  const r: Record<string, unknown> = isRecord(raw) ? raw : {};
+  const minutes = (value: unknown, max: number, fallback: number) =>
+    typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= max ? value : fallback;
+  return {
+    focusMin: minutes(r.focusMin, 120, DEFAULT_POMODORO.focusMin),
+    breakMin: minutes(r.breakMin, 60, DEFAULT_POMODORO.breakMin),
+    longBreakMin: minutes(r.longBreakMin, 60, DEFAULT_POMODORO.longBreakMin),
+  };
 }
 
 /** The schema this build writes. Data with a higher version comes from a newer ToDoMe. */
@@ -148,6 +160,7 @@ export function parseState(raw: string | null): AppState | null {
         // Shown once to everyone, including people updating from before the hub.
         companionIntroSeen: settings.companionIntroSeen === true,
         quickCapture: (['ctrl_alt_space', 'ctrl_alt_t', 'alt_shift_n', 'off'] as const).find((k) => k === settings.quickCapture) ?? DEFAULT_SETTINGS.quickCapture,
+        pomodoro: normalizePomodoro(settings.pomodoro),
         companion: {
           ...DEFAULT_COMPANION,
           ...(companion as Partial<AppState['settings']['companion']>),

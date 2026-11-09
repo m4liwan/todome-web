@@ -7,6 +7,7 @@ import {
   type PlannedCheckIn,
 } from '../domain/checkinEngine';
 import { planCoachPrompt } from '../domain/coach';
+import { HELD_IN_FOCUS, pomodoroPhase } from '../domain/pomodoro';
 import { foregroundSession, projectAll } from '../domain/session';
 import type { AppState, CheckIn } from '../domain/types';
 import { sendCheckIn, type Deps } from './commands';
@@ -25,7 +26,7 @@ export interface TickResult {
  * At most ONE new prompt per tick and never more than one open session prompt
  * plus one open coach prompt at a time.
  */
-export function tick(state: AppState, deps: Deps, opts: { focusSignalActive?: boolean } = {}): TickResult {
+export function tick(state: AppState, deps: Deps, opts: { focusSignalActive?: boolean; focusTimer?: boolean } = {}): TickResult {
   const actions: Action[] = [];
   const sent: CheckIn[] = [];
   const all = Object.values(state.checkIns);
@@ -40,6 +41,8 @@ export function tick(state: AppState, deps: Deps, opts: { focusSignalActive?: bo
   const projections = projectAll(state, deps.now);
   const fg = foregroundSession(projections);
   const candidates: PlannedCheckIn[] = [];
+  // Focus timer round: the timer is the structure, check-ins wait for the break.
+  const hold = opts.focusTimer && fg && pomodoroPhase(state, fg, deps.now).kind === 'focus' ? HELD_IN_FOCUS : undefined;
 
   if (fg) {
     const task = state.tasks[fg.taskId];
@@ -50,6 +53,7 @@ export function tick(state: AppState, deps: Deps, opts: { focusSignalActive?: bo
         checkIns: current,
         now: deps.now,
         focusSignalActive: opts.focusSignalActive ?? false,
+        hold,
       });
       if (plan) candidates.push(plan);
     }
@@ -57,7 +61,7 @@ export function tick(state: AppState, deps: Deps, opts: { focusSignalActive?: bo
 
   if (!open.some((c) => COACH_KINDS.has(c.kind))) {
     const coach = planCoachPrompt(state, projections, deps.now);
-    if (coach) candidates.push(coach);
+    if (coach && !hold?.has(coach.kind)) candidates.push(coach);
     const delay = planStartDelay(Object.values(state.tasks), projections, current, deps.now);
     if (delay) candidates.push(delay);
   }

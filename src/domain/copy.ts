@@ -273,6 +273,7 @@ export const PAUSE_REASON_LABELS = {
   energy: 'Energie',
   meeting: 'Termin',
   tech: 'Technik',
+  pomodoro: 'Pomodoro-Pause',
 } as const;
 
 export const OUTCOME_LABELS = {

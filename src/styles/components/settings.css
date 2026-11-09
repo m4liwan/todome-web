@@ -562,7 +562,7 @@
 }
 .focus-styles {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
 }
 .focus-style-opt__preview {
@@ -592,6 +592,33 @@
 .focus-style-opt__preview--breathe i:nth-child(n + 2) {
   filter: blur(2px);
   opacity: 0.5;
+}
+/* Focus timer: three round marks, the middle one running. */
+.focus-style-opt__preview--pomodoro i {
+  inset: auto;
+  top: 21px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.focus-style-opt__preview--pomodoro i:nth-child(1) {
+  left: calc(50% - 30px);
+  background: var(--ink);
+  opacity: 0.55;
+}
+.focus-style-opt__preview--pomodoro i:nth-child(2) {
+  left: calc(50% - 6px);
+  background: linear-gradient(135deg, var(--accent-2), var(--accent-mesh));
+}
+.focus-style-opt__preview--pomodoro i:nth-child(3) {
+  left: calc(50% + 18px);
+}
+.focus-style-opt.is-locked {
+  opacity: 0.62;
+}
+.focus-style-opt .pro-lock {
+  justify-self: start;
+  margin: 2px 0;
 }
 .focus-style-opt__preview--tunnel i:nth-child(1) {
   inset: 8px 22%;

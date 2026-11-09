@@ -14,7 +14,10 @@ import { FocusProgress } from './FocusProgress';
 import { addChecklistItem, addMicroBites, pauseSession, toggleChecklistItem } from '../state/commands';
 import { microBites } from '../domain/micro';
 import { Avatar } from './Avatar';
-import { FocusStyleMenu } from './FocusStyle';
+import { FOCUS_TIMER_LOCKED, FocusStyleMenu } from './FocusStyle';
+import { PomodoroClock } from './PomodoroClock';
+import { effectiveFocusStyle, focusTimerUnlocked } from '../app/focusTimer';
+import { pomodoroPhase } from '../domain/pomodoro';
 import { IconCheck, IconHelp, IconPause, IconPlay, IconPlus, IconStop, IconSwap } from './icons';
 import { contextLabels } from '../domain/userContext';
 import { trackEvent } from '../services/telemetry';
@@ -188,7 +191,10 @@ function OneThing({ state, now, onOpen, onShowPlan, returnTo }: { state: AppStat
 function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: AppState; p: SessionProjection; now: Millis; onOpen: OpenModal; stackDepth: number; onBreathe: () => void }) {
   const labels = contextLabels(state.settings.userContext);
   const services = useServices();
-  const style = state.settings.appearance.focusStyle;
+  // A stored "pomodoro" below level 10 behaves like the breathing focus.
+  const style = effectiveFocusStyle(state);
+  const timerUnlocked = focusTimerUnlocked(state);
+  const timer = style === 'pomodoro' ? pomodoroPhase(state, p, now) : null;
   const taskForBites = state.tasks[p.taskId];
   // Mikro-Schritt-Modus: a task without steps gets three small bites right away.
   useEffect(() => {
@@ -232,7 +238,7 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
           </div>
           <span className={`status-pill status-pill--${stateName}`}>
             <span className="status-pill__dot" />
-            {paused ? labels.breakShort : over ? 'Länger als geplant' : 'Im Fluss'}
+            {timer?.kind === 'break' ? PAUSE_REASON_LABELS.pomodoro : paused ? labels.breakShort : over ? 'Länger als geplant' : 'Im Fluss'}
           </span>
         </div>
 
@@ -241,6 +247,10 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
 
         <div className="focus__row">
         <div className="focus__clock">
+          {timer ? (
+            <PomodoroClock phase={timer} />
+          ) : (
+          <>
           <span className="focus__time" role="timer" aria-live="off" aria-label={over ? `${formatDuration(-remaining)} über Plan` : `${formatDuration(remaining)} übrig`}>
             {formatClock(remaining)}
           </span>
@@ -251,6 +261,8 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
                 ? 'länger als geplant, ganz okay'
                 : `übrig von ${p.effectiveTimeboxMin} min`}
           </span>
+          </>
+          )}
         </div>
 
         <span className="focus__dot" aria-hidden="true" title={`${avatarName(state.settings.companion.avatar)} ist bei dir`}>
@@ -359,7 +371,12 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
           <button type="button" className="pill pill--glass" onClick={() => onOpen({ kind: 'end_check', sessionId: p.sessionId })}>
             <IconStop size={14} /> Beenden
           </button>
-          <FocusStyleMenu value={style} onChange={(focusStyle) => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...state.settings.appearance, focusStyle } } })} />
+          <FocusStyleMenu
+            value={style}
+            timerUnlocked={timerUnlocked}
+            onLocked={() => services.announce(FOCUS_TIMER_LOCKED)}
+            onChange={(focusStyle) => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...state.settings.appearance, focusStyle } } })}
+          />
           <button type="button" className="pill pill--glass focus__breathe" onClick={onBreathe} title="Alles ausblenden und kurz durchatmen">
             Durchatmen
           </button>

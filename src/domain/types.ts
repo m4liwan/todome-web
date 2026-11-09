@@ -83,7 +83,9 @@ export type PauseReason =
   | 'distraction'
   | 'energy'
   | 'meeting'
-  | 'tech';
+  | 'tech'
+  /** The focus timer's break between two rounds. */
+  | 'pomodoro';
 
 export type IdleResolution = 'working' | 'break' | 'distracted';
 
@@ -220,9 +222,17 @@ export interface AppearanceSettings {
  * Focus styles for different kinds of distractibility:
  * breathe (soft: side cards blur and dim), tunnel (medium: side cards leave,
  * a centred glass container), cocoon (strong: only timer, task and a
- * companion dot), micro (ADHD / paralysis: the task in three small bites).
+ * companion dot), micro (ADHD / paralysis: the task in three small bites),
+ * pomodoro (focus timer, unlocked at companion level 10: rounds with breaks).
  */
-export type FocusStyle = 'breathe' | 'tunnel' | 'cocoon' | 'micro';
+export type FocusStyle = 'breathe' | 'tunnel' | 'cocoon' | 'micro' | 'pomodoro';
+
+/** Focus timer (Pomodoro): minutes per focus round, short break and long break after 4 rounds. */
+export interface PomodoroSettings {
+  focusMin: number;
+  breakMin: number;
+  longBreakMin: number;
+}
 
 /** "Wie tickt dein Kopf am liebsten?" */
 export type BrainProfile = 'overload' | 'adhd' | 'procrastination' | 'creative';
@@ -332,6 +342,8 @@ export interface Settings {
   uiSounds: boolean;
   /** A short breathing exercise before a block starts (off by default). */
   breathBeforeStart: boolean;
+  /** Focus timer lengths (the timer itself is the focus style "pomodoro"). */
+  pomodoro: PomodoroSettings;
   /** Pro: own card arrangement per layout. */
   workspace: Partial<Record<LayoutId, Workspace>>;
 }

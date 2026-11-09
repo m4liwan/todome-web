@@ -56,6 +56,8 @@ export interface SessionEngineInput {
   now: Millis;
   /** External "user is active in the right tool" signal (desktop companion). */
   focusSignalActive?: boolean;
+  /** Kinds held back right now (e.g. during a focus timer round). */
+  hold?: ReadonlySet<CheckInKind>;
 }
 
 /** Next prompt for one session, or null. Does not apply quiet hours / caps (see `gate`). */
@@ -157,8 +159,9 @@ export function planSessionCheckIn(input: SessionEngineInput): PlannedCheckIn | 
     }
   }
 
-  candidates.sort((a, b) => a.dueAt - b.dueAt || a.priority - b.priority);
-  return candidates[0] ?? null;
+  const allowed = input.hold ? candidates.filter((c) => !input.hold!.has(c.kind)) : candidates;
+  allowed.sort((a, b) => a.dueAt - b.dueAt || a.priority - b.priority);
+  return allowed[0] ?? null;
 }
 
 /** Start-delay nudge: a planned start passed by 10 min and nothing was started. */

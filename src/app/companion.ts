@@ -36,6 +36,7 @@ import { isGoodMoment, type CompanionKind } from '../domain/companion';
 import { currentMoment } from './attention';
 import { focusRhythm } from '../domain/rhythm';
 import { resolveTheme } from './theme';
+import { focusTimerOn, inFocusRound } from './focusTimer';
 
 /**
  * Companion delivery. On the desktop the avatar appears in its own transparent
@@ -278,6 +279,8 @@ export function useCompanion(openModal: OpenModal): void {
       }
 
       if (!state.settings.onboarded || isCompanionBusy(Date.now())) return;
+      // A focus timer round runs: nothing but the timer speaks until the break.
+      if (inFocusRound(state, now)) return;
       const moment = currentMoment();
       // The afternoon check has a two-hour window: it can always wait for a pause.
       if (shouldOfferSoftCheck(state, now, energyToday(state, now)) && isGoodMoment('soft_check', moment, 0)) {
@@ -293,7 +296,7 @@ export function useCompanion(openModal: OpenModal): void {
         deliverCompanion(services, dockInMessage(services.deps().newId(), state.settings.userName.trim(), firstStep, focusRhythm(state, now)));
         return;
       }
-      const plan = planCompanionVisit(state, projections, now);
+      const plan = planCompanionVisit(state, projections, now, { focusTimer: focusTimerOn(state) });
       if (!plan || plan.dueAt > now) return;
       // Never in the middle of a sentence: wait for a micro-pause (at most 3 minutes).
       if (!isGoodMoment(plan.kind, moment, now - plan.dueAt)) return;
@@ -346,6 +349,8 @@ export function useUpdateCompanion(): void {
         return;
       }
       if (!canOfferUpdate(state, services.clock.now()) || isCompanionBusy(Date.now())) return;
+      // Never into a focus timer round: the offer waits for the break.
+      if (inFocusRound(state, services.clock.now())) return;
       if (!isGoodMoment('update', currentMoment(), Date.now() - pendingSince)) return;
       deliverCompanion(services, updateReadyMessage(services.deps().newId(), state.settings.companion.avatar, pending || undefined));
       offered = pending;
