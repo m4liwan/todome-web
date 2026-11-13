@@ -504,7 +504,7 @@
   }
   85%,
   100% {
-    transform: translateX(calc(-100% + 160px));
+    transform: translateX(calc(-1 * var(--marquee-shift, 0px)));
   }
 }
 

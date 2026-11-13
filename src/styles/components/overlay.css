@@ -170,27 +170,38 @@ html.is-overlay body {
 .media.is-playing .media__icon svg {
   opacity: 0;
 }
+/* Title and artist: shrink with the row and end in a clean "…". The span
+   stays inline at rest, or the ellipsis could not cut inside it. */
 .media__label {
   min-width: 0;
   max-width: 170px;
   overflow: hidden;
   white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 0.8rem;
   font-weight: 600;
-  mask-image: linear-gradient(90deg, #000 85%, transparent);
 }
-.media__label span {
-  display: inline-block;
+/* On hover a title that really overflows scrolls by exactly its overflow
+   (MediaControl measures it into --marquee-shift); short titles stay put. */
+@media (prefers-reduced-motion: no-preference) {
+  .media:hover .media__label.is-overflowing {
+    text-overflow: clip;
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+  .media:hover .media__label.is-overflowing span {
+    display: inline-block;
+    animation: marquee 9s linear infinite;
+  }
 }
-.media:hover .media__label span {
-  animation: marquee 9s linear infinite;
-}
+/* Transport keeps its shape: the title gives way, never the buttons. */
 .media__buttons {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 2px;
 }
 .media__btn {
+  flex-shrink: 0;
   display: grid;
   place-items: center;
   width: 30px;
@@ -264,12 +275,8 @@ html.is-companion {
   contain: inline-size;
 }
 .media--mini .media__label {
-  flex: 1;
+  flex: 1 1 0;
   max-width: none;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 .media--mini .media__btn {
   transition: background-color 0.2s ease;
