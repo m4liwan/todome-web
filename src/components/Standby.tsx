@@ -5,6 +5,7 @@ import { theOneThing } from '../domain/energy';
 import type { AppState, Millis, StandbyLayout } from '../domain/types';
 import { AvatarScene } from './AvatarScene';
 import { useFocusTrap } from '../lib/a11y';
+import { WindowDrag } from './WindowDrag';
 
 interface Props {
   state: AppState;
@@ -35,6 +36,7 @@ export function Standby({ state, now, onWake }: Props) {
 
   return (
     <div ref={trap} data-focus-trap="" className={`standby standby--${layout}`} role="dialog" aria-modal="true" aria-label="Ruhemodus. Klicken, Leertaste, Enter oder Escape, um weiterzumachen." onClick={onWake}>
+      <WindowDrag />
       <div className="standby__aura" aria-hidden="true">
         <span />
         <span />

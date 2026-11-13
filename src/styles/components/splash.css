@@ -85,18 +85,16 @@
   opacity: 0;
   transform: translateY(-8px);
 }
+/* Full-screen views cover the header: their surface never moves the window
+   (it also switches off the hidden header underneath, drag regions follow
+   the layout, not what is visible). Only their title bar strip does
+   (WindowDrag, .window-drag), and every control in that strip stays one. */
 html.is-desktop .splash,
-html.is-desktop .onboard,
-html.is-desktop .standby,
-html.is-desktop .pause-room {
-  -webkit-app-region: drag;
+html.is-desktop .onboard {
+  -webkit-app-region: no-drag;
 }
-html.is-desktop .splash button,
-html.is-desktop .onboard button,
-html.is-desktop .onboard input,
-html.is-desktop .onboard label,
-html.is-desktop .standby button,
-html.is-desktop .pause-room button {
+html.is-desktop .splash :is(button, a, input, select, textarea, label, summary, nav, .tag, [role='button'], [role='link'], [role='tab'], [role='radio'], [role='checkbox'], [role='switch'], [role='slider'], [role='menuitem'], [tabindex]:not([tabindex='-1'])),
+html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, select, textarea, label, summary, nav, .tag, [role='button'], [role='link'], [role='tab'], [role='radio'], [role='checkbox'], [role='switch'], [role='slider'], [role='menuitem'], [tabindex]:not([tabindex='-1'])) {
   -webkit-app-region: no-drag;
 }
 .splash {

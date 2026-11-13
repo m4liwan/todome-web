@@ -633,3 +633,21 @@
     grid-column: 1 / -1 !important;
   }
 }
+
+/* Title bar strip of a full-screen view (components/WindowDrag): as high as
+   the window buttons, left of them. Desktop only; no pointer events, so it
+   never covers anything for the page, Windows alone treats it as title bar. */
+.window-drag {
+  display: none;
+}
+html.is-desktop .window-drag {
+  display: block;
+  /* Fixed: stays at the top while a long view (the setup) scrolls. */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: env(titlebar-area-width, 100%);
+  height: env(titlebar-area-height, 36px);
+  pointer-events: none;
+  -webkit-app-region: drag;
+}

@@ -33,6 +33,7 @@ const { pathToFileURL } = require('node:url');
 const { createMediaBridge } = require('./media.cjs');
 const { createUpdater } = require('./updater.cjs');
 const { attachZoom } = require('./zoom.cjs');
+const overlayBounds = require('./overlay-bounds.cjs');
 const { createContact } = require('./contact.cjs');
 const { createVault } = require('./vault.cjs');
 const { createCrashGuard } = require('./crash-guard.cjs');
@@ -128,6 +129,12 @@ app.commandLine.appendSwitch('lang', 'de-DE');
 let overlayReady = false;
 let overlayConfig = null;
 let overlayState = null;
+/** Window height the overlay's content needs (reported by the overlay). */
+let overlayNeed = 0;
+/** The size the user dragged the overlay to, or null for the automatic size. */
+let overlayUser = null;
+/** A grip is being dragged: the content fit waits until the user lets go. */
+let overlayResize = null;
 /** @type {Tray | null} */ let tray = null;
 let companionReady = false;
 let pendingCompanion = null;
@@ -441,11 +448,29 @@ function deliverCompanion(payload) {
 // Mini overlay (draggable glass box, e.g. on a second monitor)
 // ---------------------------------------------------------------------------
 const OVERLAY_AVATAR = { small: 56, medium: 76, large: 100 };
-const OVERLAY_MARGIN = 14;
+/** First guess at the content height, until the overlay has measured itself. */
+function overlayGuess(cfg) {
+  return (OVERLAY_AVATAR[(cfg && cfg.avatarSize) || 'medium'] || 76) + 56;
+}
+/** User size or automatic size, never smaller than the content (electron/overlay-bounds.cjs). */
 function overlaySize(cfg) {
-  const avatar = OVERLAY_AVATAR[(cfg && cfg.avatarSize) || 'medium'] || 76;
-  // Box = avatar + padding, plus a transparent 14px margin for the glow.
-  return { width: 390, height: avatar + 56 };
+  return overlayBounds.fitSize(cfg, overlayUser, overlayNeed || overlayGuess(cfg));
+}
+/** Applies a size; the minimum follows the content, so the window can never cut it off. */
+function setOverlayBounds(bounds) {
+  if (!overlay || overlay.isDestroyed()) return;
+  overlay.setMinimumSize(1, 1);
+  overlay.setBounds(bounds);
+  overlay.setContentSize(bounds.width, bounds.height);
+  overlay.setMinimumSize(overlayBounds.minWidth(overlayConfig), overlayNeed || overlayBounds.MIN_HEIGHT);
+}
+/** Re-fits the window to the user size (or automatic size) and the content. */
+function fitOverlay() {
+  if (!overlay || overlay.isDestroyed() || overlayResize) return;
+  const size = overlaySize(overlayConfig);
+  const b = overlay.getBounds();
+  if (b.width === size.width && b.height === size.height) return;
+  setOverlayBounds(clampToDisplays({ x: b.x, y: b.y, ...size }));
 }
 
 function clampToDisplays(bounds) {
@@ -459,6 +484,8 @@ function clampToDisplays(bounds) {
 }
 
 function createOverlay() {
+  overlayUser = overlayBounds.savedSize(readShellState().overlaySize);
+  overlayNeed = 0;
   const size = overlaySize(overlayConfig);
   const saved = readShellState().overlayPosition;
   const a = screen.getPrimaryDisplay().workArea;
@@ -474,10 +501,13 @@ function createOverlay() {
     frame: false,
     transparent: true,
     backgroundColor: '#00000000',
-    // Resizable only so the app can size it to its content; there are no
-    // handles (frameless, thickFrame off), so the user cannot drag-resize it.
+    // Resizable: the overlay draws its own grips in the transparent margin
+    // (a frameless transparent window gets no reliable resize border on
+    // Windows) and the size follows them; see overlay:resize-* below.
     resizable: true,
     thickFrame: false,
+    minWidth: overlayBounds.minWidth(overlayConfig),
+    minHeight: overlayBounds.MIN_HEIGHT,
     useContentSize: true,
     minimizable: false,
     maximizable: false,
@@ -498,6 +528,7 @@ function createOverlay() {
   overlay.on('closed', () => {
     overlay = null;
     overlayReady = false;
+    overlayResize = null;
   });
   overlay.webContents.once('did-finish-load', () => {
     overlayReady = true;
@@ -518,8 +549,8 @@ function applyOverlayConfig(cfg) {
   }
   if (!overlay || overlay.isDestroyed()) createOverlay();
   else {
-    const b = overlay.getBounds();
-    overlay.setBounds(clampToDisplays({ x: b.x, y: b.y, ...overlaySize(cfg) }));
+    // A new avatar size can change the minimum width; the user size stays otherwise.
+    fitOverlay();
     if (overlayReady) overlay.webContents.send('overlay:config', cfg);
   }
   rebuildTrayMenu();
@@ -925,17 +956,41 @@ function registerIpc() {
     overlay.setBounds(b);
     writeShellState({ overlayPosition: { x: b.x, y: b.y } });
   });
-  // The overlay measures its glass box; the window follows, so nothing is cut off.
+  // The overlay measures how tall its content is; the window is never shorter than that.
   ipcMain.on('overlay:resize', (event, size) => {
     if (!fromOverlay(event) || !overlay || overlay.isDestroyed() || !size) return;
-    const w = Math.min(560, Math.max(200, Math.ceil(Number(size.width) || 0) + OVERLAY_MARGIN * 2));
-    const h = Math.min(320, Math.max(80, Math.ceil(Number(size.height) || 0) + OVERLAY_MARGIN * 2));
-    const b = overlay.getBounds();
-    if (b.width !== w || b.height !== h) {
-      overlay.setMinimumSize(1, 1);
-      overlay.setBounds(clampToDisplays({ x: b.x, y: b.y, width: w, height: h }));
-      overlay.setContentSize(w, h);
-    }
+    overlayNeed = overlayBounds.contentHeight(size.height);
+    fitOverlay();
+  });
+  // Resizing by the overlay's own grips: start, follow the pointer, save on release.
+  ipcMain.on('overlay:resize-start', (event, edge) => {
+    if (!fromOverlay(event) || !overlay || overlay.isDestroyed() || !overlayBounds.EDGES.has(edge)) return;
+    overlayResize = { edge, origin: overlay.getBounds() };
+  });
+  ipcMain.on('overlay:resize-move', (event, d) => {
+    if (!fromOverlay(event) || !overlayResize || !overlay || overlay.isDestroyed() || !d) return;
+    const dx = Number(d.dx);
+    const dy = Number(d.dy);
+    if (!Number.isFinite(dx) || !Number.isFinite(dy)) return;
+    const next = overlayBounds.resizeBounds(overlayResize.origin, overlayResize.edge, dx, dy, overlayConfig, overlayNeed);
+    if (next) setOverlayBounds(next);
+  });
+  ipcMain.on('overlay:resize-end', (event) => {
+    if (!fromOverlay(event) || !overlayResize || !overlay || overlay.isDestroyed()) return;
+    overlayResize = null;
+    const b = clampToDisplays(overlay.getBounds());
+    overlayUser = { width: b.width, height: b.height };
+    writeShellState({ overlaySize: overlayUser, overlayPosition: { x: b.x, y: b.y } });
+    setOverlayBounds(b);
+    fitOverlay();
+  });
+  // Double-click on a grip: back to the automatic size.
+  ipcMain.on('overlay:resize-reset', (event) => {
+    if (!fromOverlay(event) || !overlay || overlay.isDestroyed()) return;
+    overlayResize = null;
+    overlayUser = null;
+    writeShellState({ overlaySize: null });
+    fitOverlay();
   });
   ipcMain.on('overlay:close', (event) => {
     if (!fromOverlay(event)) return;

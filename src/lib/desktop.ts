@@ -44,6 +44,9 @@ export interface OverlayState {
   hint: string;
 }
 
+/** A grip of the mini overlay: the side or corner that moves. */
+export type OverlayEdge = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
 export type MediaCommand = 'info' | 'toggle' | 'next' | 'prev';
 
 export interface MediaInfo {
@@ -149,6 +152,12 @@ export interface DesktopBridge {
   overlayDragStart(): void;
   overlayDragMove(delta: { dx: number; dy: number }): void;
   overlayDragEnd(): void;
+  /** Resizing by the overlay's own grips (frameless transparent windows have no OS border). */
+  overlayResizeStart(edge: OverlayEdge): void;
+  overlayResizeMove(delta: { dx: number; dy: number }): void;
+  overlayResizeEnd(): void;
+  /** Back to the automatic size. */
+  overlayResizeReset(): void;
   companionHover(hovering: boolean): void;
   /** Registers the global quick-capture shortcut (or none with 'off'). `ok: false` = taken by another app. */
   quickConfig(key: QuickCaptureKey): Promise<{ ok: boolean; active: boolean }>;

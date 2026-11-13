@@ -14,6 +14,7 @@ import { dissolveText } from '../lib/dissolve';
 import { AvatarScene } from './AvatarScene';
 import { AvatarFx, holoFor } from './AvatarFx';
 import { IconArrowUpRight, IconCheck, IconClose, IconPlus, IconChat } from './icons';
+import { WindowDrag } from './WindowDrag';
 
 /* ------------------------------------------------------------------------
    Tagesgedanke
@@ -418,6 +419,7 @@ export function RoutineTimer({ routine, onClose }: { routine: Routine; onClose: 
   const breathe = routine.id === 'breathe';
   return (
     <div className="pause-room" role="dialog" aria-modal="true" aria-label={routine.label}>
+      <WindowDrag />
       <div className="standby__aura" aria-hidden="true">
         <span />
         <span />

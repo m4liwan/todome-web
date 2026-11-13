@@ -16,6 +16,7 @@ import { AvatarScene } from './AvatarScene';
 import { useFocusTrap } from '../lib/a11y';
 import { TELEMETRY_LABEL, trackEvent } from '../services/telemetry';
 import { USER_CONTEXTS, contextLabels, type UserContext } from '../domain/userContext';
+import { WindowDrag } from './WindowDrag';
 
 /** The first tasks are collected right after, by the companion (FirstTasks). */
 const STEPS = ['Hallo', 'Kontext', 'Kopf', 'Energie', 'Arbeitszeit', 'Overlay'] as const;
@@ -130,6 +131,7 @@ export function Onboarding({ onLeave, onDone }: { onLeave: () => void; onDone: (
         if (leaving && e.target === e.currentTarget && e.animationName === 'onboard-out') onDone();
       }}
     >
+      <WindowDrag />
       <div className="splash__grid" aria-hidden="true" />
       <div className="onboard__aura" aria-hidden="true">
         <span />

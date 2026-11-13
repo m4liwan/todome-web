@@ -9,6 +9,7 @@ import { uiSound } from '../app/uiSound';
 import { Biolume } from './Biolume';
 import { greetingFor } from './Greeting';
 import { useFocusTrap } from '../lib/a11y';
+import { WindowDrag } from './WindowDrag';
 
 interface Props {
   state: AppState;
@@ -77,6 +78,7 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
       aria-label="Willkommen"
       style={{ '--splash-ms': `${total}ms` } as React.CSSProperties}
     >
+      <WindowDrag />
       <div className="splash__grid" aria-hidden="true" />
       <Logo className="splash__logo" height={28} />
 

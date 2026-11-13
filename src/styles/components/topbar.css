@@ -79,11 +79,9 @@
     display: none;
   }
 }
-html.is-desktop .topbar-wrap button,
-html.is-desktop .topbar-wrap a,
-html.is-desktop .topbar-wrap nav,
-html.is-desktop .topbar-wrap .tag,
-html.is-desktop .topbar-wrap input {
+/* The header is the window's title bar: everything you can use in it stays a
+   control, only the empty glass between moves the window. */
+html.is-desktop .topbar-wrap :is(button, a, input, select, textarea, label, summary, nav, .tag, [role='button'], [role='link'], [role='tab'], [role='radio'], [role='checkbox'], [role='switch'], [role='slider'], [role='menuitem'], [tabindex]:not([tabindex='-1'])) {
   -webkit-app-region: no-drag;
 }
 .segnav {

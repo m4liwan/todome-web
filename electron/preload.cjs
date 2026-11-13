@@ -71,6 +71,10 @@ contextBridge.exposeInMainWorld('todome', {
   overlayDragStart: () => ipcRenderer.send('overlay:drag-start'),
   overlayDragMove: (delta) => ipcRenderer.send('overlay:drag-move', delta),
   overlayDragEnd: () => ipcRenderer.send('overlay:drag-end'),
+  overlayResizeStart: (edge) => ipcRenderer.send('overlay:resize-start', edge),
+  overlayResizeMove: (delta) => ipcRenderer.send('overlay:resize-move', delta),
+  overlayResizeEnd: () => ipcRenderer.send('overlay:resize-end'),
+  overlayResizeReset: () => ipcRenderer.send('overlay:resize-reset'),
 
   // Quick capture: the app sets the shortcut and answers each line
   quickConfig: (key) => ipcRenderer.invoke('todome:quick-config', String(key)),

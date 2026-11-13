@@ -141,7 +141,6 @@
   color: var(--ink-2);
 }
 html.is-desktop .standby,
-html.is-desktop .standby *,
 html.is-desktop .pause-room {
   -webkit-app-region: no-drag;
 }
