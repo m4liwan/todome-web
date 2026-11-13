@@ -112,6 +112,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^17.14.0",
     "jsdom": "^25.0.1",
+    "ogl": "^1.0.11",
     "postcss": "^8.5.32",
     "posthog-js": "^1.438.19",
     "react": "^18.3.1",

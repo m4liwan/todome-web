@@ -1,0 +1,16 @@
+/* ========================================================================
+   Electric logo (WebGL canvas, see components/ElectricLogo.tsx)
+   ======================================================================== */
+
+.electric-logo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+/* Out of the flow: the canvas size attributes must never hold the box open,
+   or the box could not shrink with the window (and resize never fires). */
+.electric-logo > canvas {
+  position: absolute;
+  inset: 0;
+}

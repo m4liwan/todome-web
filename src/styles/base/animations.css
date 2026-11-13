@@ -767,3 +767,15 @@
     translate: 160px 0;
   }
 }
+/* Splash HUD: a status light that breathes. */
+@keyframes hud-blip {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.7);
+  }
+}

@@ -25,6 +25,39 @@ export function useResolvedTheme(pref: ThemePreference): 'light' | 'dark' {
   return pref === 'system' ? (systemDark ? 'dark' : 'light') : pref;
 }
 
+/*
+ * The accent of the current colour world, as JS sees it (for WebGL and canvas,
+ * which cannot read CSS variables). Follows palette and theme switches: the
+ * tokens hang on <html data-palette / data-theme> and the system colour scheme.
+ */
+const ACCENT_VARS = ['--accent-2', '--accent-mesh'] as const;
+const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
+
+function readAccent(): string {
+  if (typeof document === 'undefined') return '';
+  const style = getComputedStyle(document.documentElement);
+  return ACCENT_VARS.map((name) => style.getPropertyValue(name).trim()).join(' ');
+}
+
+function subscribeAccent(listener: () => void) {
+  const observer = new MutationObserver(listener);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-palette', 'data-theme'] });
+  media?.addEventListener('change', listener);
+  return () => {
+    observer.disconnect();
+    media?.removeEventListener('change', listener);
+  };
+}
+
+/** Strong accent (`--accent-2`) and light accent (`--accent-mesh`) as hex, live. */
+export function useAccentColors(fallback: { strong: string; light: string }): { strong: string; light: string } {
+  const [strong = '', light = ''] = useSyncExternalStore(subscribeAccent, readAccent, () => '').split(' ');
+  return {
+    strong: HEX.test(strong) ? strong : fallback.strong,
+    light: HEX.test(light) ? light : fallback.light,
+  };
+}
+
 export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
