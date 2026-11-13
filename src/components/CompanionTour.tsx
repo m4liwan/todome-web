@@ -79,7 +79,7 @@ export function buildSteps(name: string, user: string, labels: ContextLabels, br
       tab: 'design',
       targets: ['#settings-tab-design'],
       title: 'Design-Anpassungen',
-      text: 'Hier machst du ToDoMe. zu deinem Ort: Farbwelten, Layouts, Atmosphäre mit leisem Klang und der Stil deiner Zeitlinie.',
+      text: 'Hier machst du ToDoMe. zu deinem Ort: Farbwelten, Layouts, die Atmosphäre im Hintergrund und der Stil deiner Zeitlinie. Den Klang dazu findest du unter „Audio“.',
       place: 'top',
     },
     {

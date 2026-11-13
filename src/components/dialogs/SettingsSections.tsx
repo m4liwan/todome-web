@@ -3,7 +3,7 @@ import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
 import { BRAIN_PROFILES, brainPatch } from '../../domain/brain';
 import { effectTier } from '../../domain/companionProgression';
-import type { BrainProfile, PomodoroSettings, Settings, TimelineStyle } from '../../domain/types';
+import type { AmbienceId, BrainProfile, PomodoroSettings, Settings, TimelineStyle } from '../../domain/types';
 import { desktop } from '../../lib/desktop';
 import { useEffectsMode, type EffectsMode } from '../../lib/effects';
 import { setSoundVolume } from '../../lib/soundscape';
@@ -313,6 +313,65 @@ export function MoodSection() {
 }
 
 /** Ambience sound: switch and a calm volume slider (settles after a moment, no stutter). */
+const AMBIENCES: Array<{ id: AmbienceId; label: string }> = [
+  { id: 'none', label: 'Ruhig' },
+  { id: 'live', label: 'Wie draußen' },
+  { id: 'rain', label: 'Regen' },
+  { id: 'clouds', label: 'Wolken' },
+  { id: 'snow', label: 'Schnee' },
+  { id: 'leaves', label: 'Herbstlaub' },
+];
+
+/**
+ * The background atmosphere. One setting for picture and sound alike, so
+ * "Design" (the picture) and "Audio" (the sound) show this same picker.
+ */
+export function AmbiencePicker({ label }: { label: string }) {
+  const services = useServices();
+  const a = useAppState().settings.appearance;
+  return (
+    <>
+      <p className="settings__label">{label}</p>
+      <div className="segmented" role="radiogroup" aria-label={label}>
+        {AMBIENCES.map((x) => (
+          <button
+            key={x.id}
+            type="button"
+            role="radio"
+            aria-checked={a.ambience === x.id}
+            className={a.ambience === x.id ? 'is-on' : ''}
+            onClick={() => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...a, ambience: x.id } } })}
+          >
+            {x.label}
+          </button>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/** "Audio" tab: the atmosphere's sound (on/off, volume) and which atmosphere plays. */
+export function AmbienceSoundSection({ onShowDesign }: { onShowDesign?: () => void }) {
+  return (
+    <section aria-labelledby="settings-ambience-sound">
+      <h3 id="settings-ambience-sound">Klang der Atmosphäre</h3>
+      <AmbiencePicker label="Atmosphäre (Klang und Bild)" />
+      <small className="hint">
+        Die Atmosphäre klingt nicht nur, sie zeigt sich auch leise im Hintergrund.
+        {onShowDesign && (
+          <>
+            {' '}
+            <button type="button" className="link-btn" onClick={onShowDesign}>
+              Zum Bild unter Design
+            </button>
+          </>
+        )}
+      </small>
+      <AmbienceSoundField />
+    </section>
+  );
+}
+
 export function AmbienceSoundField() {
   const services = useServices();
   const a = useAppState().settings.appearance;
@@ -331,7 +390,7 @@ export function AmbienceSoundField() {
     <div className="sound-field">
       <label className="check">
         <input type="checkbox" checked={a.sound} onChange={(e) => setA({ sound: e.target.checked })} />
-        <span>Klang der Atmosphäre: leiser Regen, Wind, Schneestille oder raschelndes Laub</span>
+        <span>Hintergrundklang abspielen: leiser Regen, Wind, Schneestille oder raschelndes Laub</span>
       </label>
       {a.sound && (
         <label className="field sound-field__volume">

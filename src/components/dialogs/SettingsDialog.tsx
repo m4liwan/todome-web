@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
-import type { AmbienceId, AppState, Client, LayoutId, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
+import type { AppState, Client, LayoutId, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
 import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
 import { desktop } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
@@ -23,7 +23,7 @@ import { Select } from '../Select';
 import { AboutSection } from './AboutSection';
 import { ContactDialog } from './ContactDialog';
 import { downloadBackup } from '../../app/backup';
-import { AmbienceSoundField, BrainSection, CompanionFxSection, TimelineStyleField, MediaSection, MoodSection, OverlaySection, StandbySection } from './SettingsSections';
+import { AmbiencePicker, AmbienceSoundSection, BrainSection, CompanionFxSection, TimelineStyleField, MediaSection, MoodSection, OverlaySection, StandbySection } from './SettingsSections';
 import { USER_CONTEXTS, businessShown, contextLabels, normalizeUserContext, type ContextLabels } from '../../domain/userContext';
 
 export type SettingsTab = 'general' | 'companion' | 'design' | 'overlay' | 'media' | 'data' | 'about';
@@ -79,15 +79,6 @@ const LAYOUTS: Array<{ id: LayoutId; label: string; text: string }> = [
   { id: 'flow', label: 'Flow & Focus', text: 'Bereiche als sanfter Slider, Seite für Seite' },
 ];
 
-const AMBIENCES: Array<{ id: AmbienceId; label: string }> = [
-  { id: 'none', label: 'Ruhig' },
-  { id: 'live', label: 'Wie draußen' },
-  { id: 'rain', label: 'Regen' },
-  { id: 'clouds', label: 'Wolken' },
-  { id: 'snow', label: 'Schnee' },
-  { id: 'leaves', label: 'Herbstlaub' },
-];
-
 /** Position of the sliding tab highlight (moves with transform only, no layout work). */
 const tabPill = (i: number) => ({ '--i': i, '--c4': i % 4, '--r4': Math.floor(i / 4) }) as React.CSSProperties;
 
@@ -95,6 +86,11 @@ const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minut
 
 export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCompanion }: Props) {
   const [tab, setTab] = useState<SettingsTab>(initialTab);
+  /** A link to another tab: switch and keep the keyboard on that tab (the panel is rebuilt). */
+  const goTo = (next: SettingsTab) => {
+    setTab(next);
+    document.getElementById(`settings-tab-${next}`)?.focus({ preventScroll: true });
+  };
   const [contactOpen, setContactOpen] = useState(false);
   // The companion tour can point to a tab without reopening the sheet.
   useEffect(() => {
@@ -420,23 +416,13 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             ))}
           </div>
           <TimelineStyleField />
-          <p className="settings__label">Atmosphäre im Hintergrund</p>
-          <div className="segmented" role="radiogroup" aria-label="Atmosphäre">
-            {AMBIENCES.map((a) => (
-              <button
-                key={a.id}
-                type="button"
-                role="radio"
-                aria-checked={s.appearance.ambience === a.id}
-                className={s.appearance.ambience === a.id ? 'is-on' : ''}
-                onClick={() => set({ appearance: { ...s.appearance, ambience: a.id } })}
-              >
-                {a.label}
-              </button>
-            ))}
-          </div>
-          <small className="hint">„Wie draußen“ folgt deinem Wetter: Regen tropft, Wolken ziehen, Schnee fällt. Ganz leise im Hintergrund.</small>
-          <AmbienceSoundField />
+          <AmbiencePicker label="Atmosphäre im Hintergrund" />
+          <small className="hint">
+            „Wie draußen“ folgt deinem Wetter: Regen tropft, Wolken ziehen, Schnee fällt. Ganz leise im Hintergrund. Den Klang dazu stellst du unter Audio ein.{' '}
+            <button type="button" className="link-btn" onClick={() => goTo('media')}>
+              Zum Klang
+            </button>
+          </small>
         </section>
               <MoodSection />
               <StandbySection />
@@ -445,6 +431,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           {tab === 'overlay' && <OverlaySection />}
           {tab === 'media' && (
             <>
+              <AmbienceSoundSection onShowDesign={() => goTo('design')} />
               <section>
                 <h3>Sanfte Interaktions-Klänge</h3>
                 <label className="check">
