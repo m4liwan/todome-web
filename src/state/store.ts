@@ -52,8 +52,8 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   const legacy = isRecord(raw) ? (raw as Record<string, unknown>) : {};
   if (!('focusStyle' in legacy)) a.focusStyle = legacy.silentFocus === true ? 'tunnel' : 'breathe';
   delete (a as Partial<AppearanceSettings> & { silentFocus?: boolean }).silentFocus;
-  // Data from before layouts existed always looked "classic"; keep that look.
-  if (!isRecord(raw) || !('layout' in raw)) a.layout = 'classic';
+  // 1.18: the four home layouts became one cockpit.
+  delete (a as Partial<AppearanceSettings> & { layout?: unknown }).layout;
   const p = String(a.palette);
   a.palette = RETIRED_PALETTES[p] ?? (PALETTES.has(p) ? a.palette : 'lime');
   // 1.18: ambient light strength and corner rounding.
@@ -151,7 +151,9 @@ export function parseState(raw: string | null): AppState | null {
     if (!isRecord(data) || ![1, 2, 3, 4].includes(data.schemaVersion as number)) return null;
     const base = emptyState();
     const coach = isRecord(data.coach) ? data.coach : {};
-    const settings = isRecord(data.settings) ? (data.settings as Partial<AppState['settings']>) : {};
+    const settings = { ...(isRecord(data.settings) ? data.settings : {}) } as Partial<AppState['settings']> & { workspace?: unknown };
+    // 1.18: the Pro workspace editor (per-layout card arrangement) is gone with the layouts.
+    delete settings.workspace;
     const companion = isRecord(settings.companion) ? settings.companion : {};
     const tasks = records<Partial<Task>>(data.tasks);
     const migratedTasks: AppState['tasks'] = {};

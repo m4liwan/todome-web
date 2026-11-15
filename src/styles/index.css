@@ -8,7 +8,6 @@
 @import './base/base.css';
 @import './base/animations.css';
 @import './layout/shell.css';
-@import './layout/layouts.css';
 @import './components/controls.css';
 @import './components/report.css';
 @import './components/topbar.css';
@@ -35,7 +34,6 @@
 @import './components/pro.css';
 @import './components/companion-tour.css';
 @import './components/focus-progress.css';
-@import './components/workspace.css';
 @import './components/breathe.css';
 @import './components/first-tasks.css';
 @import './components/contact.css';

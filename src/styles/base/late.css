@@ -36,10 +36,6 @@
 .module span {
   color: var(--ink-2);
 }
-html.flow-lock,
-html.flow-lock body {
-  overflow: hidden;
-}
 .topbar__brand .media__label {
   max-width: 140px;
 }

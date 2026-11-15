@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react';
-import type { AppearanceSettings, AppState, AvatarId, LayoutId, PaletteId } from '../domain/types';
+import type { AppearanceSettings, AppState, AvatarId, PaletteId } from '../domain/types';
 import { DEFAULT_AVATAR } from '../domain/companion';
 import { isFeatureUnlocked } from '../domain/companionProgression';
 
@@ -11,13 +11,12 @@ import { isFeatureUnlocked } from '../domain/companionProgression';
  * For internal testing Pro can be previewed with
  * `localStorage.setItem('todome:pro-preview', '1')` and a restart.
  */
-export type ProFeature = 'reports' | 'clients' | 'avatars' | 'palettes' | 'flow' | 'stats' | 'workspace';
+export type ProFeature = 'reports' | 'clients' | 'avatars' | 'palettes' | 'stats';
 
 export const PRO_AVATARS: ReadonlySet<AvatarId> = new Set<AvatarId>(['keimi', 'woody']);
 export const PRO_PALETTES: ReadonlySet<PaletteId> = new Set<PaletteId>(['violet', 'rose']);
 /** Where a locked light colour falls back to without Pro or level 15: the closest free one. */
 const FREE_LIGHT: Partial<Record<PaletteId, PaletteId>> = { violet: 'cyan', rose: 'amber' };
-export const PRO_LAYOUTS: ReadonlySet<LayoutId> = new Set<LayoutId>(['flow']);
 
 export const PRO_COPY: Record<ProFeature, { title: string; text: string }> = {
   reports: {
@@ -32,10 +31,6 @@ export const PRO_COPY: Record<ProFeature, { title: string; text: string }> = {
     title: 'Anti-Hustle-Statistiken in Pro',
     text: 'Statt Aufgaben zu zählen, zeigt ToDoMe. dir, was du geschützt hast: ungestörte Fokuszeit, deinen längsten ruhigen Block, geparkte Gedanken und jedes bewusste Durchatmen. Ab Level 5 deines Begleiters sind sie auch ohne Pro für dich frei.',
   },
-  workspace: {
-    title: 'Workspace-Editor in Pro',
-    text: 'Ordne deine Karten frei an und gib ihnen die Größe, die zu deinem Tag passt. Ziehen, ablegen, fertig. Free behält die ruhigen, sorgfältig abgestimmten Standard-Layouts.',
-  },
   avatars: {
     title: 'Mehr Begleiter in Pro',
     text: 'Keimi wächst mit jedem Schritt mit dir, Woody bringt Ruhe in jeden Tag. Die beiden ziehen mit Pro bei dir ein.',
@@ -43,10 +38,6 @@ export const PRO_COPY: Record<ProFeature, { title: string; text: string }> = {
   palettes: {
     title: 'Exklusive Lichtfarben in Pro',
     text: 'Tiefes Violett und gedämpftes Rosé: zwei leise Lichter für späte Stunden, augenschonend und tief. Ab Level 15 deines Begleiters sind sie auch ohne Pro für dich frei.',
-  },
-  flow: {
-    title: 'Flow & Focus in Pro',
-    text: 'Deine Bereiche als sanfter Slider, Seite für Seite. Immer nur ein Gedanke auf dem Bildschirm.',
   },
 };
 
@@ -64,17 +55,12 @@ export const isProPalette = (id: PaletteId, themesUnlocked = false) => !hasPro()
 
 /** The companion level opens some Pro features on its own (see domain/companionProgression). */
 export const themesUnlocked = (state: Pick<AppState, 'progression'>) => isFeatureUnlocked(state.progression.stats, 'exclusive_themes');
-export const isProLayout = (id: LayoutId) => !hasPro() && PRO_LAYOUTS.has(id);
 
 /** Free fallbacks so a locked choice from an older version never sticks. */
 export function freeAppearance(a: AppearanceSettings, pro = hasPro(), themes = false): AppearanceSettings {
   const lockedPalette = !themes && PRO_PALETTES.has(a.palette);
-  if (pro || (!lockedPalette && !PRO_LAYOUTS.has(a.layout))) return a;
-  return {
-    ...a,
-    palette: lockedPalette ? (FREE_LIGHT[a.palette] ?? 'lime') : a.palette,
-    layout: PRO_LAYOUTS.has(a.layout) ? 'hub' : a.layout,
-  };
+  if (pro || !lockedPalette) return a;
+  return { ...a, palette: FREE_LIGHT[a.palette] ?? 'lime' };
 }
 
 export function freeState(state: AppState, pro = hasPro()): AppState {

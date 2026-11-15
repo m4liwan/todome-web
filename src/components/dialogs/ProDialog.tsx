@@ -18,10 +18,8 @@ const ROWS: Row[] = [
   { label: 'Zeitbericht im Detail und CSV-Export', free: false, pro: true, feature: 'reports' },
   { label: 'Kunden anlegen', free: false, pro: true, feature: 'clients' },
   { label: 'Anti-Hustle-Statistiken', free: false, pro: true, feature: 'stats' },
-  { label: 'Workspace-Editor (Karten frei anordnen)', free: false, pro: true, feature: 'workspace' },
   { label: 'Begleiter', free: '6', pro: '8', feature: 'avatars' },
   { label: 'Lichtfarben', free: '4', pro: '6', feature: 'palettes' },
-  { label: 'Layouts (Pro: mit Flow & Focus)', free: '3', pro: '4', feature: 'flow' },
 ];
 
 function Value({ v }: { v: Cell }) {

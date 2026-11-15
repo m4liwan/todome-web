@@ -126,7 +126,6 @@ function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Service
   root.setAttribute('data-palette', appearance.palette);
   root.setAttribute('data-corners', appearance.corners);
   writeAmbient(appearance.ambient);
-  root.setAttribute('data-layout', appearance.layout);
   if (desktop) root.classList.add('is-desktop');
 
   installInputModality();

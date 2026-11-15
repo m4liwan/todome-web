@@ -223,14 +223,12 @@ describe('Tages-Anker: pop-up', () => {
   });
 });
 
-describe('Tages-Anker: never part of the layouts', () => {
-  it('leaves the home layouts and the welcome screen untouched', () => {
+describe('Tages-Anker: never part of the cockpit', () => {
+  it('leaves the home cockpit and the welcome screen untouched', () => {
     const read = (p: string) => readFileSync(fileURLToPath(new URL(p, import.meta.url)), 'utf8');
     const app = read('../app/App.tsx');
-    // The standard orders of the layouts and the flow slides.
-    const orders = [...app.matchAll(/\['greet'[^\]]*\]/g)].map((m) => m[0]);
-    expect(orders).toHaveLength(3);
-    for (const order of orders) expect(order).not.toContain('anchors');
+    // The four home layouts are gone: one cockpit, and the anchors stay a floating pill.
+    expect(app).not.toMatch(/WorkspaceHome|FlowSlider|layout ===/);
     expect(app).not.toMatch(/panel\('anchors'\)|anchors: </);
     expect(read('../styles/layout/shell.css')).not.toMatch(/anchors/);
     expect(read('../components/Splash.tsx')).not.toMatch(/nchor/);

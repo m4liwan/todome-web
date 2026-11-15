@@ -206,8 +206,7 @@ html.is-desktop .topbar__actions {
   opacity: 1;
 }
 .shell.is-covered .topbar-wrap,
-.shell.is-covered .app,
-.shell.is-covered .ws-fab {
+.shell.is-covered .app {
   visibility: hidden;
 }
 @media (max-width: 520px) {

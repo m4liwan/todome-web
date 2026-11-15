@@ -10,7 +10,6 @@ import { DayPlan } from '../components/DayPlan';
 import { Greeting } from '../components/Greeting';
 import { PromptCenter } from '../components/PromptCenter';
 import { ReportPanel, TodayTimesCard } from '../components/ReportPanel';
-import { FlowSlider } from '../components/FlowSlider';
 import { CompanionHome, DailyImpulse, MicroRoutines, RoutineTimer, ThoughtParking, WeekTeaser, type Routine } from '../components/HomeExtras';
 import { AnchorsDialog, AnchorsPill } from '../components/DailyAnchors';
 import { ANCHOR_IMPULSE_SECONDS } from '../domain/anchors';
@@ -28,7 +27,6 @@ import { Toasts } from '../components/Toasts';
 import { Topbar, type View } from '../components/Topbar';
 import { WeatherCard } from '../components/WeatherCard';
 import { WeekView } from '../components/WeekView';
-import { WorkspaceHome } from '../components/Workspace';
 import { CalmStats } from '../components/CalmStats';
 import { EnergyDialog } from '../components/dialogs/EnergyDialog';
 import { InterruptDialog } from '../components/dialogs/InterruptDialog';
@@ -161,10 +159,6 @@ export function App() {
   useOverlaySync(state, now, foreground, theme);
   const appearance = state.settings.appearance;
   useAmbienceSound(resolveAmbience(appearance.ambience, state.weather), appearance.sound, appearance.soundVolume);
-  const layout = state.settings.appearance.layout;
-  useEffect(() => {
-    document.documentElement.setAttribute('data-layout', layout);
-  }, [layout]);
 
   const open = useMemo(() => openCheckIns(Object.values(state.checkIns)), [state.checkIns]);
   const fgTask = foreground ? state.tasks[foreground.taskId] : undefined;
@@ -348,14 +342,7 @@ export function App() {
   const winter = isWinterActive(state.settings.appearance.xmas, now);
   // Level 50: the companion's shimmer touches the app (badge, header line), if the user wants it.
   const legendary = useLegendaryShell(state.progression.stats.level, state.settings.appearance.companionFx);
-  // Flow shows one calm stage: no vertical scrolling there.
-  useEffect(() => {
-    const lock = view === 'today' && layout === 'flow';
-    document.documentElement.classList.toggle('flow-lock', lock);
-    return () => document.documentElement.classList.remove('flow-lock');
-  }, [view, layout]);
-
-  // Every home panel once; the layout decides where they sit.
+  // Every home panel once; the cockpit decides where they sit.
   const p: Record<string, ReactNode> = {
     greet: (
       <Greeting
@@ -385,12 +372,7 @@ export function App() {
     routines: <MicroRoutines state={state} now={now} onStart={setRoutine} />,
     week: <WeekTeaser state={state} projections={projections} now={now} onOpen={() => setView('times')} />,
   };
-  const order =
-    layout === 'hub'
-      ? ['greet', 'focus', 'hub', 'plan', 'water', 'tl', 'weather', 'impulse', 'times', 'thoughts', 'week', 'routines']
-      : layout === 'sanctuary'
-        ? ['greet', 'weather', 'focus', 'plan', 'water', 'times', 'routines', 'tl', 'impulse', 'week', 'thoughts']
-        : ['greet', 'focus', 'plan', 'impulse', 'tl', 'weather', 'water', 'times', 'thoughts', 'routines', 'week'];
+  const order = ['greet', 'focus', 'hub', 'plan', 'tl', 'water', 'weather', 'times', 'week', 'impulse', 'thoughts', 'routines'];
   const panel = (id: string) => (
     <div key={id} className={`panel panel--${id}`}>
       {p[id]}
@@ -398,7 +380,7 @@ export function App() {
   );
 
   return (
-    <div className={`shell shell--${view} shell--${layout}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
+    <div className={`shell shell--${view}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
       <Ambience kind={state.settings.appearance.ambience} weather={state.weather} dark={theme === 'dark'} />
       {winter && state.settings.appearance.ambience !== 'snow' && <Ambience kind="snow" weather={null} dark={theme === 'dark'} />}
       {winter && <Garland />}
@@ -409,23 +391,7 @@ export function App() {
 
       <div className="app">
         <main id="main" className={`dash dash--${view}`}>
-          {view === 'today' &&
-            (layout === 'flow' ? (
-              <div className="home home--flow" key="flow">
-                {panel('greet')}
-                <FlowSlider
-                  slides={[
-                    { id: 'now', label: 'Jetzt', content: <>{panel('focus')}</> },
-                    { id: 'day', label: 'Dein Tag', content: <>{panel('tl')}{panel('plan')}</> },
-                    { id: 'care', label: 'Für dich', content: <>{panel('water')}{panel('weather')}{panel('impulse')}</> },
-                    { id: 'mind', label: 'Kopf frei', content: <>{panel('thoughts')}{panel('routines')}</> },
-                    { id: 'look', label: 'Rückblick', content: <>{panel('times')}{panel('week')}</> },
-                  ]}
-                />
-              </div>
-            ) : (
-              <WorkspaceHome layout={layout} settings={state.settings} standard={order} panels={p} enabled={!focusing && !tour && !modal} />
-            ))}
+          {view === 'today' && <div className="home">{order.map(panel)}</div>}
           {view === 'times' && (
             <div className="view-fade" key="times">
               <WeekView state={state} projections={projections} now={now} />
@@ -453,7 +419,7 @@ export function App() {
           <InlineCompanion onOpen={setModal} />
         </>
       )}
-      {/* Tages-Anker: a floating glass pill (bottom left), never part of the layouts; steps back while you focus. */}
+      {/* Tages-Anker: a floating glass pill (bottom left), never part of the cockpit; steps back while you focus. */}
       {state.settings.onboarded && !onboarding && !landing && !focusing && (
         <AnchorsPill state={state} now={now} onOpen={() => setModal({ kind: 'anchors' })} />
       )}

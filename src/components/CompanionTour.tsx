@@ -22,8 +22,6 @@ interface Step {
   place: Place;
   /** Steps inside the settings sheet. */
   tab?: SettingsTab;
-  /** Flow & Focus layout: the slide that holds the target. */
-  slide?: string;
   /** A small chip next to the title (e.g. "Pro-Vorschau"). */
   badge?: string;
 }
@@ -41,7 +39,6 @@ export function buildSteps(name: string, user: string, labels: ContextLabels, br
       title: 'Deine Fokus-Karte',
       text: `Hallo${you}! Ich bin ${name} und zeige dir kurz alles. Hier steht immer nur dein nächster Schritt, nie die ganze Liste. Ein Klick auf „Ankommen und starten“, und wir legen gemeinsam los.`,
       place: 'corner',
-      slide: 'Jetzt',
     },
     {
       id: 'energy',
@@ -56,7 +53,6 @@ export function buildSteps(name: string, user: string, labels: ContextLabels, br
       title: 'Der Gedanken-Parkplatz',
       text: 'Alles, was dir zwischendurch durch den Kopf geht, parkst du hier. Es geht nicht verloren und stört deinen Fokus nicht. Oder du lässt es bewusst los.',
       place: 'corner',
-      slide: 'Kopf frei',
     },
     {
       id: 'closing',
@@ -100,7 +96,6 @@ export function buildSteps(name: string, user: string, labels: ContextLabels, br
         ? `Ich bleibe in deiner Nähe und schaue ab und zu vorbei. Zum Schluss räumen wir kurz deinen Kopf auf${you}, dann kann es losgehen.`
         : `Ich bleibe in deiner Nähe und schaue ab und zu vorbei. Ein Schritt nach dem anderen${you}.`,
       place: 'corner',
-      slide: 'Jetzt',
     },
   ];
   // Clients are a work topic: studying and everyday use skip this step.
@@ -253,7 +248,7 @@ export function CompanionTour({ avatar, userName, onOpenSettings, onCloseSetting
     else setIndex((i) => i + 1);
   }, [last, finish]);
 
-  // Prepare each station: open/close the settings, pick the slide, scroll gently.
+  // Prepare each station: open/close the settings, scroll gently.
   useEffect(() => {
     if (!step) return;
     setRect(null);
@@ -263,16 +258,12 @@ export function CompanionTour({ avatar, userName, onOpenSettings, onCloseSetting
       else onOpenSettings(step.tab);
     } else {
       if (settingsOpen) onCloseSettings();
-      if (step.slide) {
-        const dot = Array.from(document.querySelectorAll<HTMLButtonElement>('.flow__dots button')).find((b) => b.textContent?.trim() === step.slide);
-        dot?.click();
-      }
     }
-    // Give the sheet / slide a moment, then make sure the target is in view.
+    // Give the sheet a moment, then make sure the target is in view.
     const t = window.setTimeout(() => {
       const el = findTarget(step);
       if (!el) {
-        // Nothing to show here (e.g. hidden in this layout): walk on.
+        // Nothing to show here (e.g. hidden right now): walk on.
         setIndex((i) => (i === index ? Math.min(i + 1, steps.length - 1) : i));
         if (last) finish();
         return;

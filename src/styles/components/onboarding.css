@@ -8,11 +8,6 @@
   background: var(--line);
 }
 /* order-pinned: belongs to layout/layouts, kept here so the cascade stays as before */
-.flow__dots button {
-  min-height: 34px;
-  color: var(--ink-2);
-  cursor: pointer;
-}
 .onboard__logo {
   position: absolute;
   top: calc(28px + env(safe-area-inset-top, 0px));

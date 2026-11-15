@@ -17,7 +17,7 @@ describe('state from schema 3', () => {
     expect(s?.schemaVersion).toBe(4);
     expect(s?.thoughts).toEqual([]);
     expect(s?.wellbeing.energyLog).toEqual({ '2026-11-03': 4 });
-    expect(s?.settings.appearance.layout).toBe('classic');
+    expect(s?.settings.appearance).not.toHaveProperty('layout');
   });
 });
 
@@ -34,7 +34,7 @@ describe('settings from 1.3 and older', () => {
       },
     };
     const s = parseState(JSON.stringify(raw));
-    expect(s?.settings.appearance).toMatchObject({ palette: 'mono', layout: 'hub', standby: 'calm', ambient: 0.55, corners: 'precise' });
+    expect(s?.settings.appearance).toMatchObject({ palette: 'mono', standby: 'calm', ambient: 0.55, corners: 'precise' });
     expect(s?.settings.overlay).toMatchObject({ enabled: true, opacity: 0.6, modules: { avatar: true, anchor: true } });
     // 1.7: the player leaves the home screen once and stays in the overlay.
     expect(s?.settings.media).toEqual({ enabled: true, inTopbar: false, rev: 2 });
@@ -97,15 +97,34 @@ describe('settings from 1.4', () => {
       wellbeing: { ...old.wellbeing, softCheckDay: undefined },
     };
     const s = parseState(JSON.stringify(raw));
-    expect(s?.settings.appearance).toMatchObject({ layout: 'flow', standby: 'drift', xmas: 'december', focusStyle: 'breathe' });
+    expect(s?.settings.appearance).toMatchObject({ standby: 'drift', xmas: 'december', focusStyle: 'breathe' });
     expect(s?.settings.companion.softCheck).toBe(true);
     expect(s?.wellbeing.softCheckDay ?? null).toBeNull();
   });
 });
 
 describe('defaults for new installs', () => {
-  it('starts new installs in the Companion Hub', () => {
-    expect(emptyState().settings.appearance.layout).toBe('hub');
+  it('knows no home layouts and no workspace editor', () => {
+    expect(emptyState().settings.appearance).not.toHaveProperty('layout');
+    expect(emptyState().settings).not.toHaveProperty('workspace');
+  });
+});
+
+describe('settings from 1.17 (home layouts)', () => {
+  it('drops the retired home layouts and the workspace editor', () => {
+    const old = emptyState();
+    const raw = {
+      ...old,
+      settings: {
+        ...old.settings,
+        appearance: { ...old.settings.appearance, palette: 'cyan', layout: 'flow', standby: 'drift' },
+        workspace: { hub: { order: ['focus'], size: { focus: 'l' } } },
+      },
+    };
+    const s = parseState(JSON.stringify(raw));
+    expect(s?.settings.appearance).not.toHaveProperty('layout');
+    expect(s?.settings).not.toHaveProperty('workspace');
+    expect(s?.settings.appearance).toMatchObject({ palette: 'cyan', standby: 'drift' });
   });
 });
 
@@ -169,6 +188,6 @@ describe('settings from 1.8', () => {
     const s = parseState(JSON.stringify(raw));
     expect(s?.settings.appearance.focusStyle).toBe('tunnel');
     expect(s?.settings.appearance).not.toHaveProperty('silentFocus');
-    expect(s?.settings).toMatchObject({ uiSounds: true, oneStep: false, brain: null, workspace: {} });
+    expect(s?.settings).toMatchObject({ uiSounds: true, oneStep: false, brain: null });
   });
 });

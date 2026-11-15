@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
-import type { AppState, Client, CornerStyle, LayoutId, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
+import type { AppState, Client, CornerStyle, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
 import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
 import { desktop, type AutostartStatus } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
-import { freeState, hasPro, isProLayout, isProPalette, openPro, themesUnlocked } from '../../app/pro';
+import { freeState, hasPro, isProPalette, openPro, themesUnlocked } from '../../app/pro';
 import { IconChat, IconLock } from '../icons';
 import { companionHello } from '../../app/companion';
 import { avatarName } from '../../domain/companion';
@@ -73,13 +73,6 @@ const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
   { id: 'sharp', label: 'Kantig', text: 'Architektonisch, klare Kanten' },
   { id: 'precise', label: 'Präzise', text: 'Straff und exakt' },
   { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
-];
-
-const LAYOUTS: Array<{ id: LayoutId; label: string; text: string }> = [
-  { id: 'hub', label: 'Companion Hub', text: 'Dein Begleiter im Mittelpunkt, in seinem Glas-Zuhause' },
-  { id: 'classic', label: 'Classic', text: 'Übersichtliches Dashboard zum Scrollen' },
-  { id: 'sanctuary', label: 'Sanctuary', text: 'Eine große Karte im Zentrum, alles andere ruhig drumherum' },
-  { id: 'flow', label: 'Flow & Focus', text: 'Bereiche als sanfter Slider, Seite für Seite' },
 ];
 
 /** Position of the sliding tab highlight (moves with transform only, no layout work). */
@@ -388,25 +381,6 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
               >
                 <strong>{c.label}</strong>
                 <span className="muted small">{c.text}</span>
-              </button>
-            ))}
-          </div>
-          <p className="settings__label">Aufbau der Startseite</p>
-          <div className="layouts" role="radiogroup" aria-label="Aufbau der Startseite">
-            {LAYOUTS.map((l) => (
-              <button
-                key={l.id}
-                type="button"
-                role="radio"
-                aria-checked={s.appearance.layout === l.id}
-                aria-disabled={isProLayout(l.id) || undefined}
-                className={`layout-opt${s.appearance.layout === l.id ? ' is-on' : ''}${isProLayout(l.id) ? ' is-pro' : ''}`}
-                onClick={() => (isProLayout(l.id) ? openPro('flow') : set({ appearance: { ...s.appearance, layout: l.id } }))}
-              >
-                <strong>{l.label}</strong>
-                {l.id === 'hub' && <span className="layout-opt__badge">Standard</span>}
-                <span>{l.text}</span>
-                {isProLayout(l.id) && <ProLock />}
               </button>
             ))}
           </div>

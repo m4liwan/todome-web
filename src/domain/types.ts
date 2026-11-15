@@ -197,9 +197,6 @@ export type CornerStyle = 'sharp' | 'precise' | 'soft';
 /** How the rest screen looks. */
 export type StandbyLayout = 'calm' | 'bigclock' | 'drift' | 'breath';
 
-/** How the home screen is arranged. */
-export type LayoutId = 'classic' | 'flow' | 'sanctuary' | 'hub';
-
 /** Subtle animated environment behind the glass. */
 export type AmbienceId = 'none' | 'rain' | 'clouds' | 'snow' | 'leaves' | 'live';
 
@@ -210,7 +207,6 @@ export interface AppearanceSettings {
   ambient: number;
   corners: CornerStyle;
   ambience: AmbienceId;
-  layout: LayoutId;
   standby: StandbyLayout;
   /** Winter magic: off, 1–26 December, or always. */
   xmas: 'off' | 'december' | 'always';
@@ -247,13 +243,6 @@ export interface PomodoroSettings {
 
 /** "Wie tickt dein Kopf am liebsten?" */
 export type BrainProfile = 'overload' | 'adhd' | 'procrastination' | 'creative';
-
-export type CardSize = 's' | 'm' | 'l' | 'xl';
-/** Pro workspace editor: own order and card sizes per layout. */
-export interface Workspace {
-  order: string[];
-  size: Record<string, CardSize>;
-}
 
 /** Progress look of the running block: breathing wave, glass bar or beads. */
 export type TimelineStyle = 'wave' | 'bar' | 'beads';
@@ -355,8 +344,6 @@ export interface Settings {
   breathBeforeStart: boolean;
   /** Focus timer lengths (the timer itself is the focus style "pomodoro"). */
   pomodoro: PomodoroSettings;
-  /** Pro: own card arrangement per layout. */
-  workspace: Partial<Record<LayoutId, Workspace>>;
 }
 
 /** Small wellbeing counters behind the companion (water, last visits). */
