@@ -4,8 +4,8 @@
 }
 .prompts {
   position: fixed;
-  right: calc(22px + env(safe-area-inset-right, 0px));
-  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  right: calc(var(--frame-r) + 22px + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--frame-b) + 22px + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   display: grid;
   gap: var(--gap);
@@ -73,8 +73,8 @@ html.is-companion body {
   left: 0;
 }
 .buddy-layer:not(.buddy-layer--desktop) {
-  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-  left: calc(var(--rail-w) + 16px + env(safe-area-inset-left, 0px));
+  bottom: calc(var(--frame-b) + 20px + env(safe-area-inset-bottom, 0px));
+  left: calc(var(--frame-l) + 16px + env(safe-area-inset-left, 0px));
   right: auto;
 }
 .buddy {

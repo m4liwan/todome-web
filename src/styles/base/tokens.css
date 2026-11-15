@@ -38,9 +38,16 @@
   --s10: 96px;
   --gap: var(--s3);
 
-  /* Frame: header line and icon rail */
-  --header-h: 48px;
-  --rail-w: 64px;
+  /* Frame: the window strip along the top and the floating dock. --frame-*
+     is what the dock takes from each edge (data-dock below picks the side). */
+  --chrome-h: 36px;
+  --dock-size: 56px;
+  --dock-inset: 16px;
+  --dock-space: calc(var(--dock-size) + var(--dock-inset) * 2);
+  --frame-l: var(--dock-space);
+  --frame-r: 0px;
+  --frame-t: var(--chrome-h);
+  --frame-b: 0px;
 
   /* Type */
   --font-sans: 'Geist Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -94,8 +101,22 @@
 
 @media (max-width: 760px) {
   :root {
-    --rail-w: 56px;
+    --dock-size: 52px;
+    --dock-inset: 10px;
   }
+}
+
+:root[data-dock='right'] {
+  --frame-l: 0px;
+  --frame-r: var(--dock-space);
+}
+:root[data-dock='top'] {
+  --frame-l: 0px;
+  --frame-t: var(--dock-space);
+}
+:root[data-dock='bottom'] {
+  --frame-l: 0px;
+  --frame-b: var(--dock-space);
 }
 
 :root[data-corners='sharp'] {

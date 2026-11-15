@@ -23,7 +23,7 @@ function Svg({ size = 20, children, ...rest }: IconProps & { children: ReactNode
   );
 }
 
-/* ---------- rail stations ---------- */
+/* ---------- dock stations ---------- */
 export const IconHome = (p: IconProps) => (
   <Svg {...p}>
     <path d="M4 10.5 12 4l8 6.5V19a1 1 0 01-1 1h-4.5v-5.5h-5V20H5a1 1 0 01-1-1z" />
@@ -98,6 +98,12 @@ export const IconSun = (p: IconProps) => (
   <Svg {...p}>
     <circle cx="12" cy="12" r="4" />
     <path d="M12 2.5v2M12 19.5v2M4.6 4.6L6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4" />
+  </Svg>
+);
+/** The day end: a sun setting behind the horizon. */
+export const IconSunset = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7.5 16a4.5 4.5 0 019 0M3 16h18M6 20h12M12 4.5v3M5.2 8.7l1.6 1.6M18.8 8.7l-1.6 1.6" />
   </Svg>
 );
 export const IconMoon = (p: IconProps) => (

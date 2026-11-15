@@ -45,6 +45,7 @@ const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = {
 };
 const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose']);
 const CORNERS = new Set(['sharp', 'precise', 'soft']);
+const DOCKS = new Set(['left', 'right', 'top', 'bottom']);
 
 function migrateAppearance(raw: unknown): AppearanceSettings {
   const a = { ...DEFAULT_APPEARANCE, ...(isRecord(raw) ? (raw as Partial<AppearanceSettings>) : {}) };
@@ -59,6 +60,8 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   // 1.18: ambient light strength and corner rounding.
   a.ambient = typeof a.ambient === 'number' && Number.isFinite(a.ambient) ? Math.min(1, Math.max(0, a.ambient)) : DEFAULT_APPEARANCE.ambient;
   if (!CORNERS.has(String(a.corners))) a.corners = DEFAULT_APPEARANCE.corners;
+  // 1.18: the floating navigation can sit on any edge.
+  if (!DOCKS.has(String(a.dock))) a.dock = DEFAULT_APPEARANCE.dock;
   // 2.x: level effects arrive switched on; only a real choice survives.
   if (typeof a.companionFx !== 'boolean') a.companionFx = DEFAULT_APPEARANCE.companionFx;
   return a;

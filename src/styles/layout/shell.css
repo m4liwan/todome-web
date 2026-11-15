@@ -1,5 +1,5 @@
 /* ========================================================================
-   Shell: the frame (content beside the rail), the ambient veil, view
+   Shell: the frame (content beside the dock), the ambient veil, view
    entrance, focus dimming and the title bar strip of full-screen views.
    ======================================================================== */
 
@@ -14,7 +14,8 @@
 }
 .app {
   position: relative;
-  margin-left: var(--rail-w);
+  padding: var(--frame-t) var(--frame-r) var(--frame-b) var(--frame-l);
+  transition: padding var(--t-slow) var(--ease);
 }
 .dash {
   max-width: 1440px;

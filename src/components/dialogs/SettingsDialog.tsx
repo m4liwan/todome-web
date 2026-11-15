@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
-import type { AppState, Client, CornerStyle, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
+import type { AppState, Client, CornerStyle, DockPosition, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
 import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
 import { desktop, type AutostartStatus } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
@@ -73,6 +73,14 @@ const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
   { id: 'sharp', label: 'Kantig', text: 'Architektonisch, klare Kanten' },
   { id: 'precise', label: 'Präzise', text: 'Straff und exakt' },
   { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
+];
+
+/** Where the floating navigation sits; left keeps the reading flow free. */
+const DOCKS: Array<{ id: DockPosition; label: string; text: string }> = [
+  { id: 'left', label: 'Links', text: 'Ruhig am Rand, wie ein Buchrücken' },
+  { id: 'right', label: 'Rechts', text: 'Der Blick startet beim Inhalt' },
+  { id: 'top', label: 'Oben', text: 'Kompakt über allem' },
+  { id: 'bottom', label: 'Unten', text: 'Wie ein Dock, griffbereit' },
 ];
 
 const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minuten-Takt', fifteen: '15-Minuten-Takt' };
@@ -333,6 +341,28 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           )}
           {tab === 'design' && (
             <>
+        <section>
+          <h3>Navigation</h3>
+          <p className="muted small">Die schwebende Leiste mit allen Bereichen. Sie zeigt nur Symbole; die Namen erscheinen, wenn du darüber fährst.</p>
+          <div className="docks" role="radiogroup" aria-label="Position der Navigation">
+            {DOCKS.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                role="radio"
+                aria-checked={s.appearance.dock === d.id}
+                className={`option dock-opt${s.appearance.dock === d.id ? ' is-on' : ''}`}
+                onClick={() => set({ appearance: { ...s.appearance, dock: d.id } })}
+              >
+                <span className={`dock-opt__preview dock-opt__preview--${d.id}`} aria-hidden="true">
+                  <i />
+                </span>
+                <strong>{d.label}</strong>
+                <span>{d.text}</span>
+              </button>
+            ))}
+          </div>
+        </section>
         <section>
           <h3>Ambient Light</h3>
           <p className="muted small">Die Flächen bleiben dunkel. Hinter deinen Modulen liegt ein leises Licht, ganz nach deiner Stimmung.</p>

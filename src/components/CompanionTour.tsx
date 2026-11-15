@@ -56,10 +56,10 @@ export function buildSteps(name: string, user: string, labels: ContextLabels, br
     },
     {
       id: 'closing',
-      targets: ['.topbar__main'],
+      targets: ['.dock__item--closing'],
       title: labels.dayEnd,
       text: labels.tourText,
-      place: 'left',
+      place: 'corner',
     },
     {
       id: 'clients',

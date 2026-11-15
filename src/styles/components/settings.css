@@ -96,6 +96,7 @@
 
 /* ---------- options: hairline cards to pick one look ---------- */
 .options,
+.docks,
 .corners,
 .timeline-opts,
 .focus-styles,
@@ -121,6 +122,51 @@
 }
 .modules {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.docks {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+/* A tiny window with its dock on the chosen side. */
+.dock-opt__preview {
+  position: relative;
+  display: block;
+  height: 46px;
+  margin-bottom: var(--s2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+}
+.dock-opt__preview i {
+  position: absolute;
+  border-radius: calc(var(--radius) / 2);
+  background: var(--ink-3);
+  transition: background-color var(--t-fast) var(--ease);
+}
+.dock-opt.is-on .dock-opt__preview i {
+  background: var(--ink);
+}
+.dock-opt__preview--left i,
+.dock-opt__preview--right i {
+  top: 5px;
+  bottom: 5px;
+  width: 5px;
+}
+.dock-opt__preview--left i {
+  left: 5px;
+}
+.dock-opt__preview--right i {
+  right: 5px;
+}
+.dock-opt__preview--top i,
+.dock-opt__preview--bottom i {
+  left: 32%;
+  right: 32%;
+  height: 5px;
+}
+.dock-opt__preview--top i {
+  top: 5px;
+}
+.dock-opt__preview--bottom i {
+  bottom: 5px;
 }
 .option,
 .corner-opt,
@@ -392,6 +438,9 @@
 }
 
 @media (max-width: 860px) {
+  .docks {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .focus-styles {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

@@ -4,12 +4,12 @@
 
 .toasts {
   position: fixed;
-  left: calc(50% + var(--rail-w) / 2);
-  bottom: calc(var(--s5) + env(safe-area-inset-bottom, 0px));
+  left: calc(50% + (var(--frame-l) - var(--frame-r)) / 2);
+  bottom: calc(var(--frame-b) + var(--s5) + env(safe-area-inset-bottom, 0px));
   z-index: 60;
   display: grid;
   gap: var(--s2);
-  width: min(460px, calc(100vw - var(--rail-w) - 32px));
+  width: min(460px, calc(100vw - var(--frame-l) - var(--frame-r) - 32px));
   transform: translateX(-50%);
 }
 .toast {

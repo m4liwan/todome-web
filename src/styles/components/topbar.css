@@ -1,59 +1,27 @@
 /* ========================================================================
-   Header: one slim line over the whole window (the window's drag strip).
-   Wordmark over the rail, where you are, then media and the main action.
+   Header: no bar any more. An invisible strip along the top edge moves the
+   window (desktop) and keeps media and the demo hint beside the window
+   buttons. Content scrolling under it fades out instead of colliding.
    ======================================================================== */
 
 .topbar-wrap {
-  position: sticky;
-  top: env(safe-area-inset-top, 0px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 30;
-  height: var(--header-h);
-  border-bottom: 1px solid var(--line);
-  background: rgb(5 5 5 / 0.82);
-  backdrop-filter: blur(16px);
+  height: var(--chrome-h);
+  background: linear-gradient(rgb(5 5 5 / 0.92), rgb(5 5 5 / 0));
 }
 .topbar {
-  display: grid;
-  grid-template-columns: var(--rail-w) minmax(0, 1fr) auto;
-  align-items: center;
-  height: 100%;
-}
-.topbar__brand {
-  display: grid;
-  place-items: center;
-  height: 100%;
-  border-right: 1px solid var(--line);
-}
-.topbar__where {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s3);
-  min-width: 0;
-  padding-left: var(--s5);
-  white-space: nowrap;
-}
-.topbar__view {
-  color: var(--ink);
-}
-.topbar__date {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: var(--fs-meta);
-  color: var(--ink-3);
-}
-.topbar__actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: var(--s3);
-  min-width: 0;
-  padding-right: var(--s5);
+  height: 100%;
+  padding-right: var(--s4);
 }
-.topbar__main.is-current {
-  border-color: var(--line-strong);
-  color: var(--ink);
-}
-.topbar__actions .media {
+.topbar .media {
   max-width: 280px;
 }
 
@@ -69,25 +37,21 @@ html.is-desktop.has-modal .topbar-wrap,
 html.is-desktop.has-modal .topbar-wrap * {
   -webkit-app-region: no-drag;
 }
-html.is-desktop .topbar__actions {
+html.is-desktop .topbar {
   --wco: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
-  padding-right: max(var(--s5), calc(var(--wco) + var(--s3)));
+  padding-right: max(var(--s4), calc(var(--wco) + var(--s3)));
 }
 
-/* Focus: the header steps back with the rail and returns on contact. */
-.shell.is-focusing .topbar__where,
-.shell.is-focusing .topbar__brand {
-  opacity: 0.4;
+.shell.is-covered .topbar-wrap,
+.shell.is-covered .app {
+  visibility: hidden;
+}
+.shell.is-focusing .topbar {
+  opacity: 0.35;
   transition: opacity var(--t-slow) var(--ease);
 }
-.shell.is-focusing .topbar-wrap:hover :is(.topbar__where, .topbar__brand),
-.shell.is-focusing .topbar-wrap:focus-within :is(.topbar__where, .topbar__brand) {
+.shell.is-focusing .topbar:is(:hover, :focus-within) {
   opacity: 1;
-}
-.shell.is-covered .topbar-wrap,
-.shell.is-covered .app,
-.shell.is-covered .rail {
-  visibility: hidden;
 }
 
 @media (max-width: 1360px) {
@@ -95,27 +59,8 @@ html.is-desktop .topbar__actions {
     display: none;
   }
 }
-@media (max-width: 1060px) {
-  .topbar .media {
-    display: none;
-  }
-}
-@media (max-width: 1180px) {
-  .topbar__main .lbl-long {
-    display: none;
-  }
-  .topbar__main .lbl-short {
-    display: inline;
-  }
-}
 @media (max-width: 760px) {
-  .topbar__date {
-    display: none;
-  }
-  .topbar__where {
-    padding-left: var(--s4);
-  }
-  .topbar__actions .tag {
+  .topbar :is(.media, .tag) {
     display: none;
   }
 }

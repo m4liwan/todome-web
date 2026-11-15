@@ -25,7 +25,7 @@ import { Breathe } from '../components/Breathe';
 import { Timeline } from '../components/Timeline';
 import { Toasts } from '../components/Toasts';
 import { Cockpit } from '../components/Cockpit';
-import { Rail } from '../components/Rail';
+import { Dock } from '../components/Dock';
 import { Topbar, type View } from '../components/Topbar';
 import { WeatherCard } from '../components/WeatherCard';
 import { WeekView } from '../components/WeekView';
@@ -384,8 +384,8 @@ export function App() {
       <a className="skip-link" href="#main">
         Zum Inhalt springen
       </a>
-      <Topbar state={state} view={view} onView={setView} onOpen={setModal} onResume={resumeFocus} />
-      <Rail state={state} view={view} onView={setView} onOpen={setModal} />
+      <Topbar state={state} />
+      <Dock state={state} view={view} onView={setView} onOpen={setModal} onResume={resumeFocus} />
 
       <div className="app">
         <main id="main" className={`dash dash--${view}`}>

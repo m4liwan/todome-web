@@ -36,9 +36,6 @@
 .module span {
   color: var(--ink-2);
 }
-.topbar__brand .media__label {
-  max-width: 140px;
-}
 .onboard__logo {
   position: absolute;
 }

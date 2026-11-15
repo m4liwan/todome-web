@@ -1,0 +1,237 @@
+/* ========================================================================
+   Dock: the floating navigation (components/Dock.tsx). One quiet bar inset
+   from the window edge, on the side the user chose (data-dock on <html>,
+   left by default). Icons only; each name slides out of its icon on hover
+   or keyboard focus. A soft lens glides to the current view.
+   ======================================================================== */
+
+.dock {
+  --cell: 48px;
+  --item: 40px;
+  position: fixed;
+  top: var(--dock-inset);
+  bottom: var(--dock-inset);
+  left: var(--dock-inset);
+  z-index: 31;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  width: var(--dock-size);
+  padding: var(--s3) 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgb(10 10 11 / 0.72);
+  backdrop-filter: blur(20px) saturate(1.2);
+  box-shadow: 0 18px 60px rgb(0 0 0 / 0.45);
+  -webkit-app-region: no-drag;
+  animation: dock-in var(--t-slow) var(--ease) both;
+  transition: opacity var(--t-slow) var(--ease);
+}
+:root[data-dock='right'] .dock {
+  left: auto;
+  right: var(--dock-inset);
+  top: calc(var(--chrome-h) + var(--s2));
+}
+/* Top and bottom: a compact bar, centred over the content. */
+:root:is([data-dock='top'], [data-dock='bottom']) .dock {
+  top: var(--dock-inset);
+  bottom: auto;
+  left: 50%;
+  flex-direction: row;
+  width: auto;
+  height: var(--dock-size);
+  padding: 0 var(--s3);
+  translate: -50% 0;
+}
+:root[data-dock='bottom'] .dock {
+  top: auto;
+  bottom: var(--dock-inset);
+}
+
+.dock__brand {
+  display: grid;
+  place-items: center;
+  height: var(--item);
+  padding-bottom: var(--s2);
+  border-bottom: 1px solid var(--line);
+}
+:root:is([data-dock='top'], [data-dock='bottom']) .dock__brand {
+  height: auto;
+  padding: 0 var(--s3) 0 var(--s1);
+  border-bottom: 0;
+  border-right: 1px solid var(--line);
+}
+
+.dock__stations,
+.dock__tools {
+  position: relative;
+  display: grid;
+  grid-auto-rows: var(--cell);
+  justify-items: center;
+  align-items: center;
+}
+:root:is([data-dock='top'], [data-dock='bottom']) :is(.dock__stations, .dock__tools) {
+  grid-auto-flow: column;
+  grid-auto-columns: var(--cell);
+  grid-auto-rows: auto;
+}
+.dock__sep {
+  flex: none;
+  width: 20px;
+  height: 1px;
+  margin-top: auto;
+  background: var(--line-strong);
+}
+:root:is([data-dock='top'], [data-dock='bottom']) .dock__sep {
+  width: 1px;
+  height: 20px;
+  margin: 0 var(--s1);
+}
+
+.dock__item {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--item);
+  height: var(--item);
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  transition: color var(--t-fast) var(--ease);
+}
+.dock__item:hover,
+.dock__item:focus-visible,
+.dock__item[aria-current='page'],
+.dock__item[aria-pressed='true'] {
+  color: var(--ink);
+}
+.dock__item > svg {
+  position: relative;
+  z-index: 1;
+}
+
+/* The lens: a soft glass square that glides to the current view. */
+.dock__lens {
+  position: absolute;
+  top: calc((var(--cell) - var(--item)) / 2);
+  left: calc(50% - var(--item) / 2);
+  width: var(--item);
+  height: var(--item);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--active);
+  pointer-events: none;
+  transform: translateY(calc(var(--at) * var(--cell)));
+  transition: transform var(--t-slow) var(--ease);
+}
+:root:is([data-dock='top'], [data-dock='bottom']) .dock__lens {
+  top: calc(50% - var(--item) / 2);
+  left: calc((var(--cell) - var(--item)) / 2);
+  transform: translateX(calc(var(--at) * var(--cell)));
+}
+
+/* The name: slides out of the icon towards the content and unveils from its
+   edge (clip), a beat after the pointer arrives. */
+.dock__label {
+  --from: inset(0 100% 0 0 round var(--radius));
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 14px);
+  z-index: 2;
+  padding: 7px 11px;
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  clip-path: var(--from);
+  transform: translate(-10px, -50%);
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-base) var(--ease),
+    clip-path var(--t-base) var(--ease);
+}
+:root[data-dock='right'] .dock__label {
+  --from: inset(0 0 0 100% round var(--radius));
+  left: auto;
+  right: calc(100% + 14px);
+  transform: translate(10px, -50%);
+}
+:root[data-dock='top'] .dock__label {
+  --from: inset(0 0 100% 0 round var(--radius));
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translate(-50%, -8px);
+}
+:root[data-dock='bottom'] .dock__label {
+  --from: inset(100% 0 0 0 round var(--radius));
+  top: auto;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  transform: translate(-50%, 8px);
+}
+.dock__item:is(:hover, :focus-visible) .dock__label {
+  opacity: 1;
+  clip-path: inset(0 0 0 0 round var(--radius));
+  transform: translate(0, -50%);
+  transition-delay: 60ms;
+}
+:root:is([data-dock='top'], [data-dock='bottom']) .dock__item:is(:hover, :focus-visible) .dock__label {
+  transform: translate(-50%, 0);
+}
+.dock__item:focus-visible .dock__label {
+  transition-delay: 0ms;
+}
+
+/* The companion's level: a tiny mono number tucked under its icon. */
+.dock__item .level-badge {
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  z-index: 1;
+  height: auto;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+
+/* Focus: the dock steps back and returns on contact. */
+.shell.is-focusing .dock {
+  opacity: 0.35;
+}
+.shell.is-focusing .dock:is(:hover, :focus-within) {
+  opacity: 1;
+}
+.shell.is-covered .dock {
+  visibility: hidden;
+}
+
+/* Short or zoomed windows (up to 200 % on a 640 px window): no wordmark,
+   tighter cells, so every item of a side dock stays on screen. */
+@media (max-height: 760px) {
+  :root {
+    --dock-inset: 10px;
+  }
+  .dock {
+    --cell: 36px;
+    --item: 32px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    row-gap: 2px;
+  }
+  .dock__brand {
+    display: none;
+  }
+  :root[data-dock='right'] .dock {
+    top: var(--chrome-h);
+  }
+}

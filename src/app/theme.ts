@@ -44,12 +44,12 @@ export function useAccentColors(fallback: { strong: string; light: string }): { 
 export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
-type Look = Pick<AppearanceSettings, 'palette' | 'ambient' | 'corners'>;
+type Look = Pick<AppearanceSettings, 'palette' | 'ambient' | 'corners' | 'dock'>;
 
-/** Remembers light and corners for public/boot.js (first frame, before React). */
+/** Remembers light, corners and the dock side for public/boot.js (first frame, before React). */
 export function rememberBoot(look: Look): void {
   try {
-    window.localStorage.setItem('todome:boot', JSON.stringify({ theme: 'dark', palette: look.palette, ambient: look.ambient, corners: look.corners }));
+    window.localStorage.setItem('todome:boot', JSON.stringify({ theme: 'dark', palette: look.palette, ambient: look.ambient, corners: look.corners, dock: look.dock }));
   } catch {
     /* ignore */
   }
@@ -62,12 +62,13 @@ export function writeAmbient(ambient: number): void {
 
 /**
  * Applies the look: always dark, the ambient light colour (`data-palette`),
- * its strength (`--ambient`) and the corner rounding (`data-corners`). Light
- * changes fade softly; the desktop shell follows (title bar, window background).
+ * its strength (`--ambient`), the corner rounding (`data-corners`) and the
+ * dock side (`data-dock`). Light changes fade softly; the desktop shell
+ * follows (title bar, window background).
  */
 export function useApplyTheme(look: Look): void {
-  const { palette, ambient, corners } = look;
-  useEffect(() => rememberBoot({ palette, ambient, corners }), [palette, ambient, corners]);
+  const { palette, ambient, corners, dock } = look;
+  useEffect(() => rememberBoot({ palette, ambient, corners, dock }), [palette, ambient, corners, dock]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark');
@@ -87,6 +88,10 @@ export function useApplyTheme(look: Look): void {
   useEffect(() => {
     document.documentElement.setAttribute('data-corners', corners);
   }, [corners]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-dock', dock);
+  }, [dock]);
 }
 
 const LAST_LIGHT = 'todome:ambient:last';
