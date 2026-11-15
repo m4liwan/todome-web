@@ -80,7 +80,7 @@ export function ReportPanel({ state, projections, now }: Props) {
   const pro = hasPro();
 
   return (
-    <section className="card report rise" style={{ '--i': 2 } as React.CSSProperties} aria-label="Zeitbericht">
+    <section className="zone report rise" style={{ '--i': 2 } as React.CSSProperties} aria-label="Zeitbericht">
       <header className="card__head">
         <div>
           <h2>Zeitbericht</h2>

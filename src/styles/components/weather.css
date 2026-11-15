@@ -147,3 +147,17 @@ button.weather__icon:hover {
   padding-top: 18px;
   border-top: 1px solid var(--line);
 }
+
+/* Home (OLED): the sky is a faint glow, the advice a quiet line, not a box.
+   Same border width and padding as before: the module keeps its height. */
+.shell--today .weather__glow {
+  opacity: calc(0.06 + 0.2 * var(--ambient));
+}
+.shell--today .weather__advice {
+  border-color: transparent;
+  border-top-color: var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-2);
+}

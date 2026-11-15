@@ -22,7 +22,7 @@ export function CalmStats({ state, projections, now }: { state: AppState; projec
     { label: 'Bewusst durchgeatmet', value: String(s.breaths), note: s.feelings ? `${s.smooth} von ${s.feelings} Blöcken fühlten sich flüssig an` : 'jedes Mal zählt' },
   ];
   return (
-    <section className="card calm-stats rise" aria-label="Anti-Hustle-Statistiken">
+    <section className="zone calm-stats rise" aria-label="Anti-Hustle-Statistiken">
       <header className="card__head">
         <div>
           <h2>Was du diese Woche geschützt hast</h2>
@@ -35,7 +35,7 @@ export function CalmStats({ state, projections, now }: { state: AppState; projec
           </span>
         )}
       </header>
-      <ul className={`calm-stats__grid${pro ? '' : ' pro-veil'}`} aria-hidden={pro ? undefined : true}>
+      <ul className={`band calm-stats__grid${pro ? '' : ' pro-veil'}`} aria-hidden={pro ? undefined : true}>
         {tiles.map((t) => (
           <li key={t.label}>
             <span className="calm-stats__label">{t.label}</span>

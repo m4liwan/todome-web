@@ -656,3 +656,18 @@ html.is-desktop .window-drag {
 html.is-desktop.has-modal .window-drag {
   display: none;
 }
+
+/* OLED redesign: on the home screen the grid stays exactly, only the frames go.
+   Positions and sizes are untouched (border width and padding stay); every
+   module loses its box and stands free in the dark under one hairline.
+   The focus card keeps its own glass: it is the one module on stage. */
+.home > .panel > .card,
+.home > .panel > .card:hover {
+  border-color: transparent;
+  border-top-color: var(--hairline);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

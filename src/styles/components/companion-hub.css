@@ -5,18 +5,20 @@
 
 .companion-hub {
   display: grid;
-  gap: 20px;
+  gap: 0;
   --frost: #7cc8f5;
 }
 
 /* ---------- hero ---------- */
 
+/* No box: the companion and its level stand in the open dark. */
 .companion-hub__hero {
+  position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: clamp(20px, 4vw, 52px);
-  padding: clamp(24px, 4vw, 44px);
+  gap: clamp(20px, 4vw, 64px);
+  padding: clamp(32px, 5vw, 72px) 0 clamp(36px, 5vw, 64px);
 }
 .companion-hub__stage {
   position: relative;
@@ -26,7 +28,8 @@
   aspect-ratio: 1;
   border-radius: 50%;
   isolation: isolate;
-  background: radial-gradient(circle at 50% 58%, rgb(var(--accent-rgb) / 0.3), transparent 68%);
+  /* The companion is a small light in the dark: its glow follows the ambient light. */
+  background: radial-gradient(circle at 50% 58%, rgb(var(--accent-rgb) / calc(0.08 + 0.24 * var(--ambient))), transparent 68%);
 }
 .companion-hub__stage > svg {
   width: 80%;
@@ -60,10 +63,9 @@
   height: 32px;
   padding: 0;
   border-radius: 50%;
-  border: 1px solid var(--glass-edge);
-  background: var(--surface-strong);
-  box-shadow: var(--glass-inset);
-  color: var(--ink-2);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink-3);
   font: 750 0.95rem/1 var(--font-body);
   cursor: pointer;
   transition: color 0.2s ease,
@@ -78,7 +80,7 @@
 
 /* ---------- intro: the part being explained stays bright ---------- */
 
-.companion-hub > .card {
+.companion-hub > * {
   /* Clear of the sticky header above and the speech bubble below. */
   scroll-margin: 96px 0 230px;
   outline: 2px solid transparent;
@@ -86,14 +88,14 @@
 }
 @media (max-width: 760px) {
   /* The header takes two rows here. */
-  .companion-hub > .card {
+  .companion-hub > * {
     scroll-margin-top: 136px;
   }
 }
-.companion-hub.is-touring > .card:not(.is-spot) {
+.companion-hub.is-touring > :not(.is-spot) {
   opacity: 0.32;
 }
-.companion-hub.is-touring > .card.is-spot {
+.companion-hub.is-touring > .is-spot {
   outline-color: rgb(var(--accent-rgb) / 0.7);
 }
 
@@ -104,9 +106,11 @@
 }
 .companion-hub__name {
   font-family: var(--font-body);
-  font-size: 1.05rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: var(--ink-2);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 .companion-hub__level {
   display: flex;
@@ -117,21 +121,23 @@
 }
 .companion-hub__level-word {
   font-size: clamp(1.4rem, 2.4vw, 2rem);
-  font-weight: 600;
-  color: var(--ink-2);
+  font-weight: 500;
+  color: var(--ink-3);
 }
 .companion-hub__level-num {
   font-size: clamp(4.6rem, 10vw, 8.2rem);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.045em;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
 .companion-hub__line {
   max-width: 46ch;
-  margin-top: 12px;
-  font-size: 1rem;
-  line-height: 1.5;
+  margin-top: 14px;
+  font-size: 1.08rem;
+  font-weight: 450;
+  line-height: 1.55;
+  color: var(--ink-2);
 }
 .companion-hub__next {
   margin-top: 12px;
@@ -149,18 +155,19 @@
   max-width: 560px;
   margin-top: 22px;
 }
+/* A precise line, not a chunky bar. */
 .xp-bar__track {
-  height: 14px;
+  height: 4px;
   border-radius: 999px;
   overflow: hidden;
-  background: var(--surface-sunk);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+  background: var(--hairline);
 }
 .xp-bar__fill {
   display: block;
   height: 100%;
   transform-origin: left center;
-  background: linear-gradient(90deg, var(--accent-2), var(--accent-mesh));
+  background: rgb(var(--accent-rgb) / 0.85);
+  box-shadow: 0 0 12px rgb(var(--accent-rgb) / calc(0.5 * var(--ambient)));
   transition: transform 1.1s var(--ease-out);
   will-change: transform;
 }
@@ -170,27 +177,14 @@
   justify-content: space-between;
   gap: 4px 12px;
   font-size: 0.82rem;
-  color: var(--ink-2);
+  color: var(--ink-3);
   font-variant-numeric: tabular-nums;
 }
 
 /* ---------- the four numbers (one card, hairline cells) ---------- */
 
 .companion-hub__stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.companion-hub__stats > li {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: 22px 24px;
-}
-.companion-hub__stats > li + li {
-  border-left: 1px solid var(--line);
+  --cols: 4;
 }
 .companion-hub__stats > li.is-lit .companion-hub__stat-label svg {
   color: var(--warm-b);
@@ -199,21 +193,24 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.84rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--ink-2);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 .companion-hub__stat-value {
   font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 750;
-  line-height: 1.1;
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
   font-variant-numeric: tabular-nums;
 }
 .companion-hub__stat-note {
-  font-size: 0.8rem;
-  line-height: 1.45;
-  color: var(--ink-2);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-3);
 }
 .companion-hub__freezes {
   display: flex;
@@ -236,7 +233,7 @@
 /* ---------- reward path (a real sequence: levels in order) ---------- */
 
 .companion-hub__path {
-  padding-bottom: 26px;
+  padding-bottom: clamp(32px, 4.5vw, 56px);
 }
 /* ---------- progression trail ----------
    Reached milestones are gold medallions, joined by charged strands with a
@@ -462,20 +459,6 @@
 
 /* ---------- responsive ---------- */
 
-@media (max-width: 960px) {
-  .companion-hub__stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .companion-hub__stats > li + li {
-    border-left: 0;
-  }
-  .companion-hub__stats > li:nth-child(even) {
-    border-left: 1px solid var(--line);
-  }
-  .companion-hub__stats > li:nth-child(n + 3) {
-    border-top: 1px solid var(--line);
-  }
-}
 @media (max-width: 720px) {
   .companion-hub__hero {
     grid-template-columns: minmax(0, 1fr);
@@ -483,16 +466,5 @@
   .companion-hub__stage {
     width: 180px;
     justify-self: center;
-  }
-}
-@media (max-width: 520px) {
-  .companion-hub__stats {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .companion-hub__stats > li:nth-child(even) {
-    border-left: 0;
-  }
-  .companion-hub__stats > li + li {
-    border-top: 1px solid var(--line);
   }
 }

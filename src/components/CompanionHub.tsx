@@ -113,7 +113,7 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen }: Hu
 
   return (
     <section className={`companion-hub rise${intro.spot ? ' is-touring' : ''}`} aria-label={`Dein Begleiter ${name}`}>
-      <div ref={intro.refs.hero} className={`companion-hub__hero card is-${tier}${spotOf('hero')}`}>
+      <div ref={intro.refs.hero} className={`companion-hub__hero is-${tier}${spotOf('hero')}`}>
         <button
           ref={intro.help}
           type="button"
@@ -151,7 +151,7 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen }: Hu
         </div>
       </div>
 
-      <ul ref={intro.refs.stats} className={`companion-hub__stats card${spotOf('stats')}`} aria-label="Eure Zahlen">
+      <ul ref={intro.refs.stats} className={`band companion-hub__stats${spotOf('stats')}`} aria-label="Eure Zahlen">
         <li className={streak > 0 ? 'is-lit' : ''}>
           <span className="companion-hub__stat-label">
             <IconFlame size={16} /> Serie
@@ -193,7 +193,7 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen }: Hu
         </li>
       </ul>
 
-      <section ref={intro.refs.path} className={`companion-hub__path card${spotOf('path')}`} aria-labelledby="reward-path-title">
+      <section ref={intro.refs.path} className={`zone companion-hub__path${spotOf('path')}`} aria-labelledby="reward-path-title">
         <header className="card__head">
           <div>
             <h2 id="reward-path-title">Euer Belohnungs-Pfad</h2>

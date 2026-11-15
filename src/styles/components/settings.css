@@ -182,7 +182,7 @@
   border-top-left-radius: 3px;
 }
 [data-corners-preview='precise'] .corner-opt__shape {
-  border-top-left-radius: 10px;
+  border-top-left-radius: 6px;
 }
 [data-corners-preview='soft'] .corner-opt__shape {
   border-top-left-radius: 20px;

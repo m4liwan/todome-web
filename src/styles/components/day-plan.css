@@ -186,3 +186,13 @@
     display: none;
   }
 }
+
+/* Home (OLED): hairline rows instead of filled little boxes. */
+.shell--today .later__list li {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: inset 0 -1px 0 var(--hairline);
+}
+.shell--today .later__list li:hover {
+  background: rgba(255, 255, 255, 0.025);
+}

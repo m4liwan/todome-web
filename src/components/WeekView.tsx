@@ -11,7 +11,7 @@ interface Props {
   now: Millis;
 }
 
-const PEOPLE_COLORS = ['var(--accent-2)', 'var(--accent-mesh)', 'var(--accent-3)', '#5b8cff', '#a993ff', '#ff8fb4'];
+const PEOPLE_COLORS = ['var(--accent-2)', 'var(--accent-mesh)', 'var(--accent-3)', 'var(--blue)', 'var(--lavender)', 'var(--pink)'];
 
 const weekday = (day: string, style: 'short' | 'long' = 'short') => new Date(`${day}T12:00:00`).toLocaleDateString('de-DE', { weekday: style });
 
@@ -32,7 +32,10 @@ function recognition(focusMs: Millis, done: number, activeDays: number): { title
   return { title, text: `${parts.join(', ')}. Das bist du. Das hast du bewegt.` };
 }
 
-/** Week deep-dive: what you achieved, made visible and warm. */
+/**
+ * Week deep-dive: what you achieved, made visible and warm. Borderless: a
+ * monumental headline, one band of numbers and calm zones under hairlines.
+ */
 export function WeekView({ state, projections, now }: Props) {
   const labels = contextLabels(state.settings.userContext);
   const w = useMemo(() => weekSummary(state, projections, now), [state, projections, now]);
@@ -45,9 +48,9 @@ export function WeekView({ state, projections, now }: Props) {
 
   return (
     <section className="weekview rise" aria-label="Deine Woche">
-      <div className="weekview__hero card">
+      <div className="weekview__hero">
         <div className="weekview__glow" aria-hidden="true" />
-        <p className="weekview__kicker">Dein Rückblick, die letzten sieben Tage</p>
+        <p className="zone__label">Dein Rückblick · die letzten sieben Tage</p>
         <h1 className="weekview__title">{r.title}</h1>
         <p className="weekview__text">{r.text}</p>
 
@@ -72,18 +75,18 @@ export function WeekView({ state, projections, now }: Props) {
         </p>
       </div>
 
-      <div className="weekview__tiles">
-        <article className="card tile">
+      <div className="band weekview__tiles" style={{ '--cols': w.amount > 0 ? 4 : 3 } as React.CSSProperties}>
+        <article className="tile">
           <p className="tile__label">Längster Block am Stück</p>
           <p className="tile__value">{w.longestBlockMs > 0 ? formatDuration(w.longestBlockMs) : '–'}</p>
           <p className="muted small">So lange warst du ganz bei einer Sache. Das können nicht viele.</p>
         </article>
-        <article className="card tile">
+        <article className="tile">
           <p className="tile__label">Dein stärkster Tag</p>
           <p className="tile__value">{w.bestDay ? weekday(w.bestDay.day, 'long') : '–'}</p>
           <p className="muted small">{w.bestDay ? `${formatDuration(w.bestDay.netMs)} Fokus. Merk dir, wie sich das angefühlt hat.` : 'Kommt noch. Ganz in deinem Tempo.'}</p>
         </article>
-        <article className="card tile">
+        <article className="tile">
           <p className="tile__label">Gut für dich gesorgt</p>
           <p className="tile__value">
             {w.waterGoalDays}
@@ -92,7 +95,7 @@ export function WeekView({ state, projections, now }: Props) {
           <p className="muted small">Wasserziel erreicht. Dein Körper arbeitet mit dir, nicht gegen dich.</p>
         </article>
         {w.amount > 0 && (
-          <article className="card tile">
+          <article className="tile">
             <p className="tile__label">Wert deiner Arbeit</p>
             <p className="tile__value">{formatEuro(w.amount)}</p>
             <p className="muted small">Abrechenbar diese Woche. Deine Zeit ist etwas wert.</p>
@@ -100,42 +103,48 @@ export function WeekView({ state, projections, now }: Props) {
         )}
       </div>
 
-      <div className="weekview__care">
-        <article className="card care">
-          <p className="tile__label">Selbstmitgefühl</p>
-          <div className="care__ring">
-            <Ring value={care.selfCompassion / 100} />
-            <span className="care__score">{care.selfCompassion}</span>
-          </div>
-          <p className="care__word">{care.selfCompassionWord}</p>
-          <ul className="care__parts">
-            {care.parts.map((part) => (
-              <li key={part.id}>
-                <span>{part.label}</span>
-                <span className="care__bar" aria-hidden="true">
-                  <span style={{ width: `${Math.round(part.value * 100)}%` }} />
-                </span>
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article className="card care">
-          <p className="tile__label">Pausen-Index</p>
-          <PauseGauge ratio={care.pauseRatio} />
-          <p className="care__word">{care.pauseWord}</p>
-          <p className="muted small">
-            {w.focusMs > 0 ? `${formatDuration(w.pauseMs)} Pause auf ${formatDuration(w.focusMs)} Fokus.` : ''} Zwischen 10 und 25 % fühlt sich für die meisten am leichtesten an.
-          </p>
-        </article>
-        <article className="card care care--energy">
-          <p className="tile__label">Deine Energie</p>
-          <EnergyCurve energy={care.energy} today={today} />
-          <p className="care__word">{care.energyWord}</p>
-        </article>
-      </div>
+      <section className="zone" aria-labelledby="weekview-balance">
+        <header>
+          <h2 id="weekview-balance">Deine Balance</h2>
+          <p className="zone__sub">Selbstmitgefühl, Pausen und Energie. Ohne Wertung, nur damit du dich siehst.</p>
+        </header>
+        <div className="band weekview__care" style={{ '--cols': 3 } as React.CSSProperties}>
+          <article className="care">
+            <p className="tile__label">Selbstmitgefühl</p>
+            <div className="care__ring">
+              <Ring value={care.selfCompassion / 100} />
+              <span className="care__score">{care.selfCompassion}</span>
+            </div>
+            <p className="care__word">{care.selfCompassionWord}</p>
+            <ul className="care__parts">
+              {care.parts.map((part) => (
+                <li key={part.id}>
+                  <span>{part.label}</span>
+                  <span className="care__bar" aria-hidden="true">
+                    <span style={{ width: `${Math.round(part.value * 100)}%` }} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </article>
+          <article className="care">
+            <p className="tile__label">Pausen-Index</p>
+            <PauseGauge ratio={care.pauseRatio} />
+            <p className="care__word">{care.pauseWord}</p>
+            <p className="muted small">
+              {w.focusMs > 0 ? `${formatDuration(w.pauseMs)} Pause auf ${formatDuration(w.focusMs)} Fokus.` : ''} Zwischen 10 und 25 % fühlt sich für die meisten am leichtesten an.
+            </p>
+          </article>
+          <article className="care care--energy">
+            <p className="tile__label">Deine Energie</p>
+            <EnergyCurve energy={care.energy} today={today} />
+            <p className="care__word">{care.energyWord}</p>
+          </article>
+        </div>
+      </section>
 
-      <div className="weekview__row">
-        <article className="card wins">
+      <div className="zone weekview__row">
+        <article className="wins">
           <h2>Was du geschafft hast</h2>
           {w.tasksDone.length === 0 ? (
             <p className="muted">Sobald du etwas abschließt, sammelt es sich hier. Auch kleine Dinge zählen.</p>
@@ -163,7 +172,7 @@ export function WeekView({ state, projections, now }: Props) {
           )}
         </article>
 
-        <article className="card people">
+        <article className="people">
           <h2>{labels.forWhom}</h2>
           {w.clients.length === 0 ? (
             <p className="muted">Noch keine Zeiten in dieser Woche.</p>
@@ -248,7 +257,7 @@ function EnergyCurve({ energy, today }: { energy: CareSummary['energy']; today: 
     <svg className="curve" viewBox={`0 0 ${W} ${H + 22}`} width="100%" role="img" aria-label="Energieverlauf der letzten sieben Tage">
       <defs>
         <linearGradient id="curve-line" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="#8ab4ff" />
+          <stop offset="0" stopColor="var(--blue)" />
           <stop offset="1" stopColor="var(--accent-2)" />
         </linearGradient>
       </defs>

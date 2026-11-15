@@ -45,5 +45,6 @@
 @import './components/recovery.css';
 @import './components/quick.css';
 @import './components/pomodoro.css';
+@import './layout/zones.css';
 @import './base/late.css';
 @import './base/accessibility.css';

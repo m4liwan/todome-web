@@ -13,7 +13,7 @@
 
   /* ---------- knobs (overridden by boot.js / app/theme.ts) ---------- */
   --ambient: 0.55;
-  --rs: 0.55;
+  --rs: 0.23;
 
   /* ---------- OLED surfaces: architectural calm ---------- */
   --bg: #050505;
@@ -26,7 +26,9 @@
   --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.045);
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.15);
-  --grid-line: rgba(255, 255, 255, 0.022);
+  /* Borderless UI: zones are separated by space and this one fine line. */
+  --hairline: rgba(255, 255, 255, 0.06);
+  --grid-line: rgba(255, 255, 255, 0.014);
 
   /* ---------- ink: quiet greys, one clear white ---------- */
   --ink: #f2f2f4;
@@ -127,10 +129,11 @@
 
 /* ---------- corners ---------- */
 :root[data-corners='sharp'] {
-  --rs: 0.22;
+  --rs: 0.12;
 }
 :root[data-corners='precise'] {
-  --rs: 0.55;
+  /* About 6px on a card: taut, architectural, never clumsy. */
+  --rs: 0.23;
 }
 :root[data-corners='soft'] {
   --rs: 1;

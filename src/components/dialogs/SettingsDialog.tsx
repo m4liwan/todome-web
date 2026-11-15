@@ -71,7 +71,7 @@ const LIGHTS: Array<{ id: PaletteId; label: string; color: string }> = [
 
 const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
   { id: 'sharp', label: 'Kantig', text: 'Architektonisch, klare Kanten' },
-  { id: 'precise', label: 'Präzise', text: 'Ruhig und exakt' },
+  { id: 'precise', label: 'Präzise', text: 'Straff und exakt' },
   { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
 ];
 
