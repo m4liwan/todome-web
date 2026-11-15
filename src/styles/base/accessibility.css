@@ -20,8 +20,9 @@
   .shell.is-focusing .timeline,
   .shell.fs-breathe .hello__chips,
   .shell.fs-breathe .vitals,
-  .shell.fs-breathe .panel:not(.panel--focus):not(.panel--greet) {
+  .shell.is-focusing .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band) {
     opacity: 1 !important;
+    filter: none !important;
   }
   :focus-visible {
     outline: 3px solid var(--ink) !important;

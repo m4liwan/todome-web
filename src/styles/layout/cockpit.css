@@ -1,0 +1,141 @@
+/* ========================================================================
+   Cockpit: the one home screen (components/Cockpit.tsx).
+   Stage (8 of 12) and side column (4 of 12), the day across the full width,
+   two quiet bands below. No boxes: hairlines and space carry the order.
+   While a block runs, everything but the stage steps back (fs-* styles).
+   ======================================================================== */
+
+.cockpit {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--s8);
+  align-items: start;
+}
+.cockpit__stage {
+  grid-column: span 8;
+  display: grid;
+  gap: var(--s8);
+  min-width: 0;
+}
+.cockpit__side {
+  grid-column: span 4;
+  align-self: stretch;
+  display: grid;
+  align-content: start;
+  gap: var(--s7);
+  min-width: 0;
+  padding-left: var(--s7);
+  border-left: 1px solid var(--line);
+}
+.cockpit__day,
+.cockpit__band {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: var(--s8);
+  padding-top: var(--s7);
+  border-top: 1px solid var(--line);
+}
+.cockpit__band {
+  display: grid;
+  gap: var(--s6);
+}
+.cockpit__label {
+  margin: 0;
+}
+
+/* Every module: a plain column, no surface. */
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.panel > * {
+  flex: 1 1 auto;
+}
+.panel--greet > *,
+.panel--tl > * {
+  flex: none;
+}
+.panel--focus {
+  container-type: inline-size;
+}
+.panel--focus > section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  height: 100%;
+}
+.panel--focus .focus {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.panel--focus .stack {
+  flex: none;
+}
+
+/* The focus stage carries the one frame motif: fine HUD corner marks. */
+.cockpit .panel--focus {
+  padding: var(--s7);
+  background: var(--hud-frame);
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 1180px) {
+  .cockpit__stage,
+  .cockpit__side {
+    grid-column: 1 / -1;
+  }
+  .cockpit__side {
+    margin-top: var(--s7);
+    padding-top: var(--s7);
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s7);
+  }
+}
+@media (max-width: 760px) {
+  .cockpit {
+    column-gap: 0;
+  }
+  .cockpit__side {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cockpit .panel--focus {
+    padding: var(--s5);
+  }
+}
+
+/* ---------- focus styles: the rest of the cockpit steps back ---------- */
+.cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band),
+.cockpit .panel--greet {
+  transition:
+    opacity var(--t-slow) var(--ease),
+    filter var(--t-slow) var(--ease);
+}
+/* Breathe, micro and the focus timer: dim and soften, back on contact. */
+.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band) {
+  opacity: 0.35;
+  filter: blur(1.5px);
+}
+.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band):is(:hover, :focus-within) {
+  opacity: 0.92;
+  filter: none;
+}
+/* Tunnel and cocoon: only the stage stays, centred. */
+.shell:is(.fs-tunnel, .fs-cocoon) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band) {
+  display: none;
+}
+.shell:is(.fs-tunnel, .fs-cocoon) .cockpit__stage {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, 880px);
+}
+.shell.fs-cocoon .cockpit .panel--greet {
+  display: none;
+}
+.shell.fs-cocoon .cockpit .panel--focus {
+  margin-top: var(--s8);
+}

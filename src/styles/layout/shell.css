@@ -78,33 +78,6 @@
   display: grid;
   gap: var(--gap);
 }
-.home {
-  display: grid;
-  gap: var(--gap);
-  align-items: stretch;
-}
-.panel--focus {
-  container-type: inline-size;
-}
-.panel--focus > section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
-  height: 100%;
-}
-.panel--focus .focus {
-  min-height: 0;
-  flex: 1 1 auto;
-}
-.panel--focus .stack {
-  flex: none;
-}
-.panel {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
 .pro-blur__lock {
   position: absolute;
   top: 50%;
@@ -119,14 +92,6 @@
 .pro-blur__lock--sm {
   width: 22px;
   height: 22px;
-}
-.shell.fs-breathe .panel:not(.panel--focus):not(.panel--greet),
-.shell.fs-micro .panel:not(.panel--focus):not(.panel--greet) {
-  opacity: 0.42;
-}
-.shell.fs-breathe .panel:not(.panel--focus):not(.panel--greet):hover,
-.shell.fs-micro .panel:not(.panel--focus):not(.panel--greet):hover {
-  opacity: 0.92;
 }
 .window-drag {
   display: none;

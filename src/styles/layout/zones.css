@@ -18,6 +18,7 @@
 .tile__label {
   color: var(--ink-3);
 }
+/* A band: equal columns divided by vertical hairlines (no boxes). */
 .band {
   display: grid;
   grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr));
@@ -28,15 +29,36 @@
   align-content: start;
   gap: var(--gap);
   min-width: 0;
+  padding: 0 var(--s6);
+  border-left: 1px solid var(--line);
 }
-@media (max-width: 980px) {
+.band > :first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.band > :last-child {
+  padding-right: 0;
+}
+@media (max-width: 1180px) {
   .band {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: var(--s7);
+  }
+  .band > :nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .band > :nth-child(even) {
+    padding-right: 0;
   }
 }
-@media (max-width: 560px) {
+@media (max-width: 760px) {
   .band {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .band > * {
+    padding: 0;
+    border-left: 0;
   }
 }
 .tile {

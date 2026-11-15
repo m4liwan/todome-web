@@ -8,6 +8,7 @@
 @import './base/base.css';
 @import './base/animations.css';
 @import './layout/shell.css';
+@import './layout/cockpit.css';
 @import './components/controls.css';
 @import './components/report.css';
 @import './components/topbar.css';

@@ -60,15 +60,6 @@ html.is-overlay body {
 .mini__btn:hover {
   color: var(--ink);
 }
-/* order-pinned: belongs to layout/shell, kept here so the cascade stays as before */
-.panel > * {
-  flex: 1 1 auto;
-}
-/* order-pinned: belongs to layout/shell, kept here so the cascade stays as before */
-.panel--greet > *,
-.panel--tl > * {
-  flex: none;
-}
 .mini {
   user-select: none;
   position: fixed;

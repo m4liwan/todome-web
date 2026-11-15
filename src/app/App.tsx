@@ -24,6 +24,7 @@ import { Standby } from '../components/Standby';
 import { Breathe } from '../components/Breathe';
 import { Timeline } from '../components/Timeline';
 import { Toasts } from '../components/Toasts';
+import { Cockpit } from '../components/Cockpit';
 import { Rail } from '../components/Rail';
 import { Topbar, type View } from '../components/Topbar';
 import { WeatherCard } from '../components/WeatherCard';
@@ -373,12 +374,6 @@ export function App() {
     routines: <MicroRoutines state={state} now={now} onStart={setRoutine} />,
     week: <WeekTeaser state={state} projections={projections} now={now} onOpen={() => setView('times')} />,
   };
-  const order = ['greet', 'focus', 'hub', 'plan', 'tl', 'water', 'weather', 'times', 'week', 'impulse', 'thoughts', 'routines'];
-  const panel = (id: string) => (
-    <div key={id} className={`panel panel--${id}`}>
-      {p[id]}
-    </div>
-  );
 
   return (
     <div className={`shell shell--${view}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
@@ -394,7 +389,7 @@ export function App() {
 
       <div className="app">
         <main id="main" className={`dash dash--${view}`}>
-          {view === 'today' && <div className="home">{order.map(panel)}</div>}
+          {view === 'today' && <Cockpit panels={p} />}
           {view === 'times' && (
             <div className="view-fade" key="times">
               <WeekView state={state} projections={projections} now={now} />
