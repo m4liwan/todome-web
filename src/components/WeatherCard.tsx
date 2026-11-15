@@ -24,7 +24,7 @@ export function WeatherCard({ state, now, onOpen }: Props) {
           <h2>Wetter</h2>
         </header>
         <p className="muted">Sag mir, wo du arbeitest. Dann weißt du schon mittags, ob du abends eine Jacke brauchst.</p>
-        <button type="button" className="pill pill--dark" onClick={() => onOpen({ kind: 'weather' })}>
+        <button type="button" className="btn btn--primary" onClick={() => onOpen({ kind: 'weather' })}>
           <IconLocation size={16} /> Ort festlegen
         </button>
       </section>

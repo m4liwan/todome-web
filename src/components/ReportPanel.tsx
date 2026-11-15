@@ -88,19 +88,19 @@ export function ReportPanel({ state, projections, now }: Props) {
         </div>
         <div className="report__tools">
           <div className="daynav">
-            <button type="button" className="round-btn round-btn--sm" aria-label="Vorheriger Tag" onClick={() => setDay(addDays(day, -1))}>
+            <button type="button" className="round-btn round-btn--small" aria-label="Vorheriger Tag" onClick={() => setDay(addDays(day, -1))}>
               <IconChevronLeft size={16} />
             </button>
-            <button type="button" className="round-btn round-btn--sm" aria-label="Nächster Tag" disabled={day >= today} onClick={() => setDay(addDays(day, 1))}>
+            <button type="button" className="round-btn round-btn--small" aria-label="Nächster Tag" disabled={day >= today} onClick={() => setDay(addDays(day, 1))}>
               <IconChevronRight size={16} />
             </button>
           </div>
           {pro ? (
-            <button type="button" className="pill pill--sm" onClick={() => downloadCsv(entries, state, day)} disabled={entries.length === 0}>
+            <button type="button" className="btn btn--small" onClick={() => downloadCsv(entries, state, day)} disabled={entries.length === 0}>
               CSV exportieren
             </button>
           ) : (
-            <button type="button" className="pill pill--sm pill--pro" onClick={() => openPro('reports')} title="Bald in Pro">
+            <button type="button" className="btn btn--small btn--pro" onClick={() => openPro('reports')} title="Bald in Pro">
               <IconLock size={14} />
               CSV exportieren
             </button>
@@ -151,7 +151,7 @@ export function ReportPanel({ state, projections, now }: Props) {
                 Pro
               </span>
               <p>Jede Session im Detail und der CSV-Export kommen mit Pro. Deine Summen pro {labels.client} bleiben frei.</p>
-              <button type="button" className="pill pill--sm pill--glass-soft" onClick={() => openPro('reports')}>
+              <button type="button" className="btn btn--small" onClick={() => openPro('reports')}>
                 Vorschau ansehen
               </button>
             </div>

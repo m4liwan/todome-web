@@ -181,7 +181,7 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
           <button
             ref={button}
             type="button"
-            className="glass-cta splash__action"
+            className="btn btn--primary splash__action"
             onClick={() => {
               uiSound(state, 'bloom');
               setLeaving(true);

@@ -54,7 +54,7 @@ export function LocationPicker({ value, onChange }: Props) {
           Ort suchen
         </label>
         <input id={`${id}-q`} value={query} onChange={(e) => setQuery(e.target.value)} placeholder={value ? 'Anderen Ort suchen' : 'z. B. Wetzlar'} minLength={2} />
-        <button type="submit" className="pill pill--sm" disabled={busy || query.trim().length < 2}>
+        <button type="submit" className="btn btn--small" disabled={busy || query.trim().length < 2}>
           {busy ? 'Sucht …' : 'Suchen'}
         </button>
       </form>

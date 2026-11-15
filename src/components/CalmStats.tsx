@@ -51,7 +51,7 @@ export function CalmStats({ state, projections, now }: { state: AppState; projec
             Pro
           </span>
           <p>Geschützte Fokuszeit, ruhige Blöcke, geparkte Gedanken und Atempausen auf einen Blick. Ab Level 5 deines Begleiters frei, oder sofort mit Pro.</p>
-          <button type="button" className="pill pill--sm" onClick={() => openPro('stats')}>
+          <button type="button" className="btn btn--small" onClick={() => openPro('stats')}>
             Vorschau ansehen
           </button>
         </div>

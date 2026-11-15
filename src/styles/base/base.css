@@ -1,6 +1,7 @@
 /* ========================================================================
-   Base: reset and the raw wireframe look of plain elements.
-   Text on black, buttons read as underlined words, fields as one line.
+   Base: reset, type and the quiet defaults of plain elements.
+   Buttons are styled by their class (components/controls.css); a bare
+   <button> is plain text that brightens on hover.
    ======================================================================== */
 
 *,
@@ -16,8 +17,10 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--ink);
-  font: 400 15px/1.5 var(--font-body);
+  font: 400 var(--fs-body) / 1.55 var(--font-sans);
+  font-optical-sizing: auto;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   background: transparent;
 }
 [hidden] {
@@ -31,22 +34,36 @@ h3,
 p {
   margin: 0;
 }
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: var(--track-tight);
+  text-wrap: balance;
+}
 h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: var(--fs-h1);
+  line-height: 1.1;
 }
 h2 {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: var(--fs-h2);
   line-height: 1.25;
 }
 h3 {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--fs-body);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+p {
+  text-wrap: pretty;
 }
 small {
+  font-size: var(--fs-meta);
   color: var(--ink-2);
+}
+strong,
+b {
+  font-weight: 600;
 }
 ul,
 ol {
@@ -56,13 +73,19 @@ ol {
 }
 a {
   color: inherit;
+  text-decoration-color: var(--ink-3);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--t-fast) var(--ease);
+}
+a:hover {
+  text-decoration-color: currentColor;
 }
 ::selection {
   background: var(--ink);
   color: var(--bg);
 }
 
-/* ---------- buttons: plain underlined words ---------- */
+/* ---------- buttons: plain until a class gives them a shape ---------- */
 button,
 input,
 select,
@@ -72,68 +95,61 @@ textarea {
 }
 button {
   margin: 0;
-  padding: 2px 0;
+  padding: 0;
   border: 0;
   background: transparent;
-  color: var(--ink);
+  color: inherit;
   text-align: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--ink-3);
-  text-underline-offset: 3px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-button:hover:not(:disabled) {
-  text-decoration-color: currentColor;
+  transition:
+    color var(--t-fast) var(--ease),
+    opacity var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
 }
 button:disabled {
   opacity: 0.4;
   cursor: default;
 }
-
-/* The current choice (tabs, toggles, options, steps) is bold and fully underlined. */
-[aria-current='page'],
-[aria-current='step'],
-[aria-current='true'],
-[aria-pressed='true'],
-[aria-selected='true'],
-[aria-checked='true'],
-:is(button, label, li, a).is-on,
-:is(button, label, li, a).is-active,
-:is(button, label, li, a).is-current,
-:is(button, label, li, a).is-selected {
-  font-weight: 700;
-  text-decoration-color: currentColor;
-  text-decoration-thickness: 2px;
-}
 :is(li, label).is-done {
   color: var(--ink-3);
 }
 
-/* ---------- fields: one line underneath ---------- */
+/* ---------- fields: one hairline underneath ---------- */
 input:not([type='checkbox']):not([type='radio']):not([type='range']),
 select,
 textarea {
   width: 100%;
-  min-height: 34px;
-  padding: 4px 0;
+  min-height: 38px;
+  padding: 6px 0;
   border: 0;
   border-bottom: 1px solid var(--line-strong);
   border-radius: 0;
   background: transparent;
+  transition: border-color var(--t-fast) var(--ease);
+}
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-3);
 }
 select option {
-  background: var(--bg);
+  background: var(--bg-raised);
 }
 textarea {
   resize: vertical;
-  line-height: 1.45;
+  line-height: 1.5;
 }
-input:not([type='checkbox']):not([type='radio']):not([type='range']):focus-visible,
-select:focus-visible,
-textarea:focus-visible {
+input:not([type='checkbox']):not([type='radio']):not([type='range']):hover,
+select:hover,
+textarea:hover {
+  border-bottom-color: rgba(255, 255, 255, 0.18);
+}
+input:not([type='checkbox']):not([type='radio']):not([type='range']):focus,
+select:focus,
+textarea:focus {
   outline: none;
-  border-bottom-color: var(--ink);
+  border-bottom-color: var(--ink-2);
 }
 input[type='checkbox'],
 input[type='radio'],
@@ -141,20 +157,10 @@ input[type='range'] {
   accent-color: var(--ink);
 }
 
-/* ---------- focus and motion ---------- */
+/* ---------- focus ---------- */
 :focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 1.5px solid rgb(var(--accent-rgb) / 0.8);
   outline-offset: 2px;
-}
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    animation-delay: 0ms !important;
-    transition-duration: 0.01ms !important;
-  }
 }
 
 /* ---------- scrollbars ---------- */
@@ -169,7 +175,11 @@ input[type='range'] {
 ::-webkit-scrollbar-thumb {
   min-height: 40px;
   border: 3px solid transparent;
+  border-radius: 999px;
   background: var(--line-strong) padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.18) padding-box;
 }
 
 /* ---------- shell ---------- */

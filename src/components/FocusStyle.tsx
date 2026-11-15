@@ -109,7 +109,7 @@ export function FocusStyleMenu({
 
   return (
     <div className="fstyle" ref={root}>
-      <button type="button" className="pill pill--glass fstyle__btn" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button type="button" className="btn fstyle__btn" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {focusStyleLabel(value)}
       </button>
       {presence.mounted &&

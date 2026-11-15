@@ -21,13 +21,13 @@
   font-style: italic;
 }
 .briefing__next p {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: 1.3rem;
   font-weight: 650;
   padding: 6px 12px;
-  border-radius: calc(12px * var(--rs));
-  background: var(--lime);
-  color: var(--lime-ink);
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--bg);
   width: fit-content;
 }
 /* order-pinned: belongs to components/controls, kept here so the cascade stays as before */
@@ -90,12 +90,12 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
     var(--bg);
   transition: opacity 0.75s ease,
     filter 0.75s ease,
-    transform 0.75s var(--ease-out);
+    transform 0.75s var(--ease);
   cursor: default;
 }
 .splash__grid {
-  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-image: linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 44px 44px;
   background-position: center;
   mask-image: radial-gradient(ellipse 58% 52% at 50% 50%, #000 0, transparent 72%);
@@ -144,7 +144,7 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   gap: 6px;
   max-width: min(640px, 100%);
   text-align: center;
-  animation: fade-up 0.9s var(--ease-out) 0.3s both;
+  animation: fade-up 0.9s var(--ease) 0.3s both;
 }
 .splash__sys {
   display: inline-flex;
@@ -213,9 +213,8 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   margin: 0;
   padding: 10px 14px 11px;
   border: 1px solid var(--line);
-  border-radius: calc(12px * var(--rs));
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.025), transparent 60%), var(--surface);
-  box-shadow: var(--glass-inset);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
   backdrop-filter: blur(12px) saturate(140%);
   animation: fade-in 1s ease 0.8s both;
 }
@@ -291,7 +290,7 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 0.7s ease,
-    transform 0.7s var(--ease-out);
+    transform 0.7s var(--ease);
   pointer-events: none;
 }
 .splash__enter.is-ready {
@@ -329,7 +328,7 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
 }
 .splash__skip:hover {
   color: var(--ink);
-  background: var(--surface-sunk);
+  background: var(--hover);
   letter-spacing: 0.08em;
 }
 

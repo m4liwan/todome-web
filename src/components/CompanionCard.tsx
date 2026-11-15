@@ -59,7 +59,7 @@ export function CompanionCard({ state, projections, now, onOpen }: Props) {
             </linearGradient>
           </defs>
           <g clipPath={`url(#glass-${uid})`}>
-            <rect x="0" y="0" width="100" height="124" fill="var(--glass-fill)" />
+            <rect x="0" y="0" width="100" height="124" fill="rgba(255, 255, 255, 0.025)" />
             <g className="hydro__water" style={{ transform: `translateY(${level}px)` }}>
               <path className="hydro__wave hydro__wave--back" d="M-100 6 q25 -8 50 0 t50 0 t50 0 t50 0 t50 0 V140 H-100z" fill="#9db8e2" opacity="0.45" />
               <path className="hydro__wave" d="M-100 8 q25 -7 50 0 t50 0 t50 0 t50 0 t50 0 V140 H-100z" fill={`url(#water-${uid})`} />
@@ -70,7 +70,7 @@ export function CompanionCard({ state, projections, now, onOpen }: Props) {
               <circle cx="50" cy="100" r="1.2" />
             </g>
           </g>
-          <path d="M18 12h64l-7 98a8 8 0 01-8 7H33a8 8 0 01-8-7z" fill="none" stroke="var(--glass-stroke)" strokeWidth="2.5" />
+          <path d="M18 12h64l-7 98a8 8 0 01-8 7H33a8 8 0 01-8-7z" fill="none" stroke="rgba(255, 255, 255, 0.18)" strokeWidth="2.5" />
           <path d="M28 22l4 74" stroke="#fff" strokeOpacity="0.55" strokeWidth="3" strokeLinecap="round" />
         </svg>
 
@@ -85,10 +85,10 @@ export function CompanionCard({ state, projections, now, onOpen }: Props) {
       </div>
 
       <div className="hydro__actions">
-        <button type="button" className="round-btn round-btn--sm" aria-label="Ein Glas weniger" onClick={() => drink(-1)} disabled={water === 0}>
+        <button type="button" className="round-btn round-btn--small" aria-label="Ein Glas weniger" onClick={() => drink(-1)} disabled={water === 0}>
           <IconMinus size={14} />
         </button>
-        <button type="button" className="pill pill--sm pill--water" onClick={() => drink(1)}>
+        <button type="button" className="btn btn--small btn--water" onClick={() => drink(1)}>
           <IconPlus size={14} /> Ein Glas, 250 ml
         </button>
       </div>

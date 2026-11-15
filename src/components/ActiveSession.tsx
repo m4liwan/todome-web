@@ -65,7 +65,7 @@ export function ActiveSession({ state, projections, foreground, now, onOpen, onS
                   </div>
                   <button
                     type="button"
-                    className="pill pill--sm"
+                    className="btn btn--small"
                     disabled={Boolean(foreground)}
                     title={foreground ? 'Beende zuerst die aktuelle Session' : undefined}
                     onClick={() => onOpen({ kind: 'reentry', sessionId: p.sessionId, mode: 'return' })}
@@ -134,9 +134,9 @@ function OneThing({ state, now, onOpen, onShowPlan, returnTo }: { state: AppStat
               <p className="one__meta">
                 {typeLabel(one)}
                 {client ? `, für ${client.name}` : ''}
-                {one.priority === 'high' && <span className="chip chip--glass chip--xs">{PRIORITY_LABELS.high}</span>}
+                {one.priority === 'high' && <span className="chip chip--xs">{PRIORITY_LABELS.high}</span>}
                 {state.settings.brain === 'procrastination' && (
-                  <span className="chip chip--glass chip--xs" title="Gut genug ist fertig. Ein unperfekter Anfang zählt.">
+                  <span className="chip chip--xs" title="Gut genug ist fertig. Ein unperfekter Anfang zählt.">
                     80 % reichen
                   </span>
                 )}
@@ -144,20 +144,20 @@ function OneThing({ state, now, onOpen, onShowPlan, returnTo }: { state: AppStat
             )}
             <div className="focus__actions">
               {returnTo && back ? (
-                <button type="button" className="pill pill--dark pill--lg" onClick={() => onOpen({ kind: 'reentry', sessionId: returnTo.sessionId, mode: 'return' })}>
+                <button type="button" className="btn btn--primary btn--large" onClick={() => onOpen({ kind: 'reentry', sessionId: returnTo.sessionId, mode: 'return' })}>
                   <IconPlay size={16} /> Sanft zurückkehren
                 </button>
               ) : one ? (
-                <button type="button" className="pill pill--dark pill--lg" onClick={() => onOpen({ kind: 'start', taskId: one.id })}>
+                <button type="button" className="btn btn--primary btn--large" onClick={() => onOpen({ kind: 'start', taskId: one.id })}>
                   <IconPlay size={16} /> Ankommen und starten
                 </button>
               ) : (
-                <button type="button" className="pill pill--dark pill--lg" onClick={() => onOpen({ kind: 'task', taskId: null })}>
+                <button type="button" className="btn btn--primary btn--large" onClick={() => onOpen({ kind: 'task', taskId: null })}>
                   <IconPlus size={16} /> Ersten Schritt notieren
                 </button>
               )}
               {one && (
-                <button type="button" className="pill pill--glass" onClick={onShowPlan}>
+                <button type="button" className="btn" onClick={onShowPlan}>
                   Lieber etwas anderes
                 </button>
               )}
@@ -214,12 +214,12 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
       <div className="focus__inner">
         <div className="focus__top">
           <div className="chips">
-            <span className="chip chip--glass">
+            <span className="chip">
               {typeLabel(task)}
             </span>
-            {client && <span className="chip chip--glass">{client.name}</span>}
-            {task.priority === 'high' && <span className="chip chip--lime">{PRIORITY_LABELS.high}</span>}
-            {task.billable && client && <span className="chip chip--glass">abrechenbar</span>}
+            {client && <span className="chip">{client.name}</span>}
+            {task.priority === 'high' && <span className="chip chip--accent">{PRIORITY_LABELS.high}</span>}
+            {task.billable && client && <span className="chip">abrechenbar</span>}
           </div>
           <span className={`status-pill status-pill--${stateName}`}>
             {timer?.kind === 'break' ? PAUSE_REASON_LABELS.pomodoro : paused ? labels.breakShort : over ? 'Länger als geplant' : 'Im Fluss'}
@@ -327,17 +327,17 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
 
         <div className="focus__actions">
           {paused ? (
-            <button type="button" className="pill pill--dark pill--lg" onClick={() => onOpen({ kind: 'reentry', sessionId: p.sessionId, mode: 'resume' })}>
+            <button type="button" className="btn btn--primary btn--large" onClick={() => onOpen({ kind: 'reentry', sessionId: p.sessionId, mode: 'resume' })}>
               <IconPlay size={16} /> Weiterarbeiten
             </button>
           ) : (
-            <button type="button" className="pill pill--dark pill--lg" onClick={pause}>
+            <button type="button" className="btn btn--primary btn--large" onClick={pause}>
               <IconPause size={16} /> {labels.breakName}
             </button>
           )}
           <button
             type="button"
-            className="pill pill--glass"
+            className="btn"
             onClick={() => onOpen({ kind: 'interrupt', sessionId: p.sessionId })}
             disabled={stackDepth >= MAX_STACK_DEPTH}
             title={stackDepth >= MAX_STACK_DEPTH ? `Maximal ${MAX_STACK_DEPTH} Unterbrechungen` : 'Andere Arbeit dazwischen, z. B. ein Kundenanruf'}
@@ -345,11 +345,11 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
             <IconSwap size={16} /> Unterbrechung
           </button>
           {!paused && (
-            <button type="button" className="pill pill--glass" onClick={() => onOpen({ kind: 'stuck', sessionId: p.sessionId })}>
+            <button type="button" className="btn" onClick={() => onOpen({ kind: 'stuck', sessionId: p.sessionId })}>
               <IconHelp size={16} /> Hänge fest
             </button>
           )}
-          <button type="button" className="pill pill--glass" onClick={() => onOpen({ kind: 'end_check', sessionId: p.sessionId })}>
+          <button type="button" className="btn" onClick={() => onOpen({ kind: 'end_check', sessionId: p.sessionId })}>
             <IconStop size={14} /> Beenden
           </button>
           <FocusStyleMenu
@@ -358,7 +358,7 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
             onLocked={() => services.announce(FOCUS_TIMER_LOCKED)}
             onChange={(focusStyle) => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...state.settings.appearance, focusStyle } } })}
           />
-          <button type="button" className="pill pill--glass focus__breathe" onClick={onBreathe} title="Alles ausblenden und kurz durchatmen">
+          <button type="button" className="btn focus__breathe" onClick={onBreathe} title="Alles ausblenden und kurz durchatmen">
             Durchatmen
           </button>
         </div>
@@ -382,7 +382,7 @@ function MicroBites({ task, state }: { task: Task; state: AppState }) {
       {current ? (
         <>
           <p className="bites__now">{current.label}</p>
-          <button type="button" className="pill pill--dark bites__done" onClick={() => services.run(toggleChecklistItem(state, services.deps(), task.id, current.id))}>
+          <button type="button" className="btn btn--primary bites__done" onClick={() => services.run(toggleChecklistItem(state, services.deps(), task.id, current.id))}>
             <IconCheck size={14} /> Geschafft
           </button>
         </>

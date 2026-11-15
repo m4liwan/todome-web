@@ -57,7 +57,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
             {total === 0 ? 'Noch nichts geplant' : done.length > 0 ? `${done.length} ${done.length === 1 ? 'Sache' : 'Sachen'} schon geschafft` : 'Eins nach dem anderen'}
           </p>
         </div>
-        <button type="button" className="round-btn round-btn--dark" aria-label="Aufgabe anlegen" title="Aufgabe anlegen" onClick={() => onOpen({ kind: 'task', taskId: null })}>
+        <button type="button" className="round-btn round-btn--primary" aria-label="Aufgabe anlegen" title="Aufgabe anlegen" onClick={() => onOpen({ kind: 'task', taskId: null })}>
           <IconPlus size={18} />
         </button>
       </header>
@@ -82,7 +82,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
             </ul>
           )}
           <div className="later__actions">
-            <button type="button" className="pill pill--sm" onClick={onToggle} aria-expanded={false}>
+            <button type="button" className="btn btn--small" onClick={onToggle} aria-expanded={false}>
               Ganzen Plan zeigen
             </button>
           </div>
@@ -109,7 +109,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
             {carried.map((t) => (
               <li key={t.id} className="task task--muted">
                 <TaskLine task={t} state={state} minutes={corrected(t)} />
-                <button type="button" className="pill pill--sm" onClick={() => services.run(updateTask(state, services.deps(), t.id, { plannedDay: today }))}>
+                <button type="button" className="btn btn--small" onClick={() => services.run(updateTask(state, services.deps(), t.id, { plannedDay: today }))}>
                   Auf heute
                 </button>
               </li>
@@ -121,7 +121,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
       {open.length === 0 && carried.length === 0 ? (
         <div className="empty">
           <p>Was zählt heute wirklich? Eine Sache reicht für den Anfang.</p>
-          <button type="button" className="pill pill--dark" onClick={() => onOpen({ kind: 'task', taskId: null })}>
+          <button type="button" className="btn btn--primary" onClick={() => onOpen({ kind: 'task', taskId: null })}>
             <IconPlus size={16} /> Ersten Schritt notieren
           </button>
         </div>
@@ -182,7 +182,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
             {waiting.map((t) => (
               <li key={t.id} className="task task--muted">
                 <TaskLine task={t} state={state} minutes={t.estimateMin} />
-                <button type="button" className="pill pill--sm" onClick={() => services.run(updateTask(state, services.deps(), t.id, { status: 'planned', plannedDay: today }))}>
+                <button type="button" className="btn btn--small" onClick={() => services.run(updateTask(state, services.deps(), t.id, { status: 'planned', plannedDay: today }))}>
                   Aufnehmen
                 </button>
               </li>
@@ -204,7 +204,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
         </details>
       )}
       <div className="later__actions">
-        <button type="button" className="pill pill--sm pill--ghost" onClick={onToggle} aria-expanded>
+        <button type="button" className="btn btn--small btn--quiet" onClick={onToggle} aria-expanded>
           Wieder einklappen
         </button>
       </div>
@@ -221,7 +221,7 @@ function TaskLine({ task, state, minutes, adjusted }: { task: Task; state: AppSt
       <div className="task__text">
         <p className="task__title">
           {task.title}
-          {task.priority === 'high' && <span className="chip chip--lime chip--xs">{PRIORITY_LABELS.high}</span>}
+          {task.priority === 'high' && <span className="chip chip--accent chip--xs">{PRIORITY_LABELS.high}</span>}
         </p>
         <p className="task__meta">
           {client ? client.name : 'Intern'}

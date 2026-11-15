@@ -235,7 +235,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           <div className="row">
             <button
               type="button"
-              className="pill pill--sm"
+              className="btn btn--small"
               onClick={() => {
                 set({ tourDone: false });
                 onClose();
@@ -245,7 +245,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             </button>
             <button
               type="button"
-              className="pill pill--sm"
+              className="btn btn--small"
               onClick={() => {
                 set({ companionIntroSeen: false });
                 onShowCompanion?.();
@@ -260,7 +260,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           <h3 id="settings-contact">Feedback & Kontakt</h3>
           <p className="muted small">Was fühlt sich gut an, was hakt noch, wo kommst du nicht weiter? Zwei Minuten, ganz formlos. Jede Nachricht macht ToDoMe. ruhiger und besser.</p>
           <div className="row">
-            <button type="button" className="pill pill--sm feedback-link" onClick={() => setContactOpen(true)} aria-haspopup="dialog">
+            <button type="button" className="btn btn--small feedback-link" onClick={() => setContactOpen(true)} aria-haspopup="dialog">
               <IconChat size={16} />
               Nachricht schreiben
             </button>
@@ -325,7 +325,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             <span>Am Nachmittag sanft fragen, ob der Rest des Tages leichter werden darf</span>
           </label>
           <div className="row">
-            <button type="button" className="pill pill--sm" onClick={() => companionHello(services)} disabled={!s.companion.enabled}>
+            <button type="button" className="btn btn--small" onClick={() => companionHello(services)} disabled={!s.companion.enabled}>
               Jetzt vorbeischauen lassen
             </button>
           </div>
@@ -409,10 +409,10 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
                 </label>
                 <p className="muted small">Alles wird live erzeugt, ganz leise und weich. Binaurale Töne wirken am schönsten mit Kopfhörern.</p>
                 <div className="row">
-                  <button type="button" className="pill pill--sm" onClick={() => bloom()} disabled={!s.uiSounds}>
+                  <button type="button" className="btn btn--small" onClick={() => bloom()} disabled={!s.uiSounds}>
                     Aufblühen anhören
                   </button>
-                  <button type="button" className="pill pill--sm" onClick={() => focusTone()} disabled={!s.uiSounds}>
+                  <button type="button" className="btn btn--small" onClick={() => focusTone()} disabled={!s.uiSounds}>
                     Fokus-Ton anhören
                   </button>
                 </div>

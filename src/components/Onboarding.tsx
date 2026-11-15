@@ -304,11 +304,11 @@ export function Onboarding({ onLeave, onDone }: { onLeave: () => void; onDone: (
           </ol>
           <span className="spacer" />
           {step > 0 && (
-            <button type="button" className="pill pill--ghost" onClick={() => setStep(step - 1)}>
+            <button type="button" className="btn btn--quiet" onClick={() => setStep(step - 1)}>
               Zurück
             </button>
           )}
-          <button type="submit" className="pill pill--dark pill--lg">
+          <button type="submit" className="btn btn--primary btn--large">
             {step === 0 ? (who ? `Hallo ${buddy}` : 'Weiter') : step < STEPS.length - 1 ? 'Weiter' : 'Los geht’s'}
           </button>
         </div>

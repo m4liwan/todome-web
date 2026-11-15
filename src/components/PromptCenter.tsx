@@ -68,7 +68,7 @@ function PromptCard({ checkIn, state, now, onOpen }: { checkIn: CheckIn; state: 
         <p className="prompt__body">{content.body}</p>
         <div className="prompt__options">
           {content.options.map((o, i) => (
-            <button key={o.id} ref={i === 0 ? firstRef : undefined} type="button" className={`pill pill--sm${o.primary ? ' pill--dark' : ''}`} onClick={() => answer(o.id)}>
+            <button key={o.id} ref={i === 0 ? firstRef : undefined} type="button" className={`btn btn--small${o.primary ? ' btn--primary' : ''}`} onClick={() => answer(o.id)}>
               {o.label}
             </button>
           ))}

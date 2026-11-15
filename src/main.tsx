@@ -29,8 +29,8 @@ import { compactSessions } from './domain/archive';
 import { logApplicationBootstrapped, logApplicationDataReset, logApplicationFramePainted } from './services/posthog-logs';
 import { connectTelemetry, stopTelemetry, trackError, trackEvent } from './services/telemetry';
 import { installErrorLog, logError } from './lib/diagnostics';
-import '@fontsource-variable/manrope/index.css';
-import '@fontsource-variable/urbanist/index.css';
+import '@fontsource-variable/geist/index.css';
+import '@fontsource-variable/geist-mono/index.css';
 
 const LEGACY_MODE_KEY = 'todome:mode';
 const stateKey = (mode: AppMode) => `todome:${mode}:state:v1`;

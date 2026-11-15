@@ -35,3 +35,20 @@
     outline-offset: 2px;
   }
 }
+
+/* Calm motion: reduced motion, the calm effects mode and a running focus
+   block stop every decorative movement; state changes become instant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+.shell.is-fx-calm .enter,
+.shell.is-fx-calm .veil {
+  animation: none;
+}

@@ -1,6 +1,52 @@
 /* ========================================================================
-   All keyframes (one definition per name)
+   All keyframes (one definition per name). Only transform and opacity move
+   (onboard-out keeps its blur); tempo and curve come from the motion tokens.
    ======================================================================== */
+
+/* Entrance of views, modules and floating layers. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* Menus and tooltips: a shorter rise. */
+@keyframes rise-sm {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* The ambient veil drifts very slowly, like light behind frosted glass. */
+@keyframes veil-breathe {
+  from {
+    transform: translate3d(-2%, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 3%, 0) scale(1.08);
+  }
+}
+
+/* The "now" mark of a running block: a quiet pulse. */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
 
 @keyframes fade-in {
   from {

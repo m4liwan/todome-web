@@ -247,7 +247,7 @@ function EnergyCurve({ energy, today }: { energy: CareSummary['energy']; today: 
     <svg className="curve" viewBox={`0 0 ${W} ${H + 22}`} width="100%" role="img" aria-label="Energieverlauf der letzten sieben Tage">
       <defs>
         <linearGradient id="curve-line" x1="0" y1="1" x2="0" y2="0">
-          <stop offset="0" stopColor="var(--blue)" />
+          <stop offset="0" stopColor="var(--ink-3)" />
           <stop offset="1" stopColor="var(--accent-2)" />
         </linearGradient>
       </defs>

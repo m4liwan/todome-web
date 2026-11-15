@@ -46,7 +46,7 @@ export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
           <Logo className="logo" height={22} />
           {showMedia && <MediaControl />}
           {mode === 'demo' && (
-            <span className="tag tag--lime" title="Entwickler-Vorschau mit Beispieldaten">
+            <span className="tag" title="Entwickler-Vorschau mit Beispieldaten">
               Demo {clock.speed}×
             </span>
           )}
@@ -100,7 +100,7 @@ export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
           {closedToday ? (
             <button
               type="button"
-              className="glass-cta topbar__main"
+              className="btn btn--primary topbar__main"
               onClick={() => {
                 uiSound(state, 'bloom');
                 onResume();
@@ -113,7 +113,7 @@ export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
           ) : (
             <button
               type="button"
-              className={`glass-cta topbar__main${view === 'closing' ? ' is-current' : ''}`}
+              className={`btn btn--primary topbar__main${view === 'closing' ? ' is-current' : ''}`}
               aria-current={view === 'closing' ? 'page' : undefined}
               onClick={() => {
                 if (view !== 'closing') uiSound(state, 'bloom');

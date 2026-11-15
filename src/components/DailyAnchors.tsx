@@ -236,7 +236,7 @@ export function AnchorsDialog({ open, state, now, onClose, onImpulse }: DialogPr
           </div>
         )}
         {today && !isDone && (
-          <button type="button" className="pill pill--sm anchor__impulse" onClick={() => onImpulse(a)} title="Nur fünf Minuten. Danach darfst du aufhören.">
+          <button type="button" className="btn btn--small anchor__impulse" onClick={() => onImpulse(a)} title="Nur fünf Minuten. Danach darfst du aufhören.">
             5 Min.
           </button>
         )}
@@ -301,7 +301,7 @@ export function AnchorsDialog({ open, state, now, onClose, onImpulse }: DialogPr
                 placeholder={state.anchors.length === 0 ? 'Oder ein eigener, z. B. Tagebuch schreiben' : 'Neuer Anker'}
                 aria-label="Neuer Tages-Anker"
               />
-              <button type="submit" className="pill pill--sm" disabled={!anchorTitle(draft)}>
+              <button type="submit" className="btn btn--small" disabled={!anchorTitle(draft)}>
                 Setzen
               </button>
             </div>

@@ -84,7 +84,7 @@ export function CompanionBubble({ message, avatar, position, onReply, onClosed, 
             <button
               key={o.id}
               type="button"
-              className={`pill pill--sm${o.primary ? ' pill--dark' : ''}`}
+              className={`btn btn--small${o.primary ? ' btn--primary' : ''}`}
               autoFocus={variant === 'inline' && i === 0}
               onClick={() => {
                 onReply(o.id);

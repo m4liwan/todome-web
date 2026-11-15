@@ -1,7 +1,3 @@
-.num {
-  text-align: right;
-  white-space: nowrap;
-}
 .times-mini__amount small {
   display: block;
   color: var(--ink-2);

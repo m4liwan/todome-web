@@ -1,32 +1,73 @@
 /* ========================================================================
-   Tokens. Wireframe stage: one black page, plain text, no surfaces.
+   Tokens. OLED focus cockpit: one black page, hairlines, generous space.
+   Surfaces exist only for layers that float over content (--bg-raised).
    ======================================================================== */
 
 :root {
   color-scheme: dark;
 
-  /* Page and text */
+  /* Page, floating layers, text */
   --bg: #050505;
-  --ink: #f4f4f5;
-  --ink-2: #9a9ca4;
-  --ink-3: #66686f;
-  --line: rgba(255, 255, 255, 0.12);
-  --line-strong: rgba(255, 255, 255, 0.24);
+  --bg-raised: #0b0b0c;
+  --ink: #f5f5f6;
+  --ink-2: #a1a1aa;
+  --ink-3: #63636b;
   --danger: #e2615e;
+  --hover: rgba(255, 255, 255, 0.04);
+  --active: rgba(255, 255, 255, 0.06);
 
-  /* The one spacing step */
-  --gap: 12px;
-  --font-body: 'Manrope Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  /* Hairlines: structure, interaction, floating layers */
+  --line: rgba(255, 255, 255, 0.05);
+  --line-strong: rgba(255, 255, 255, 0.1);
+  --line-float: rgba(255, 255, 255, 0.08);
+  --shadow-float: 0 24px 80px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.4);
+
+  /* Corners: set by data-corners below (Präzise = exactly 6px) */
+  --radius: 6px;
+
+  /* Space: one 4px scale; --gap is the step inside a module */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 80px;
+  --s10: 96px;
+  --gap: var(--s3);
+
+  /* Type */
+  --font-sans: 'Geist Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --fs-display: 64px;
+  --fs-timer: 88px;
+  --fs-h1: 32px;
+  --fs-h2: 20px;
+  --fs-body: 15px;
+  --fs-meta: 13px;
+  --fs-label: 11px;
+  --track-tight: -0.03em;
+  --track-label: 0.08em;
+
+  /* Motion: one curve, three tempos */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 140ms;
+  --t-base: 240ms;
+  --t-slow: 480ms;
+
+  /* Ambient light strength (0 … 1), written to <html> by app/theme.ts */
+  --ambient: 0.55;
 
   /* Accent of the chosen light colour. Read by JS (app/theme.ts) for WebGL and
-     canvas, and used by data marks (charts, rings). */
+     canvas; in CSS only for running, progress, "now", focus ring and the veil. */
   --accent-rgb: 163 230 53;
   --accent-mesh: #a3e635;
   --accent-2: #84cc16;
   --accent-2-rgb: 132 204 22;
   --accent-3: #e2b46a;
-  --lime: #a3e635;
-  --lime-ink: #0a0d05;
+  --accent: rgb(var(--accent-rgb));
 
   /* Companion figure and props (inline SVG fills in the components) */
   --prop-a: #3a3d47;
@@ -35,23 +76,9 @@
   --prop-line: rgba(10, 10, 12, 0.5);
   --prop-belt: #24262d;
   --prop-shadow: rgba(0, 0, 0, 0.4);
-  --glass-fill: rgba(150, 170, 220, 0.06);
-  --glass-stroke: rgba(255, 255, 255, 0.24);
-  --surface-solid: var(--bg);
-  --blue: #7f9be0;
-  --pink: #e2788c;
-  --lavender: #a99ae6;
 
-  /* Welcome screen (components/splash.css) only */
-  --ambient: 0.55;
-  --rs: 0.23;
-  --surface: transparent;
-  --surface-sunk: rgba(255, 255, 255, 0.022);
-  --glass-inset: 0 0 0 0 transparent;
-  --grid-line: transparent;
-  --font-display: 'Urbanist Variable', 'Segoe UI', system-ui, sans-serif;
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --hud-line: rgba(255, 255, 255, 0.16);
+  /* HUD corner marks: the one frame motif (focus stage, splash, full-screen views) */
+  --hud-line: rgba(255, 255, 255, 0.1);
   --hud-frame: linear-gradient(var(--hud-line), var(--hud-line)) left top / 22px 1px,
     linear-gradient(var(--hud-line), var(--hud-line)) left top / 1px 22px,
     linear-gradient(var(--hud-line), var(--hud-line)) right top / 22px 1px,
@@ -59,9 +86,17 @@
     linear-gradient(var(--hud-line), var(--hud-line)) left bottom / 22px 1px,
     linear-gradient(var(--hud-line), var(--hud-line)) left bottom / 1px 22px,
     linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 22px 1px,
-    linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 1px 22px,
-    linear-gradient(var(--hud-line), var(--hud-line)) left center / 10px 1px,
-    linear-gradient(var(--hud-line), var(--hud-line)) right center / 10px 1px;
+    linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 1px 22px;
+}
+
+:root[data-corners='sharp'] {
+  --radius: 0;
+}
+:root[data-corners='precise'] {
+  --radius: 6px;
+}
+:root[data-corners='soft'] {
+  --radius: 10px;
 }
 
 /* Light colours (data-palette on <html>, set by boot.js / app/theme.ts) */
@@ -71,8 +106,6 @@
   --accent-2: #3fa3c0;
   --accent-2-rgb: 63 163 192;
   --accent-3: #8fb2f0;
-  --lime: #62d4dc;
-  --lime-ink: #031416;
 }
 :root[data-palette='amber'] {
   --accent-rgb: 233 180 106;
@@ -80,8 +113,6 @@
   --accent-2: #cf8a4c;
   --accent-2-rgb: 207 138 76;
   --accent-3: #e2a0ae;
-  --lime: #e9b46a;
-  --lime-ink: #1a1004;
 }
 :root[data-palette='mono'] {
   --accent-rgb: 230 232 238;
@@ -89,8 +120,6 @@
   --accent-2: #a7acb8;
   --accent-2-rgb: 167 172 184;
   --accent-3: #c9ccd4;
-  --lime: #e6e8ee;
-  --lime-ink: #050505;
 }
 :root[data-palette='violet'] {
   --accent-rgb: 165 147 255;
@@ -98,8 +127,6 @@
   --accent-2: #7d6bea;
   --accent-2-rgb: 125 107 234;
   --accent-3: #e2a0ae;
-  --lime: #b3a4ff;
-  --lime-ink: #0e0820;
 }
 :root[data-palette='rose'] {
   --accent-rgb: 228 154 174;
@@ -107,6 +134,4 @@
   --accent-2: #c46a86;
   --accent-2-rgb: 196 106 134;
   --accent-3: #e2b46a;
-  --lime: #e8a7b8;
-  --lime-ink: #1e0a10;
 }

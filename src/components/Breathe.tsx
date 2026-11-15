@@ -67,7 +67,7 @@ export function Breathe({ avatar, sound, onClose }: Props) {
           <div className="calm-breath__ask">
             <p className="calm-breath__question">Geht es wieder?</p>
             <div className="calm-breath__actions">
-              <button type="button" className="glass-cta" onClick={() => onClose(true)}>
+              <button type="button" className="btn btn--primary" onClick={() => onClose(true)}>
                 Ja, danke
               </button>
               <button type="button" className="link-btn" onClick={() => setRound((r) => r + 1)}>

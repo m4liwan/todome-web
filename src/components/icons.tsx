@@ -138,7 +138,7 @@ export function WeatherIcon({ kind, size = 28, isDay = true }: { kind: WeatherKi
   ) : (
     <path d="M12.5 11.5A5 5 0 016.5 5a5 5 0 106 6.5z" fill="currentColor" stroke="none" opacity="0.9" />
   );
-  const cloud = <path d="M7.5 19h9.5a4 4 0 00.4-8A5.5 5.5 0 007 12a3.5 3.5 0 00.5 7z" fill="var(--surface-solid)" />;
+  const cloud = <path d="M7.5 19h9.5a4 4 0 00.4-8A5.5 5.5 0 007 12a3.5 3.5 0 00.5 7z" fill="var(--bg)" />;
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" aria-hidden="true">
       {(kind === 'clear' || kind === 'partly') && sun}

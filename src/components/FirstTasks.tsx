@@ -70,7 +70,7 @@ export function FirstTasks({ open, onDone }: { open: boolean; onDone: (created: 
     // Keyboard focus lands on the start button of the next step (once it is rendered).
     let tries = 0;
     const focusStart = () => {
-      const start = document.querySelector<HTMLButtonElement>('.focus--one .focus__actions .pill--dark');
+      const start = document.querySelector<HTMLButtonElement>('.focus--one .focus__actions .btn--primary');
       // The bridge fades out first (the page stays inert until then): try again until focus sits there.
       if (start) start.focus({ preventScroll: false });
       if (document.activeElement !== start && ++tries < 30) window.setTimeout(focusStart, 50);

@@ -94,7 +94,7 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
             {labels.doneLead(formatDuration(net))}
           </p>
           {first && <p className="muted">Morgen wartet „{first.title}“ geduldig auf dich. Mehr gibt es heute Abend nicht zu merken.</p>}
-          <button type="button" className="pill pill--glass" onClick={onBack}>
+          <button type="button" className="btn" onClick={onBack}>
             Zurück zur Übersicht
           </button>
         </div>
@@ -123,7 +123,7 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
         {foreground && (
           <p className="closing__note">
             „{state.tasks[foreground.taskId]?.title}“ läuft noch.
-            <button type="button" className="pill pill--sm" onClick={() => onOpen({ kind: 'end_check', sessionId: foreground.sessionId })}>
+            <button type="button" className="btn btn--small" onClick={() => onOpen({ kind: 'end_check', sessionId: foreground.sessionId })}>
               In Ruhe abschließen
             </button>
           </p>
@@ -195,7 +195,7 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
                   <span>
                     {formatTime(s)} bis {formatTime(e)} ({formatDuration(e - s)}) ohne Eintrag
                   </span>
-                  <button type="button" className="pill pill--sm" onClick={() => setGapForm({ from: s, to: e, title: '', clientId: '', type: 'communication' })}>
+                  <button type="button" className="btn btn--small" onClick={() => setGapForm({ from: s, to: e, title: '', clientId: '', type: 'communication' })}>
                     Nachtragen
                   </button>
                 </li>
@@ -253,12 +253,12 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
         </details>
 
         <div className="closing__actions">
-          <button type="button" className="pill pill--ghost" onClick={onBack}>
+          <button type="button" className="btn btn--quiet" onClick={onBack}>
             Doch noch nicht
           </button>
           <button
             type="button"
-            className="pill pill--dark pill--lg"
+            className="btn btn--primary btn--large"
             disabled={Boolean(foreground)}
             title={foreground ? 'Schließe zuerst den laufenden Block ab' : undefined}
             onClick={() => {

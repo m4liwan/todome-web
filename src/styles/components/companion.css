@@ -175,7 +175,7 @@ html.is-companion body {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
-.buddy__options .pill {
+.buddy__options .btn {
   white-space: normal;
   text-align: center;
   max-width: 100%;

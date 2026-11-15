@@ -139,10 +139,10 @@ export function ThoughtParking({ state, now }: { state: AppState; now: Millis })
       >
         <TickerInput inputRef={input} value={text} onChange={setText} placeholder="Was schwirrt dir gerade im Kopf herum?" />
         <div className="parking__btns">
-          <button type="submit" className="pill pill--sm" disabled={!text.trim() || Boolean(releasing)} title="Sicher aufheben, für später">
+          <button type="submit" className="btn btn--small" disabled={!text.trim() || Boolean(releasing)} title="Sicher aufheben, für später">
             <IconPlus size={14} /> Parken
           </button>
-          <button type="button" className="pill pill--sm pill--release" disabled={!text.trim() || Boolean(releasing)} onClick={() => void releaseTyped()} title="Der Gedanke löst sich in Luft auf">
+          <button type="button" className="btn btn--small btn--release" disabled={!text.trim() || Boolean(releasing)} onClick={() => void releaseTyped()} title="Der Gedanke löst sich in Luft auf">
             Loslassen
           </button>
         </div>
@@ -260,7 +260,7 @@ export function WeekTeaser({ state, projections, now, onOpen }: { state: AppStat
           <li key={d.day} className={d.day === dayKey(now) ? 'is-today' : undefined} style={{ '--h': d.netMs / max } as React.CSSProperties} />
         ))}
       </ol>
-      <button type="button" className="pill pill--sm" onClick={onOpen}>
+      <button type="button" className="btn btn--small" onClick={onOpen}>
         Zum Rückblick
       </button>
     </section>
@@ -377,7 +377,7 @@ export function MicroRoutines({ state, now, onStart }: { state: AppState; now: M
                 <span>{r.hint}</span>
               </div>
               {r.seconds && !on && (
-                <button type="button" className="pill pill--sm" onClick={() => onStart(r)}>
+                <button type="button" className="btn btn--small" onClick={() => onStart(r)}>
                   Starten
                 </button>
               )}
@@ -438,7 +438,7 @@ export function RoutineTimer({ routine, onClose }: { routine: Routine; onClose: 
               ? 'Ein, und langsam aus. Der Kreis atmet mit dir.'
               : 'Schau in die Ferne. Lass die Schultern sinken. Hier gibt es gerade nichts zu tun.'}
         </p>
-        <button type="button" className="pill pill--ghost" onClick={() => onClose(false)}>
+        <button type="button" className="btn btn--quiet" onClick={() => onClose(false)}>
           {left === 0 ? 'Zurück' : 'Lieber später'}
         </button>
       </div>
@@ -472,10 +472,10 @@ export function CompanionHome({ state, now, fgTaskId, onCustomize }: { state: Ap
         <p className="home-hub__doing">{ACTIVITY_LABELS[activity]}</p>
         <p className="muted small">{energy !== null ? `Heute bei ${energy} von 10, ${ENERGY_WORDS[energy]?.toLowerCase()}. ${profile?.label}.` : 'Erzähl mir, wie viel Energie du heute hast.'}</p>
         <div className="home-hub__actions">
-          <button type="button" className="pill pill--sm" onClick={() => companionHello(services)}>
+          <button type="button" className="btn btn--small" onClick={() => companionHello(services)}>
             Hallo sagen
           </button>
-          <button type="button" className="pill pill--sm" onClick={() => services.store.dispatch({ type: 'wellbeing/water', at: now, day: dayKey(now), delta: 1 })}>
+          <button type="button" className="btn btn--small" onClick={() => services.store.dispatch({ type: 'wellbeing/water', at: now, day: dayKey(now), delta: 1 })}>
             Glas Wasser
           </button>
         </div>
