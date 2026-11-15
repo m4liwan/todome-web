@@ -1,4 +1,24 @@
+/* ========================================================================
+   Rest screen (components/Standby.tsx): a monumental mono clock on black,
+   the HUD corner marks, one quiet line. Click or key brings you back.
+   ======================================================================== */
+
+.standby__time {
+  font-family: var(--font-mono);
+  font-size: clamp(88px, 12vw, 168px);
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+.standby--bigclock .standby__time {
+  font-size: clamp(120px, 20vw, 280px);
+}
 .standby__date {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink-3);
 }
 .standby__line {
@@ -18,11 +38,13 @@
 }
 .standby__hint {
   position: absolute;
-  bottom: calc(26px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--s7) + env(safe-area-inset-bottom, 0px));
   left: 0;
   right: 0;
+  font-size: 12px;
   text-align: center;
   color: var(--ink-3);
+  transition: color var(--t-base) var(--ease);
 }
 .standby:hover .standby__hint {
   color: var(--ink-2);
@@ -42,10 +64,19 @@ html.is-desktop .pause-room {
   display: grid;
   place-items: center;
   background: var(--bg);
+  animation: fade-in var(--t-slow) var(--ease) both;
+}
+.standby::before {
+  content: '';
+  position: absolute;
+  inset: var(--s6);
+  pointer-events: none;
+  background: var(--hud-frame);
+  background-repeat: no-repeat;
 }
 .standby__center {
   position: relative;
-  gap: var(--gap);
+  gap: var(--s4);
   display: grid;
   justify-items: center;
   align-content: center;

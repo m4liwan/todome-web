@@ -125,6 +125,8 @@ html.is-desktop .topbar__actions {
   position: relative;
   display: inline-block;
   flex: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 .brand-logo img {
   position: absolute;

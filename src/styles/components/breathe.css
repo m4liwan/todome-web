@@ -1,28 +1,55 @@
+/* ========================================================================
+   Breathe (components/Breathe.tsx): the companion breathes in a soft halo
+   of the light colour; the cue changes between in and out.
+   ======================================================================== */
+
 .calm-breath {
   position: fixed;
   inset: 0;
   z-index: 260;
   display: grid;
   place-items: center;
+  padding: var(--s5);
+  background: var(--bg);
   color: var(--ink);
   -webkit-app-region: no-drag;
-  background: var(--bg);
-  padding: 24px;
+  animation: fade-in var(--t-slow) var(--ease) both;
+}
+.calm-breath::before {
+  content: '';
+  position: absolute;
+  inset: var(--s6);
+  pointer-events: none;
+  background: var(--hud-frame);
+  background-repeat: no-repeat;
 }
 .calm-breath__center {
   position: relative;
   display: grid;
   justify-items: center;
-  gap: var(--gap);
+  gap: var(--s5);
   text-align: center;
 }
 .calm-breath__buddy {
+  position: relative;
   animation: breath var(--cycle, 10s) ease-in-out infinite;
+}
+.calm-breath__buddy::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.16), transparent 62%);
 }
 .calm-breath__cue {
   position: relative;
   height: 1.6em;
   min-width: 10ch;
+  font-family: var(--font-mono);
+  font-size: var(--fs-meta);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
 }
 .calm-breath__cue span {
   position: absolute;

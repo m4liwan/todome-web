@@ -30,11 +30,6 @@
   color: var(--bg);
   width: fit-content;
 }
-/* order-pinned: belongs to components/controls, kept here so the cascade stays as before */
-.tone span {
-  font-size: 0.8rem;
-  color: var(--ink-2);
-}
 @media (max-width: 600px) {
   .briefing li {
     grid-template-columns: minmax(0, 1fr);

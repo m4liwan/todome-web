@@ -1,13 +1,18 @@
 .stepper {
   display: flex;
-  gap: var(--gap);
+  gap: 6px;
 }
 .stepper li {
-  width: 8px;
-  height: 8px;
-  background: var(--line);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  transition: background-color var(--t-base) var(--ease), width var(--t-base) var(--ease);
 }
-/* order-pinned: belongs to layout/layouts, kept here so the cascade stays as before */
+.stepper li.is-current {
+  width: 18px;
+  border-radius: 999px;
+}
 .onboard__logo {
   position: absolute;
   top: calc(28px + env(safe-area-inset-top, 0px));
@@ -29,7 +34,15 @@
   max-width: 34ch;
 }
 .onboard__label {
-  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.onboard__speech {
+  font-size: 17px;
+  line-height: 1.55;
 }
 .onboard__avatars {
   display: grid;
@@ -53,9 +66,11 @@
 }
 .onboard__foot {
   position: absolute;
-  bottom: 18px;
+  bottom: var(--s5);
   left: 0;
   right: 0;
+  font-size: 12px;
+  color: var(--ink-3);
   text-align: center;
 }
 @media (max-width: 760px) {
@@ -105,26 +120,24 @@
   gap: var(--gap);
   width: 100%;
 }
-/* order-pinned: belongs to components/settings, kept here so the cascade stays as before */
-.settings__tabs button {
-  flex: 1 1 auto;
-  min-height: 38px;
-  color: var(--ink-2);
-  cursor: pointer;
-}
-/* order-pinned: belongs to components/topbar, kept here so the cascade stays as before */
-.brand-logo {
-  position: relative;
-  display: inline-block;
-  flex: none;
-  user-select: none;
-  -webkit-user-drag: none;
-}
 .onboard__avatar {
+  position: relative;
   display: grid;
   place-items: center;
+  padding: var(--s2);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
   cursor: pointer;
-  position: relative;
+  transition:
+    background-color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+.onboard__avatar:hover {
+  background: var(--hover);
+}
+.onboard__avatar:is([aria-checked='true'], [aria-pressed='true'], .is-on) {
+  border-color: var(--line-strong);
+  background: var(--active);
 }
 .onboard .brain ul {
   display: none;
@@ -137,12 +150,25 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   grid-template-rows: auto auto;
-  column-gap: var(--gap);
-  row-gap: var(--gap);
   align-items: center;
+  column-gap: var(--s4);
+  row-gap: 2px;
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
   color: var(--ink);
   text-align: left;
   cursor: pointer;
+  transition:
+    background-color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+.context-card:hover {
+  background: var(--hover);
+}
+.context-card:is([aria-checked='true'], [aria-pressed='true'], .is-on) {
+  border-color: var(--ink);
+  background: var(--active);
 }
 .context-card__icon {
   grid-row: 1 / span 2;
@@ -152,7 +178,8 @@
   height: 44px;
 }
 .context-card__text {
-  color: var(--ink-2);
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
   overflow-wrap: anywhere;
 }
 .workhours {
@@ -162,8 +189,10 @@
 }
 .workhours__preview {
   position: relative;
-  height: 14px;
-  background: var(--line);
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 .workhours__preview span {
   position: absolute;
@@ -187,6 +216,7 @@
   pointer-events: none;
   animation: onboard-out 0.9s cubic-bezier(0.33, 0, 0.2, 1) both;
 }
-.stepper li.is-current, .stepper li.is-done {
+.stepper li.is-current,
+.stepper li.is-done {
   background: var(--ink);
 }
