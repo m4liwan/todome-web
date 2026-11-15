@@ -11,7 +11,7 @@
 .closing {
   position: relative;
   min-height: calc(100vh - 130px);
-  border-radius: 36px;
+  border-radius: calc(36px * var(--rs));
   overflow: hidden;
   isolation: isolate;
   padding: clamp(24px, 5vw, 64px) clamp(18px, 5vw, 64px);
@@ -35,13 +35,22 @@
   right: -12vmax;
   bottom: -18vmax;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 170, 110, 0.5), transparent 65%);
-  filter: blur(30px);
+  /* The evening light: the ambient colour, warmed a little, low and far away.
+     Even at 0 % a faint ember stays, so the day's end still feels like evening. */
+  background: radial-gradient(circle, color-mix(in srgb, rgb(var(--accent-rgb)) 45%, #e2a05e) 0%, transparent 65%);
+  opacity: calc(0.06 + 0.32 * var(--ambient));
+  filter: blur(40px);
   animation: sunset 30s ease-in-out infinite alternate;
 }
-/* Midnight: a cool moon instead of the warm evening sun. */
-:root[data-palette='midnight'] .closing__sky::after {
-  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.12), transparent 65%);
+/* The horizon: one quiet hairline, where the light sets. */
+.closing__sky::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / calc(0.1 + 0.3 * var(--ambient))), transparent);
 }
 .closing__inner {
   max-width: 780px;
@@ -56,10 +65,12 @@
   gap: 20px;
 }
 .closing__kicker {
-  font-size: 0.9rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  color: var(--ink-2);
-  margin-bottom: 6px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 10px;
 }
 .closing h1 {
   font-size: clamp(1.9rem, 3.8vw, 3rem);
@@ -71,18 +82,18 @@
   margin-top: 12px;
   max-width: 52ch;
   font-size: 1.06rem;
-  font-weight: 550;
+  font-weight: 500;
   color: var(--ink-2);
 }
 .closing__block {
   display: grid;
   gap: 12px;
   padding: 22px 24px;
-  border-radius: 26px;
+  border-radius: calc(26px * var(--rs));
   background: color-mix(in srgb, var(--surface) 80%, transparent);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-inset);
-  backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(130%);
 }
 .closing__block h2 {
   font-size: 1.15rem;
@@ -100,11 +111,6 @@
 }
 :root[data-theme='dark'] .closing__wins li {
   background: rgba(255, 255, 255, 0.08);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .closing__wins li {
-    background: rgba(255, 255, 255, 0.08);
-  }
 }
 .closing__pick {
   display: flex;
@@ -151,7 +157,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px 18px;
-  border-radius: 18px;
+  border-radius: calc(18px * var(--rs));
   background: rgba(255, 181, 71, 0.22);
   font-weight: 600;
 }

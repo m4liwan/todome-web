@@ -33,11 +33,11 @@ export function overlayState(state: AppState, now: Millis, fg: SessionProjection
 export function useOverlaySync(state: AppState, now: Millis, fg: SessionProjection | null, theme: 'light' | 'dark'): void {
   const services = useServices();
   const o = state.settings.overlay;
-  const palette = state.settings.appearance.palette;
+  const { palette, corners } = state.settings.appearance;
 
   useEffect(() => {
-    desktop?.overlayConfig({ ...o, theme, palette });
-  }, [o, theme, palette]);
+    desktop?.overlayConfig({ ...o, theme, palette, corners });
+  }, [o, theme, palette, corners]);
 
   const last = useRef('');
   const status = o.enabled ? overlayState(state, now, fg) : null;

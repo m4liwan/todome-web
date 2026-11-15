@@ -1,34 +1,21 @@
 import { useEffect, useSyncExternalStore } from 'react';
-import { flushSync } from 'react-dom';
-import type { PaletteId, ThemePreference } from '../domain/types';
+import type { AppearanceSettings, ThemePreference } from '../domain/types';
 import { desktop } from '../lib/desktop';
 
-const media = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-
-function subscribeSystem(listener: () => void) {
-  media?.addEventListener('change', listener);
-  return () => media?.removeEventListener('change', listener);
+/** ToDoMe is always dark (OLED redesign): kept as a function so callers stay simple. */
+export function resolveTheme(_pref: ThemePreference): 'dark' {
+  return 'dark';
 }
 
-export function systemPrefersDark(): boolean {
-  return media?.matches ?? false;
-}
-
-export function resolveTheme(pref: ThemePreference): 'light' | 'dark' {
-  if (pref === 'system') return systemPrefersDark() ? 'dark' : 'light';
-  return pref;
-}
-
-/** Resolved theme that also follows OS changes while on "system". */
-export function useResolvedTheme(pref: ThemePreference): 'light' | 'dark' {
-  const systemDark = useSyncExternalStore(subscribeSystem, systemPrefersDark, () => false);
-  return pref === 'system' ? (systemDark ? 'dark' : 'light') : pref;
+/** Always dark; the hook form keeps the call sites of the former theme switch working. */
+export function useResolvedTheme(_pref: ThemePreference): 'dark' {
+  return 'dark';
 }
 
 /*
- * The accent of the current colour world, as JS sees it (for WebGL and canvas,
- * which cannot read CSS variables). Follows palette and theme switches: the
- * tokens hang on <html data-palette / data-theme> and the system colour scheme.
+ * The accent of the current light colour, as JS sees it (for WebGL and canvas,
+ * which cannot read CSS variables). Follows light switches: the tokens hang on
+ * <html data-palette>.
  */
 const ACCENT_VARS = ['--accent-2', '--accent-mesh'] as const;
 const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
@@ -41,12 +28,8 @@ function readAccent(): string {
 
 function subscribeAccent(listener: () => void) {
   const observer = new MutationObserver(listener);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-palette', 'data-theme'] });
-  media?.addEventListener('change', listener);
-  return () => {
-    observer.disconnect();
-    media?.removeEventListener('change', listener);
-  };
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-palette'] });
+  return () => observer.disconnect();
 }
 
 /** Strong accent (`--accent-2`) and light accent (`--accent-mesh`) as hex, live. */
@@ -61,37 +44,35 @@ export function useAccentColors(fallback: { strong: string; light: string }): { 
 export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
-/** Remembers theme and colour world for public/boot.js (first frame, before React). */
-export function rememberBoot(theme: ThemePreference, palette: PaletteId): void {
+type Look = Pick<AppearanceSettings, 'palette' | 'ambient' | 'corners'>;
+
+/** Remembers light and corners for public/boot.js (first frame, before React). */
+export function rememberBoot(look: Look): void {
   try {
-    window.localStorage.setItem('todome:boot', JSON.stringify({ theme, palette }));
+    window.localStorage.setItem('todome:boot', JSON.stringify({ theme: 'dark', palette: look.palette, ambient: look.ambient, corners: look.corners }));
   } catch {
     /* ignore */
   }
 }
 
-function writeTheme(pref: ThemePreference) {
-  const root = document.documentElement;
-  if (pref === 'system') root.removeAttribute('data-theme');
-  else root.setAttribute('data-theme', pref);
+/** `--ambient` on <html>: every light alpha in the tokens scales with it. */
+export function writeAmbient(ambient: number): void {
+  document.documentElement.style.setProperty('--ambient', String(Math.min(1, Math.max(0, ambient))));
 }
 
 /**
- * Applies the theme: `data-theme` for explicit choices (CSS tokens follow),
- * nothing for "system" (prefers-color-scheme decides). The desktop shell
- * follows (title bar, window background).
+ * Applies the look: always dark, the ambient light colour (`data-palette`),
+ * its strength (`--ambient`) and the corner rounding (`data-corners`). Light
+ * changes fade softly; the desktop shell follows (title bar, window background).
  */
-export function useApplyTheme(pref: ThemePreference, palette: PaletteId): void {
-  useEffect(() => rememberBoot(pref, palette), [pref, palette]);
+export function useApplyTheme(look: Look): void {
+  const { palette, ambient, corners } = look;
+  useEffect(() => rememberBoot({ palette, ambient, corners }), [palette, ambient, corners]);
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.add('theme-fade');
-    writeTheme(pref);
-    desktop?.setTheme(pref);
-    const id = window.setTimeout(() => root.classList.remove('theme-fade'), 700);
-    return () => window.clearTimeout(id);
-  }, [pref]);
+    document.documentElement.setAttribute('data-theme', 'dark');
+    desktop?.setTheme('dark');
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -100,39 +81,29 @@ export function useApplyTheme(pref: ThemePreference, palette: PaletteId): void {
     const id = window.setTimeout(() => root.classList.remove('theme-fade'), 700);
     return () => window.clearTimeout(id);
   }, [palette]);
+
+  useEffect(() => writeAmbient(ambient), [ambient]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-corners', corners);
+  }, [corners]);
 }
 
-type ViewTransitionDoc = Document & { startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> } };
+const LAST_LIGHT = 'todome:ambient:last';
 
 /**
- * Warm theme switch: the new theme grows as a soft circle out of the button
- * (View Transitions API), like light being switched on or dimmed. Falls back
- * to a calm cross-fade where unsupported or when reduced motion is set.
+ * The header's light switch: dims to absolute stillness (0) and brings back
+ * the strength from before (remembered on this device), or the default.
  */
-export function switchTheme(next: ThemePreference, apply: () => void, origin?: { x: number; y: number }): void {
-  const doc = document as ViewTransitionDoc;
-  const commit = () => {
-    flushSync(apply);
-    writeTheme(next);
-  };
-  if (!doc.startViewTransition || prefersReducedMotion()) {
-    document.documentElement.classList.add('theme-fade');
-    commit();
-    window.setTimeout(() => document.documentElement.classList.remove('theme-fade'), 700);
-    return;
+export function toggledAmbient(current: number, fallback: number): number {
+  try {
+    if (current > 0) {
+      window.localStorage.setItem(LAST_LIGHT, String(current));
+      return 0;
+    }
+    const last = Number(window.localStorage.getItem(LAST_LIGHT));
+    return Number.isFinite(last) && last > 0 && last <= 1 ? last : fallback;
+  } catch {
+    return current > 0 ? 0 : fallback;
   }
-  const x = origin?.x ?? window.innerWidth - 120;
-  const y = origin?.y ?? 40;
-  const r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
-  document.documentElement.classList.add('is-theme-switching');
-  const t = doc.startViewTransition(commit);
-  t.ready
-    .then(() => {
-      document.documentElement.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-        { duration: 1100, easing: 'cubic-bezier(0.22, 0.8, 0.24, 1)', pseudoElement: '::view-transition-new(root)' },
-      );
-    })
-    .catch(() => undefined);
-  t.finished.finally(() => document.documentElement.classList.remove('is-theme-switching')).catch(() => undefined);
 }

@@ -39,7 +39,7 @@ export function introSteps(name: string, user: string): IntroStep[] {
       spot: 'path',
       mood: 'curious',
       title: 'Belohnungen auf eurem Pfad',
-      text: `Hier siehst du, was wir gemeinsam freischalten: ab Level ${unlockLevel('advanced_stats')} erweiterte Statistiken, ab Level ${unlockLevel('exclusive_themes')} exklusive Themes, und für mich unterwegs Glitzern, Aura und Holofoil. Was einmal erreicht ist, bleibt für immer. Und über das ? oben erzähle ich dir das alles jederzeit wieder.`,
+      text: `Hier siehst du, was wir gemeinsam freischalten: ab Level ${unlockLevel('advanced_stats')} erweiterte Statistiken, ab Level ${unlockLevel('exclusive_themes')} exklusive Lichtfarben, und für mich unterwegs Glitzern, Aura und Holofoil. Was einmal erreicht ist, bleibt für immer. Und über das ? oben erzähle ich dir das alles jederzeit wieder.`,
     },
   ];
 }

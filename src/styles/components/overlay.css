@@ -209,7 +209,7 @@ html.is-overlay body {
   border: 1px solid var(--glass-edge);
   background: var(--surface);
   box-shadow: var(--glass-inset);
-  backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(130%);
   color: var(--ink-2);
   -webkit-app-region: no-drag;
 }
@@ -319,7 +319,7 @@ html.is-overlay body {
 .mini__box {
   position: relative;
   align-items: center;
-  border-radius: 26px;
+  border-radius: calc(26px * var(--rs));
   border: 1px solid var(--glass-edge);
   background: linear-gradient(160deg, color-mix(in srgb, var(--glass-sheen) calc(var(--mini-alpha) * 100%), transparent), transparent 45%),
     color-mix(in srgb, var(--surface-solid) calc(var(--mini-alpha) * 100%), transparent);

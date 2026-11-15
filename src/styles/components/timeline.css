@@ -91,7 +91,7 @@
 .track {
   position: relative;
   height: 54px;
-  border-radius: 16px;
+  border-radius: calc(16px * var(--rs));
   background: var(--surface-sunk);
   border: 1px solid var(--line);
   overflow: hidden;
@@ -124,7 +124,7 @@
   top: 9px;
   bottom: 9px;
   min-width: 3px;
-  border-radius: 10px;
+  border-radius: calc(10px * var(--rs));
   overflow: hidden;
   transition: width 1s linear;
 }

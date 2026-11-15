@@ -71,22 +71,22 @@
   --type-color: linear-gradient(135deg, var(--accent-2), var(--accent-mesh));
 }
 .type--communication {
-  --type-color: linear-gradient(135deg, #6fb6ff, #4a7dff);
+  --type-color: linear-gradient(135deg, #7fa3dc, #5a7cc8);
 }
 .type--admin {
-  --type-color: linear-gradient(135deg, #b8bec9, #8b93a1);
+  --type-color: linear-gradient(135deg, #a9aeb9, #7c838f);
 }
 .type--acquisition {
-  --type-color: linear-gradient(135deg, #ffb547, #ff7a59);
+  --type-color: linear-gradient(135deg, #e2b46a, #d0845a);
 }
 .type--learning {
-  --type-color: linear-gradient(135deg, #b39cff, #7a8cff);
+  --type-color: linear-gradient(135deg, #a99ae6, #7f8ad8);
 }
 .type--exploration {
-  --type-color: linear-gradient(135deg, #ff8fb4, #ffb23f);
+  --type-color: linear-gradient(135deg, #e2909f, #e2b46a);
 }
 .type--other {
-  --type-color: linear-gradient(135deg, #9ad8c9, #5fb3a1);
+  --type-color: linear-gradient(135deg, #8fc9bb, #5aa392);
 }
 .gaps li {
   display: flex;
@@ -157,15 +157,15 @@
     linear-gradient(160deg, var(--glass-sheen), transparent 38%),
     var(--surface);
   box-shadow: var(--glass-inset), var(--shadow);
-  backdrop-filter: blur(28px) saturate(185%);
-  -webkit-backdrop-filter: blur(28px) saturate(185%);
+  backdrop-filter: blur(28px) saturate(130%);
+  -webkit-backdrop-filter: blur(28px) saturate(130%);
   transition: border-color 0.3s ease,
     box-shadow 0.3s ease,
     opacity 0.5s ease,
     filter 0.5s ease;
 }
 .card:hover {
-  border-color: color-mix(in srgb, var(--glass-edge) 60%, rgb(var(--accent-rgb) / 0.6));
+  border-color: rgba(255, 255, 255, 0.14);
 }
 @media (prefers-reduced-motion: reduce) {
   .ambience {
@@ -586,7 +586,7 @@
   margin: 0 auto;
   padding: 12px;
   /* concentric with the card inside: 32px card radius + 12px ring */
-  border-radius: 44px;
+  border-radius: calc(44px * var(--rs));
   background: linear-gradient(160deg, var(--glass-sheen), transparent 50%), rgb(var(--accent-rgb) / 0.08);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-inset), var(--shadow-lg);

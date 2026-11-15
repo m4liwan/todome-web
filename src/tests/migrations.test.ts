@@ -34,20 +34,53 @@ describe('settings from 1.3 and older', () => {
       },
     };
     const s = parseState(JSON.stringify(raw));
-    expect(s?.settings.appearance).toMatchObject({ palette: 'midnight', layout: 'hub', standby: 'calm' });
+    expect(s?.settings.appearance).toMatchObject({ palette: 'mono', layout: 'hub', standby: 'calm', ambient: 0.55, corners: 'precise' });
     expect(s?.settings.overlay).toMatchObject({ enabled: true, opacity: 0.6, modules: { avatar: true, anchor: true } });
     // 1.7: the player leaves the home screen once and stays in the overlay.
     expect(s?.settings.media).toEqual({ enabled: true, inTopbar: false, rev: 2 });
     expect(s?.settings.overlay.modules.media).toBe(true);
     const moss = parseState(JSON.stringify({ ...raw, settings: { ...raw.settings, appearance: { palette: 'moss' } } }));
     expect(moss?.settings.appearance.palette).toBe('lime');
-    // 1.17: Abendrot became Midnight.
+    // 1.17: Abendrot became Midnight; 1.18: Midnight became pure white light.
     const sunset = parseState(JSON.stringify({ ...raw, settings: { ...raw.settings, appearance: { palette: 'sunset' } } }));
-    expect(sunset?.settings.appearance.palette).toBe('midnight');
+    expect(sunset?.settings.appearance.palette).toBe('mono');
   });
 
-  it('starts new installs in the system theme (no bright flash)', () => {
-    expect(emptyState().settings.theme).toBe('system');
+  it('starts new installs dark (no bright flash)', () => {
+    expect(emptyState().settings.theme).toBe('dark');
+  });
+});
+
+describe('settings from 1.17 (OLED redesign)', () => {
+  const withAppearance = (appearance: Record<string, unknown>, theme = 'light') => {
+    const old = emptyState();
+    return parseState(JSON.stringify({ ...old, settings: { ...old.settings, theme, appearance: { ...old.settings.appearance, ...appearance } } }));
+  };
+
+  it('moves every colour world to its closest ambient light', () => {
+    const expected: Record<string, string> = {
+      lime: 'lime',
+      rose: 'rose',
+      ocean: 'cyan',
+      midnight: 'mono',
+      lavender: 'violet',
+      neon: 'cyan',
+      pulse: 'rose',
+      matrix: 'cyan',
+      nonsense: 'lime',
+    };
+    for (const [from, to] of Object.entries(expected)) expect(withAppearance({ palette: from })?.settings.appearance.palette, from).toBe(to);
+  });
+
+  it('loads light and system themes as dark', () => {
+    expect(withAppearance({}, 'light')?.settings.theme).toBe('dark');
+    expect(withAppearance({}, 'system')?.settings.theme).toBe('dark');
+  });
+
+  it('keeps a valid light strength and corner style, repairs broken ones', () => {
+    expect(withAppearance({ ambient: 0, corners: 'sharp' })?.settings.appearance).toMatchObject({ ambient: 0, corners: 'sharp' });
+    expect(withAppearance({ ambient: 3, corners: 'round' })?.settings.appearance).toMatchObject({ ambient: 1, corners: 'precise' });
+    expect(withAppearance({ ambient: 'bright' })?.settings.appearance.ambient).toBe(0.55);
   });
 });
 

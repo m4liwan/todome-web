@@ -54,14 +54,14 @@ export function CompanionCard({ state, projections, now, onOpen }: Props) {
               <path d="M18 12h64l-7 98a8 8 0 01-8 7H33a8 8 0 01-8-7z" />
             </clipPath>
             <linearGradient id={`water-${uid}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#8fd3ff" />
-              <stop offset="1" stopColor="#3f7dff" />
+              <stop offset="0" stopColor="#9db8e2" />
+              <stop offset="1" stopColor="#5a7cc8" />
             </linearGradient>
           </defs>
           <g clipPath={`url(#glass-${uid})`}>
             <rect x="0" y="0" width="100" height="124" fill="var(--glass-fill)" />
             <g className="hydro__water" style={{ transform: `translateY(${level}px)` }}>
-              <path className="hydro__wave hydro__wave--back" d="M-100 6 q25 -8 50 0 t50 0 t50 0 t50 0 t50 0 V140 H-100z" fill="#8fd3ff" opacity="0.55" />
+              <path className="hydro__wave hydro__wave--back" d="M-100 6 q25 -8 50 0 t50 0 t50 0 t50 0 t50 0 V140 H-100z" fill="#9db8e2" opacity="0.45" />
               <path className="hydro__wave" d="M-100 8 q25 -7 50 0 t50 0 t50 0 t50 0 t50 0 V140 H-100z" fill={`url(#water-${uid})`} />
             </g>
             <g className="hydro__bubbles" fill="#fff" opacity={fill > 0.05 ? 0.6 : 0}>

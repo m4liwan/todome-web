@@ -38,6 +38,7 @@ export function OverlayWindow() {
       setCfg(c);
       document.documentElement.setAttribute('data-theme', c.theme);
       document.documentElement.setAttribute('data-palette', c.palette);
+      if (c.corners) document.documentElement.setAttribute('data-corners', c.corners);
     });
     const offState = desktop.onOverlayState(setSt);
     return () => {

@@ -20,7 +20,7 @@ const ROWS: Row[] = [
   { label: 'Anti-Hustle-Statistiken', free: false, pro: true, feature: 'stats' },
   { label: 'Workspace-Editor (Karten frei anordnen)', free: false, pro: true, feature: 'workspace' },
   { label: 'Begleiter', free: '6', pro: '8', feature: 'avatars' },
-  { label: 'Farbwelten', free: '6', pro: '8', feature: 'palettes' },
+  { label: 'Lichtfarben', free: '4', pro: '6', feature: 'palettes' },
   { label: 'Layouts (Pro: mit Flow & Focus)', free: '3', pro: '4', feature: 'flow' },
 ];
 

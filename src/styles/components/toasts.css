@@ -15,8 +15,11 @@
 .toast {
   padding: 13px 18px;
   border-radius: 999px;
-  background: var(--primary);
-  color: var(--on-primary);
+  /* A notice, not an alarm: dark glass with a hairline, never a bright slab. */
+  border: 1px solid var(--line-strong);
+  background: var(--surface-strong);
+  backdrop-filter: blur(18px);
+  color: var(--ink);
   font-weight: 600;
   font-size: 0.9rem;
   text-align: center;
@@ -35,7 +38,7 @@
 }
 .storage-note__status {
   padding: 10px 14px;
-  border-radius: 14px;
+  border-radius: calc(14px * var(--rs));
   background: rgb(var(--accent-2-rgb) / 0.14);
   color: var(--ink);
 }

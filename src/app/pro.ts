@@ -14,7 +14,9 @@ import { isFeatureUnlocked } from '../domain/companionProgression';
 export type ProFeature = 'reports' | 'clients' | 'avatars' | 'palettes' | 'flow' | 'stats' | 'workspace';
 
 export const PRO_AVATARS: ReadonlySet<AvatarId> = new Set<AvatarId>(['keimi', 'woody']);
-export const PRO_PALETTES: ReadonlySet<PaletteId> = new Set<PaletteId>(['pulse', 'matrix']);
+export const PRO_PALETTES: ReadonlySet<PaletteId> = new Set<PaletteId>(['violet', 'rose']);
+/** Where a locked light colour falls back to without Pro or level 15: the closest free one. */
+const FREE_LIGHT: Partial<Record<PaletteId, PaletteId>> = { violet: 'cyan', rose: 'amber' };
 export const PRO_LAYOUTS: ReadonlySet<LayoutId> = new Set<LayoutId>(['flow']);
 
 export const PRO_COPY: Record<ProFeature, { title: string; text: string }> = {
@@ -39,8 +41,8 @@ export const PRO_COPY: Record<ProFeature, { title: string; text: string }> = {
     text: 'Keimi wächst mit jedem Schritt mit dir, Woody bringt Ruhe in jeden Tag. Die beiden ziehen mit Pro bei dir ein.',
   },
   palettes: {
-    title: 'Mehr Farbwelten in Pro',
-    text: 'Neon Pulse und Matrix Frost: zwei ruhige Nachtwelten für späte Stunden, augenschonend und tief. Ab Level 15 deines Begleiters sind sie auch ohne Pro für dich frei.',
+    title: 'Exklusive Lichtfarben in Pro',
+    text: 'Tiefes Violett und gedämpftes Rosé: zwei leise Lichter für späte Stunden, augenschonend und tief. Ab Level 15 deines Begleiters sind sie auch ohne Pro für dich frei.',
   },
   flow: {
     title: 'Flow & Focus in Pro',
@@ -57,7 +59,7 @@ export function hasPro(): boolean {
 }
 
 export const isProAvatar = (id: AvatarId) => !hasPro() && PRO_AVATARS.has(id);
-/** Locked night world? `themesUnlocked`: the companion reached the "Exklusive Themes" level. */
+/** Locked light colour? `themesUnlocked`: the companion reached the "Exklusive Lichtfarben" level. */
 export const isProPalette = (id: PaletteId, themesUnlocked = false) => !hasPro() && !themesUnlocked && PRO_PALETTES.has(id);
 
 /** The companion level opens some Pro features on its own (see domain/companionProgression). */
@@ -70,7 +72,7 @@ export function freeAppearance(a: AppearanceSettings, pro = hasPro(), themes = f
   if (pro || (!lockedPalette && !PRO_LAYOUTS.has(a.layout))) return a;
   return {
     ...a,
-    palette: lockedPalette ? 'neon' : a.palette,
+    palette: lockedPalette ? (FREE_LIGHT[a.palette] ?? 'lime') : a.palette,
     layout: PRO_LAYOUTS.has(a.layout) ? 'hub' : a.layout,
   };
 }

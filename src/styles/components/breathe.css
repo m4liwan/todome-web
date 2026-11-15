@@ -9,8 +9,8 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: radial-gradient(60vmax 60vmax at 50% 45%, rgb(var(--accent-rgb) / 0.16), transparent 60%),
-    var(--bg);
+  background: radial-gradient(60vmax 60vmax at 50% 45%, rgb(var(--accent-rgb) / calc(0.16 * var(--ambient))), transparent 60%),
+    #050505;
   color: var(--ink);
   -webkit-app-region: no-drag;
   animation: breathe-in 1.2s ease both;
@@ -22,9 +22,14 @@
   width: min(62vmin, 520px);
   height: min(62vmin, 520px);
   margin: calc(min(62vmin, 520px) / -2) 0 0 calc(min(62vmin, 520px) / -2);
+  /* The pacer: a fine ring of light that widens and narrows with the breath.
+     It stays visible at 0 % ambient light, because it carries the rhythm. */
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.35), rgb(var(--accent-2-rgb) / 0.12) 45%, transparent 70%);
-  filter: blur(8px);
+  border: 1px solid rgb(var(--accent-rgb) / 0.32);
+  background: radial-gradient(circle, transparent 54%, rgb(var(--accent-rgb) / calc(0.06 + 0.12 * var(--ambient))) 70%, transparent 71%),
+    radial-gradient(circle, rgb(var(--accent-rgb) / calc(0.04 + 0.12 * var(--ambient))), transparent 62%);
+  box-shadow: 0 0 60px -10px rgb(var(--accent-rgb) / calc(0.1 + 0.25 * var(--ambient))),
+    inset 0 0 50px -20px rgb(var(--accent-rgb) / 0.35);
   animation: breath var(--cycle, 10s) ease-in-out infinite;
 }
 .calm-breath__center {
@@ -43,9 +48,9 @@
   min-width: 10ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
+  font-size: 1.75rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
 }
 .calm-breath__cue span {
   position: absolute;
@@ -72,8 +77,9 @@
 .calm-breath__question {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
 }
 .calm-breath__actions {
   display: flex;
@@ -94,4 +100,14 @@
   .calm-breath__buddy {
     animation-duration: 20s;
   }
+}
+/* The same HUD frame as the welcome and rest screens. */
+.calm-breath::after {
+  content: '';
+  position: absolute;
+  inset: calc(env(titlebar-area-height, 36px) + 6px) clamp(10px, 2vw, 22px) clamp(10px, 2vh, 22px);
+  pointer-events: none;
+  background: var(--hud-frame);
+  background-repeat: no-repeat;
+  opacity: 0.8;
 }

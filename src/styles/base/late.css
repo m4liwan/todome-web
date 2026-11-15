@@ -27,7 +27,7 @@ input:not([type='checkbox']):not([type='radio']):not([type='range']),
 textarea,
 .select {
   border: 1px solid var(--line-strong);
-  border-radius: 14px;
+  border-radius: calc(14px * var(--rs));
   background: var(--surface-solid);
   box-shadow: var(--glass-inset);
 }
@@ -145,7 +145,7 @@ html.flow-lock body {
   gap: 2px;
   padding: 9px 12px;
   border: 0;
-  border-radius: 12px;
+  border-radius: calc(12px * var(--rs));
   background: transparent;
   color: inherit;
   text-align: left;

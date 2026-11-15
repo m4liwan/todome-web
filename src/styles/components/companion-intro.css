@@ -67,7 +67,7 @@
   display: grid;
   gap: 8px;
   padding: 18px 20px 16px;
-  border-radius: 22px;
+  border-radius: calc(22px * var(--rs));
   /* Glass look on a solid base: the hub behind never shows through the text. */
   background: linear-gradient(160deg, var(--glass-sheen), transparent 45%),
     linear-gradient(var(--surface-strong), var(--surface-strong)),
@@ -87,7 +87,7 @@
   border: 1px solid var(--glass-edge);
   border-right: 0;
   border-top: 0;
-  border-radius: 0 0 0 5px;
+  border-radius: 0 0 0 calc(5px * var(--rs));
   transform: rotate(45deg);
 }
 .hub-intro__who {

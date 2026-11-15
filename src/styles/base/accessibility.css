@@ -12,12 +12,6 @@
 
 /* "More contrast": quieter greys get darker, dimmed cards come back. */
 @media (prefers-contrast: more) {
-  :root {
-    --ink-2: #3a3f49;
-    --ink-3: #555b66;
-    --line: rgba(17, 19, 24, 0.22);
-    --line-strong: rgba(17, 19, 24, 0.4);
-  }
   :root[data-theme='dark'] {
     --ink-2: #d6dae1;
     --ink-3: #b3b9c3;
@@ -35,14 +29,6 @@
   :focus-visible {
     outline: 3px solid var(--ink) !important;
     outline-offset: 2px;
-  }
-}
-@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    --ink-2: #d6dae1;
-    --ink-3: #b3b9c3;
-    --line: rgba(255, 255, 255, 0.24);
-    --line-strong: rgba(255, 255, 255, 0.42);
   }
 }
 

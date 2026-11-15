@@ -9,19 +9,20 @@ describe('Pro markers', () => {
       ...s,
       settings: {
         ...s.settings,
-        appearance: { ...s.settings.appearance, palette: 'matrix' as const, layout: 'flow' as const },
+        appearance: { ...s.settings.appearance, palette: 'rose' as const, layout: 'flow' as const },
         companion: { ...s.settings.companion, avatar: 'woody' as const },
       },
     };
     const free = freeState(locked, false);
-    expect(free.settings.appearance.palette).toBe('neon');
+    // The closest free light: rosé falls back to warm amber.
+    expect(free.settings.appearance.palette).toBe('amber');
     expect(free.settings.appearance.layout).toBe('hub');
     expect(free.settings.companion.avatar).toBe('spike');
   });
   it('leaves free choices and Pro users untouched', () => {
     const s = emptyState();
     expect(freeState(s, false)).toBe(s);
-    const a = { ...s.settings.appearance, palette: 'pulse' as const };
+    const a = { ...s.settings.appearance, palette: 'violet' as const };
     expect(freeAppearance(a, true)).toBe(a);
   });
 });

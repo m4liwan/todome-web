@@ -7,7 +7,7 @@
   gap: 10px;
   padding: 14px 16px;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(111, 182, 255, 0.16), rgba(74, 125, 255, 0.08));
+  background: linear-gradient(135deg, rgba(127, 155, 224, 0.08), rgba(127, 155, 224, 0.03));
   border: 1px solid var(--line);
 }
 .prompts {
@@ -28,7 +28,7 @@
   background: var(--surface-strong);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(28px) saturate(170%);
+  backdrop-filter: blur(28px) saturate(130%);
   overflow: hidden;
   animation: pop-in 0.5s var(--ease-spring) both;
 }
@@ -132,11 +132,11 @@ html.is-companion .ambient {
   width: 280px;
   margin-bottom: 52px;
   padding: 14px 16px 16px;
-  border-radius: 22px;
+  border-radius: calc(22px * var(--rs));
   background: var(--surface-strong);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(24px) saturate(170%);
+  backdrop-filter: blur(24px) saturate(130%);
   pointer-events: auto;
   overflow: hidden;
   transform-origin: bottom right;
@@ -430,7 +430,7 @@ html.is-companion .ambient {
 .hydro__glass {
   flex: none;
   overflow: visible;
-  filter: drop-shadow(0 10px 18px rgba(63, 125, 255, 0.25));
+  filter: drop-shadow(0 10px 18px rgba(90, 124, 200, 0.14));
 }
 .hydro__water {
   transition: transform 1.4s var(--ease-spring);
@@ -530,8 +530,8 @@ html.is-companion .ambient {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background: radial-gradient(520px circle at var(--mx, -600px) var(--my, -600px), rgba(90, 160, 255, 0.14), transparent 45%),
-    radial-gradient(circle at 0% 100%, rgba(90, 160, 255, 0.18), transparent 55%),
+  background: radial-gradient(520px circle at var(--mx, -600px) var(--my, -600px), rgba(127, 155, 224, 0.06), transparent 45%),
+    radial-gradient(circle at 0% 100%, rgba(127, 155, 224, 0.07), transparent 55%),
     linear-gradient(160deg, var(--glass-sheen), transparent 38%),
     var(--surface);
 }

@@ -93,7 +93,7 @@ describe('companion intro: data', () => {
     expect(steps[0]!.text).toMatch(/^Hallo, Rocco! Ich bin Spike/);
     expect(steps[1]!.text).toMatch(/Wochenenden nie gegen dich/);
     expect(steps[1]!.text).toMatch(/XP und Level bleiben dir immer/);
-    expect(steps[2]!.text).toMatch(/ab Level 5 erweiterte Statistiken, ab Level 15 exklusive Themes/);
+    expect(steps[2]!.text).toMatch(/ab Level 5 erweiterte Statistiken, ab Level 15 exklusive Lichtfarben/);
     expect(steps.map((s) => s.text).join(' ')).not.toMatch(/verloren|verpasst|leider|schade|musst/i);
     expect(introSteps('Spike', '')[0]!.text).toMatch(/^Hallo! Ich bin Spike/);
   });

@@ -13,7 +13,7 @@
   position: relative;
   margin: 0;
   padding: 14px 18px;
-  border-radius: 20px;
+  border-radius: calc(20px * var(--rs));
   background: linear-gradient(170deg, var(--glass-sheen), transparent 40%), var(--surface-strong);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-inset), var(--shadow-sm, var(--shadow));

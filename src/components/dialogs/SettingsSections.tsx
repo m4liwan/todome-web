@@ -7,6 +7,7 @@ import type { AmbienceId, BrainProfile, PomodoroSettings, Settings, TimelineStyl
 import { desktop } from '../../lib/desktop';
 import { useEffectsMode, type EffectsMode } from '../../lib/effects';
 import { setSoundVolume } from '../../lib/soundscape';
+import { writeAmbient } from '../../app/theme';
 import { FocusProgress } from '../FocusProgress';
 import { FOCUS_STYLES, FOCUS_TIMER_LOCKED, TimerLock } from '../FocusStyle';
 import { focusTimerUnlocked } from '../../app/focusTimer';
@@ -102,6 +103,44 @@ function OpacityField({ value, onCommit }: { value: number; onCommit: (v: number
     <label className="field">
       <span>Deckkraft {local} %</span>
       <input type="range" className="range" min={35} max={100} step={1} value={local} onChange={(e) => schedule(Number(e.target.value))} />
+    </label>
+  );
+}
+
+/**
+ * Strength of the ambient light: the page follows the slider at once (live
+ * preview), the setting is saved once the slider rests.
+ */
+export function AmbientField({ value, onCommit }: { value: number; onCommit: (v: number) => void }) {
+  const [local, setLocal] = useState(Math.round(value * 100));
+  const timer = useRef<number | null>(null);
+  useEffect(() => setLocal(Math.round(value * 100)), [value]);
+  useEffect(() => () => {
+    if (timer.current) window.clearTimeout(timer.current);
+  }, []);
+  const hint = local === 0 ? 'Absolute Stille: nur Dunkelheit.' : local < 40 ? 'Ein Hauch von Licht.' : local < 75 ? 'Ein ruhiger, atmosphärischer Schein.' : 'Ein voller, sanfter Schein. Nie grell.';
+  return (
+    <label className="field ambient-field">
+      <span>
+        Stärke {local} % <em className="muted small">{hint}</em>
+      </span>
+      <input
+        type="range"
+        className="range"
+        aria-label="Stärke des Ambient Light"
+        aria-valuetext={`${local} %, ${hint}`}
+        min={0}
+        max={100}
+        step={1}
+        value={local}
+        onChange={(e) => {
+          const v = Number(e.target.value);
+          setLocal(v);
+          writeAmbient(v / 100);
+          if (timer.current) window.clearTimeout(timer.current);
+          timer.current = window.setTimeout(() => onCommit(v / 100), 200);
+        }}
+      />
     </label>
   );
 }

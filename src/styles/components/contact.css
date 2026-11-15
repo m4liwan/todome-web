@@ -18,7 +18,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  border-radius: 14px;
+  border-radius: calc(14px * var(--rs));
   background: rgb(var(--accent-2-rgb) / 0.14);
   color: var(--ink);
   line-height: 1.45;

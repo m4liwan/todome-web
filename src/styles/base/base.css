@@ -63,7 +63,7 @@ textarea {
   min-height: 46px;
   padding: 10px 16px;
   border: 1px solid var(--line-strong);
-  border-radius: 14px;
+  border-radius: calc(14px * var(--rs));
   background: var(--surface-solid);
   transition: border-color 0.2s, box-shadow 0.2s;
 }

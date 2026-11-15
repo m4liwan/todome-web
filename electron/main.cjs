@@ -177,7 +177,7 @@ function restoredBounds() {
 
 /** Neutral app background (light). Matches --bg in base/tokens.css. */
 const APP_BG_LIGHT = '#edf0f4';
-const APP_BG_DARK = '#0b0c10';
+const APP_BG_DARK = '#050505';
 const COLOR_RE = /^(#[0-9a-f]{6}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*[\d.]+\s*)?\))$/i;
 /**
  * Window background before the first paint: the exact page colour the app
@@ -1138,9 +1138,8 @@ if (!app.requestSingleInstanceLock()) {
     session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) => callback(permission === 'notifications'));
     session.defaultSession.setPermissionCheckHandler((_wc, permission) => permission === 'notifications');
     if (app.isPackaged) Menu.setApplicationMenu(null);
-    // Start in the theme the user picked last time: no bright flash on launch.
-    const savedTheme = readShellState().theme;
-    if (['system', 'light', 'dark'].includes(savedTheme)) nativeTheme.themeSource = savedTheme;
+    // ToDoMe is always dark (OLED redesign): no bright flash, dark window buttons.
+    nativeTheme.themeSource = 'dark';
     log.info(`[start] ToDoMe ${app.getVersion()} · Electron ${process.versions.electron} · ${process.platform} ${process.arch}${START_HIDDEN ? ' · autostart' : ''}`);
     const crashes = recentCrashDumps(app.getPath('crashDumps'), 1);
     if (crashes.length) log.warn(`[start] ${crashes.length} crash dump(s) in the last 24 h`);

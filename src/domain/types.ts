@@ -180,12 +180,19 @@ export interface CheckIn {
 // ---------------------------------------------------------------------------
 
 export type Tone = 'gentle' | 'direct' | 'sporty';
-export type ThemePreference = 'system' | 'light' | 'dark';
+/** ToDoMe is always dark (OLED redesign, 1.18). Older data said 'system' or 'light'; it loads as 'dark'. */
+export type ThemePreference = 'dark';
 /** Six free companions (Spike, Mark, Bit, Spark, Kiki, Pixie) and two in Pro (Keimi, Woody). */
 export type AvatarId = 'spike' | 'mark' | 'bit' | 'spark' | 'kiki' | 'pixie' | 'keimi' | 'woody';
 
-/** Accent palette of the whole app. */
-export type PaletteId = 'lime' | 'rose' | 'ocean' | 'midnight' | 'lavender' | 'neon' | 'pulse' | 'matrix';
+/**
+ * Ambient light colour: a soft light behind the floating modules, which also
+ * tints the accents, muted. violet and rose are exclusive (Pro or companion level 15).
+ */
+export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose';
+
+/** Global corner rounding: architectural, precise, or soft (the original look). */
+export type CornerStyle = 'sharp' | 'precise' | 'soft';
 
 /** How the rest screen looks. */
 export type StandbyLayout = 'calm' | 'bigclock' | 'drift' | 'breath';
@@ -197,7 +204,11 @@ export type LayoutId = 'classic' | 'flow' | 'sanctuary' | 'hub';
 export type AmbienceId = 'none' | 'rain' | 'clouds' | 'snow' | 'leaves' | 'live';
 
 export interface AppearanceSettings {
+  /** Ambient light colour (the field kept its old name: overlay and boot read it). */
   palette: PaletteId;
+  /** Strength of the ambient light, 0 (pure darkness) … 1 (a soft glow, never glaring). */
+  ambient: number;
+  corners: CornerStyle;
   ambience: AmbienceId;
   layout: LayoutId;
   standby: StandbyLayout;

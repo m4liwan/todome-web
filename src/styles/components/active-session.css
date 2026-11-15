@@ -2,15 +2,16 @@
    Focus card (ActiveSession) and focus styles
    ======================================================================== */
 
+/* Paused and over time: warm, muted lights, never an alarm. */
 .focus[data-state='paused'] {
-  --m1: #ffd27a;
-  --m2: #ffab52;
-  --m3: #ff7a59;
+  --m1: #d9ad62;
+  --m2: #c98a52;
+  --m3: #b87a5a;
 }
 .focus[data-state='over'] {
-  --m1: #ff8fb4;
-  --m2: #ff6a6a;
-  --m3: #ffa24c;
+  --m1: #c98a9a;
+  --m2: #b8797a;
+  --m3: #c99560;
 }
 .mesh::after {
   content: '';
@@ -21,8 +22,9 @@
 .mesh__blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(46px);
-  opacity: 0.95;
+  filter: blur(54px);
+  /* OLED: the colour is a light glowing out of the dark glass, it scales with the ambient light. */
+  opacity: calc(0.16 + 0.3 * var(--ambient));
   transition: background-color 0.8s ease;
 }
 .mesh__blob--a {
@@ -47,13 +49,13 @@
   left: 30%;
   bottom: -35%;
   background: var(--m2);
-  filter: blur(60px) brightness(1.08);
+  filter: blur(64px);
   animation: drift-c 30s ease-in-out infinite alternate;
 }
 .mesh__grain {
   position: absolute;
   inset: 0;
-  opacity: 0.18;
+  opacity: 0.06;
   background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1.2px);
   background-size: 6px 6px;
   mask-image: linear-gradient(180deg, transparent 50%, #000);
@@ -166,7 +168,7 @@
   width: 20px;
   height: 20px;
   margin-top: 1px;
-  border-radius: 7px;
+  border-radius: calc(7px * var(--rs));
   border: 1.6px solid var(--field-ink-2);
   color: transparent;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s var(--ease-spring);
@@ -266,16 +268,16 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(420px circle at var(--mx, -600px) var(--my, -600px), rgba(255, 255, 255, 0.22), transparent 50%);
-  mix-blend-mode: soft-light;
+  background: radial-gradient(420px circle at var(--mx, -600px) var(--my, -600px), rgba(255, 255, 255, 0.07), transparent 50%);
+  mix-blend-mode: screen;
 }
 .focus__inner {
   z-index: 1;
 }
 .focus[data-state='idle'] {
-  --m1: color-mix(in srgb, var(--accent-2) 40%, #9cc8ff);
-  --m2: color-mix(in srgb, var(--accent-mesh) 35%, #c9b8ff);
-  --m3: color-mix(in srgb, var(--accent-3) 45%, #ffc2e2);
+  --m1: var(--accent-2);
+  --m2: var(--accent-mesh);
+  --m3: color-mix(in srgb, var(--accent-2) 60%, #8090b0);
 }
 .one {
   display: grid;
@@ -397,14 +399,14 @@
   inset: 0;
   z-index: 2;
   border-radius: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   pointer-events: none;
 }
 .mesh {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--m2);
+  background: #0a0a0c;
   transition: background-color 0.8s ease;
   border-radius: inherit;
   /* Blurred colour blobs are clipped exactly to the rounded corners. */
@@ -417,7 +419,7 @@
   align-content: center;
   gap: 10px;
   padding: 18px 14px 14px;
-  border-radius: 26px;
+  border-radius: calc(26px * var(--rs));
   background: linear-gradient(170deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.08));
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45),
@@ -428,13 +430,6 @@
 :root[data-theme='dark'] .focus__buddy {
   background: linear-gradient(170deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
   border-color: rgba(255, 255, 255, 0.12);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .one__buddy,
-  :root:not([data-theme='light']) .focus__buddy {
-    background: linear-gradient(170deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
-    border-color: rgba(255, 255, 255, 0.12);
-  }
 }
 .one__buddy {
   width: min(100%, 230px);
@@ -449,7 +444,7 @@
   min-height: 40px;
   padding: 0 14px;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: calc(12px * var(--rs));
   background: var(--field-glass);
   box-shadow: none;
   color: var(--field-ink);
@@ -560,7 +555,7 @@
   gap: 4px;
   width: min(340px, 80vw);
   padding: 6px;
-  border-radius: 18px;
+  border-radius: calc(18px * var(--rs));
   background: var(--surface-strong);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-inset), var(--shadow-lg);
@@ -591,7 +586,7 @@
   align-content: start;
   gap: 10px;
   padding: 16px;
-  border-radius: 20px;
+  border-radius: calc(20px * var(--rs));
   background: var(--field-glass);
 }
 .bites__track {
@@ -620,7 +615,7 @@
   height: 40px;
   padding: 0 14px;
   border: 0;
-  border-radius: 12px;
+  border-radius: calc(12px * var(--rs));
   background: var(--field-glass-strong);
   color: var(--field-ink);
   font: inherit;

@@ -53,7 +53,7 @@
 .ws-card {
   position: relative;
   cursor: grab;
-  border-radius: 28px;
+  border-radius: calc(28px * var(--rs));
   outline: 2px dashed rgb(var(--accent-rgb) / 0.55);
   outline-offset: 4px;
   transition: outline-color 0.2s ease,
@@ -100,7 +100,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 6px 6px 12px;
-  border-radius: 16px;
+  border-radius: calc(16px * var(--rs));
   background: var(--surface-strong);
   border: 1px solid var(--glass-edge);
   box-shadow: var(--glass-inset), var(--shadow-sm);
@@ -117,7 +117,7 @@
   display: inline-flex;
   gap: 2px;
   padding: 2px;
-  border-radius: 10px;
+  border-radius: calc(10px * var(--rs));
   background: var(--surface-sunk);
 }
 .ws-card__sizes button,
@@ -128,7 +128,7 @@
   height: 26px;
   padding: 0 6px;
   border: 0;
-  border-radius: 8px;
+  border-radius: calc(8px * var(--rs));
   background: transparent;
   color: var(--ink-2);
   font-size: 0.74rem;

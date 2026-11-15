@@ -1,6 +1,6 @@
 import type { CompanionMessage } from '../domain/companion';
 import type { Activity } from '../domain/energy';
-import type { AvatarId, OverlaySettings, PaletteId, QuickCaptureKey, ThemePreference } from '../domain/types';
+import type { AvatarId, CornerStyle, OverlaySettings, PaletteId, QuickCaptureKey, ThemePreference } from '../domain/types';
 
 /**
  * Bridge to the Electron shell (`electron/preload.cjs`). In a normal browser
@@ -29,6 +29,8 @@ export interface CompanionReply {
 export interface OverlayConfig extends OverlaySettings {
   theme: 'light' | 'dark';
   palette: PaletteId;
+  /** The app's corner rounding, so the mini overlay matches it (1.18). */
+  corners?: CornerStyle;
 }
 
 /** What the mini overlay shows: calm, no hectic numbers. */

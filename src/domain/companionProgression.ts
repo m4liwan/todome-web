@@ -135,8 +135,8 @@ export const FEATURE_UNLOCKS: readonly FeatureUnlock[] = [
   {
     feature: 'exclusive_themes',
     level: 15,
-    title: 'Exklusive Themes',
-    text: 'Farbwelten, die man sich verdient: ruhig, tief und nur für dich.',
+    title: 'Exklusive Lichtfarben',
+    text: 'Tiefes Violett und gedämpftes Rosé: Licht, das man sich verdient, ruhig und nur für dich.',
   },
 ];
 

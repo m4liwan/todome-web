@@ -124,7 +124,7 @@ button.weather__icon:hover {
   justify-items: center;
   gap: 4px;
   padding: 10px 4px;
-  border-radius: 16px;
+  border-radius: calc(16px * var(--rs));
   background: var(--surface-sunk);
 }
 .wx__h,

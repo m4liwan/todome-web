@@ -120,9 +120,9 @@
   border-color: transparent;
 }
 .pill--water {
-  background: linear-gradient(90deg, #6fb6ff, #4a7dff);
-  border-color: transparent;
-  color: #fff;
+  background: rgba(127, 155, 224, 0.14);
+  border-color: rgba(127, 155, 224, 0.32);
+  color: #d4def4;
 }
 .btn--danger {
   color: var(--danger);
@@ -405,7 +405,7 @@ span.chip {
   margin-top: 8px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: calc(16px * var(--rs));
   background: var(--surface-sunk);
   cursor: pointer;
 }
@@ -592,12 +592,12 @@ span.chip {
   margin: 0;
   padding: 6px;
   border: 1px solid var(--glass-edge);
-  border-radius: 16px;
+  border-radius: calc(16px * var(--rs));
   background: linear-gradient(170deg, var(--glass-sheen), transparent 40%), var(--surface-strong);
   color: var(--ink);
   box-shadow: var(--glass-inset), var(--shadow-lg);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(130%);
+  -webkit-backdrop-filter: blur(30px) saturate(130%);
   overflow-y: auto;
   overscroll-behavior: contain;
   z-index: 300;
@@ -618,7 +618,7 @@ span.chip {
   justify-content: space-between;
   gap: 10px;
   padding: 9px 12px;
-  border-radius: 10px;
+  border-radius: calc(10px * var(--rs));
   font-size: 0.92rem;
   font-weight: 550;
   cursor: pointer;
@@ -637,16 +637,8 @@ span.chip {
   opacity: 0.4;
   cursor: not-allowed;
 }
-:root:not([data-theme='light']) .select__option.is-active {
+:root[data-theme='dark'] .select__option.is-active {
   background: rgba(255, 255, 255, 0.07);
-}
-:root[data-theme='light'] .select__option.is-active {
-  background: rgb(var(--accent-2-rgb) / 0.09);
-}
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) .select__option.is-active {
-    background: rgb(var(--accent-2-rgb) / 0.09);
-  }
 }
 .select__list::-webkit-scrollbar {
   width: 10px;
@@ -693,7 +685,7 @@ span.chip {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
     0 0 0 0 rgb(var(--accent-rgb) / 0.4),
     0 10px 30px -14px rgb(var(--accent-2-rgb) / 0.6);
-  backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(130%);
   overflow: hidden;
   isolation: isolate;
   animation: none;

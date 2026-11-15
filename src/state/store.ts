@@ -28,9 +28,23 @@ const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'obj
  *  v1 → v2: task priority, theme, companion, location, wellbeing, weather.
  *  v2 → v3: appearance (palette, ambience), overlay, energy, water log, proud notes.
  */
-/** Retired colour worlds map to their successor (1.4: solaris, moss; 1.17: Abendrot became Midnight). */
-const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = { solaris: 'midnight', moss: 'lime', sunset: 'midnight' };
-const PALETTES = new Set(['lime', 'rose', 'ocean', 'midnight', 'lavender', 'neon', 'pulse', 'matrix']);
+/**
+ * Retired colour worlds map to the closest ambient light colour (1.4: solaris,
+ * moss; 1.17: Abendrot became Midnight; 1.18: colour worlds became ambient light).
+ */
+const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = {
+  solaris: 'mono',
+  moss: 'lime',
+  sunset: 'mono',
+  midnight: 'mono',
+  ocean: 'cyan',
+  neon: 'cyan',
+  matrix: 'cyan',
+  lavender: 'violet',
+  pulse: 'rose',
+};
+const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose']);
+const CORNERS = new Set(['sharp', 'precise', 'soft']);
 
 function migrateAppearance(raw: unknown): AppearanceSettings {
   const a = { ...DEFAULT_APPEARANCE, ...(isRecord(raw) ? (raw as Partial<AppearanceSettings>) : {}) };
@@ -42,6 +56,9 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   if (!isRecord(raw) || !('layout' in raw)) a.layout = 'classic';
   const p = String(a.palette);
   a.palette = RETIRED_PALETTES[p] ?? (PALETTES.has(p) ? a.palette : 'lime');
+  // 1.18: ambient light strength and corner rounding.
+  a.ambient = typeof a.ambient === 'number' && Number.isFinite(a.ambient) ? Math.min(1, Math.max(0, a.ambient)) : DEFAULT_APPEARANCE.ambient;
+  if (!CORNERS.has(String(a.corners))) a.corners = DEFAULT_APPEARANCE.corners;
   // 2.x: level effects arrive switched on; only a real choice survives.
   if (typeof a.companionFx !== 'boolean') a.companionFx = DEFAULT_APPEARANCE.companionFx;
   return a;
@@ -169,6 +186,8 @@ export function parseState(raw: string | null): AppState | null {
           avatar: normalizeAvatar((companion as { avatar?: unknown }).avatar ?? DEFAULT_COMPANION.avatar),
         },
         appearance: migrateAppearance(settings.appearance),
+        // 1.18: light mode is gone; 'system' and 'light' load as dark.
+        theme: 'dark',
         ...migrateMedia(settings),
       },
       wellbeing: (() => {

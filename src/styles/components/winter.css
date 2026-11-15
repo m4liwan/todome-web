@@ -30,14 +30,14 @@
   align-items: flex-end;
   width: 100%;
   max-width: 58px;
-  border-radius: 18px;
+  border-radius: calc(18px * var(--rs));
   background: var(--surface-sunk);
   overflow: hidden;
 }
 .lights__col {
   width: 100%;
   height: max(6px, calc(var(--h) * 100%));
-  border-radius: 18px;
+  border-radius: calc(18px * var(--rs));
   background: linear-gradient(to top, var(--accent-2), var(--accent-mesh));
   box-shadow: 0 0 26px rgb(var(--accent-rgb) / 0.45);
   transform-origin: bottom;

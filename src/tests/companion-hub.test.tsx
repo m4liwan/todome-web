@@ -89,15 +89,15 @@ describe('level unlocks open Pro features (step by step)', () => {
     expect(container.querySelector('.pro-veil')).toBeNull();
   });
 
-  it('opens the night worlds at level 15 and keeps them after a restart', () => {
-    expect(isProPalette('matrix', themesUnlocked(atLevel(14)))).toBe(true);
-    expect(isProPalette('matrix', themesUnlocked(atLevel(15)))).toBe(false);
+  it('opens the exclusive light colours at level 15 and keeps them after a restart', () => {
+    expect(isProPalette('violet', themesUnlocked(atLevel(14)))).toBe(true);
+    expect(isProPalette('violet', themesUnlocked(atLevel(15)))).toBe(false);
     const chosen = atLevel(15);
-    chosen.settings.appearance = { ...chosen.settings.appearance, palette: 'matrix' };
-    expect(freeState(chosen, false).settings.appearance.palette).toBe('matrix');
+    chosen.settings.appearance = { ...chosen.settings.appearance, palette: 'violet' };
+    expect(freeState(chosen, false).settings.appearance.palette).toBe('violet');
     const low = atLevel(3);
-    low.settings.appearance = { ...low.settings.appearance, palette: 'matrix' };
-    expect(freeState(low, false).settings.appearance.palette).toBe('neon');
+    low.settings.appearance = { ...low.settings.appearance, palette: 'violet' };
+    expect(freeState(low, false).settings.appearance.palette).toBe('cyan');
   });
 });
 

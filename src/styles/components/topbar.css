@@ -51,8 +51,8 @@
     color-mix(in srgb, var(--bg) 55%, transparent) 60%,
     color-mix(in srgb, var(--bg) 0%, transparent) 100%
   );
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
   mask-image: linear-gradient(to bottom, #000 62%, transparent);
   -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
 }
@@ -93,7 +93,7 @@ html.is-desktop .topbar-wrap :is(button, a, input, select, textarea, label, summ
   padding: 4px;
   border-radius: 999px;
   border: 1px solid var(--glass-edge);
-  backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(130%);
   background: radial-gradient(160px circle at var(--mx, -300px) var(--my, -300px), var(--spot), transparent 60%),
     var(--surface);
   box-shadow: var(--glass-inset), var(--shadow-sm);
@@ -191,14 +191,6 @@ html.is-desktop.has-modal .topbar-wrap * {
 }
 :root[data-theme='dark'] .brand-logo__light {
   opacity: 1;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .brand-logo__ink {
-    opacity: 0;
-  }
-  :root:not([data-theme='light']) .brand-logo__light {
-    opacity: 1;
-  }
 }
 .topbar {
   position: relative;

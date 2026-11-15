@@ -79,7 +79,7 @@
   display: grid;
   gap: 8px;
   padding: 18px 20px 16px;
-  border-radius: 22px;
+  border-radius: calc(22px * var(--rs));
   background: linear-gradient(160deg, var(--glass-sheen), transparent 45%),
     var(--surface-strong);
   border: 1px solid var(--glass-edge);
@@ -108,28 +108,28 @@
   left: calc(var(--tail, 40px) - 9px);
   border-right: 0;
   border-bottom: 0;
-  border-radius: 5px 0 0 0;
+  border-radius: calc(5px * var(--rs)) 0 0 0;
 }
 .tour__bubble.is-above::before {
   bottom: -9px;
   left: calc(var(--tail, 40px) - 9px);
   border-left: 0;
   border-top: 0;
-  border-radius: 0 0 5px 0;
+  border-radius: 0 0 calc(5px * var(--rs)) 0;
 }
 .tour__bubble.is-right::before {
   left: -9px;
   top: calc(var(--tail, 40px) - 9px);
   border-right: 0;
   border-top: 0;
-  border-radius: 0 0 0 5px;
+  border-radius: 0 0 0 calc(5px * var(--rs));
 }
 .tour__bubble.is-left::before {
   right: -9px;
   top: calc(var(--tail, 40px) - 9px);
   border-left: 0;
   border-bottom: 0;
-  border-radius: 0 5px 0 0;
+  border-radius: 0 calc(5px * var(--rs)) 0 0;
 }
 .tour__who {
   display: flex;

@@ -1,7 +1,8 @@
 import { useServices } from '../app/services';
 import { uiSound } from '../app/uiSound';
 import type { OpenModal } from '../app/modal';
-import { switchTheme, useResolvedTheme } from '../app/theme';
+import { toggledAmbient } from '../app/theme';
+import { DEFAULT_APPEARANCE } from '../state/defaults';
 import type { AppState } from '../domain/types';
 import { desktop } from '../lib/desktop';
 import { dayKey } from '../lib/time';
@@ -33,7 +34,8 @@ export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
   const labels = contextLabels(state.settings.userContext);
   const { store, mode, clock } = useServices();
   const dnd = state.settings.doNotDisturb;
-  const theme = useResolvedTheme(state.settings.theme);
+  const appearance = state.settings.appearance;
+  const lit = appearance.ambient > 0;
   const closedToday = state.coach.closedDay === dayKey(clock.now());
   const showMedia = Boolean(desktop) && state.settings.media.enabled && state.settings.media.inTopbar;
   const set = (patch: Partial<AppState['settings']>) => store.dispatch({ type: 'settings/update', patch });
@@ -85,15 +87,12 @@ export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
             <button
               type="button"
               className="tool-pill__btn"
-              aria-label={theme === 'dark' ? 'Helles Design' : 'Dunkles Design'}
-              title={theme === 'dark' ? 'Helles Design' : 'Dunkles Design'}
-              onClick={(e) => {
-                const next = theme === 'dark' ? 'light' : 'dark';
-                const r = e.currentTarget.getBoundingClientRect();
-                switchTheme(next, () => set({ theme: next }), { x: r.left + r.width / 2, y: r.top + r.height / 2 });
-              }}
+              aria-pressed={!lit}
+              aria-label={lit ? 'Licht dimmen' : 'Licht an'}
+              title={lit ? 'Licht dimmen: nur noch stille Dunkelheit' : 'Licht an: der sanfte Schein kehrt zurück'}
+              onClick={() => set({ appearance: { ...appearance, ambient: toggledAmbient(appearance.ambient, DEFAULT_APPEARANCE.ambient) } })}
             >
-              {theme === 'dark' ? <IconSun size={18} /> : <IconMoon size={18} />}
+              {lit ? <IconMoon size={18} /> : <IconSun size={18} />}
             </button>
             <button type="button" className="tool-pill__btn" aria-label="Einstellungen" title="Einstellungen" onClick={() => onOpen({ kind: 'settings' })}>
               <IconSettings size={18} />

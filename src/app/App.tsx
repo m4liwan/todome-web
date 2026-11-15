@@ -183,7 +183,7 @@ export function App() {
   useSpotlight();
 
   const { state, now, projections, foreground } = useProjections();
-  useApplyTheme(state.settings.theme, state.settings.appearance.palette);
+  useApplyTheme(state.settings.appearance);
   const theme = useResolvedTheme(state.settings.theme);
   useOverlaySync(state, now, foreground, theme);
   const appearance = state.settings.appearance;

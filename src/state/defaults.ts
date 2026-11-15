@@ -35,7 +35,7 @@ export const DEFAULT_WELLBEING: Wellbeing = {
   feelLog: {},
 };
 
-export const DEFAULT_APPEARANCE: AppearanceSettings = { palette: 'lime', ambience: 'none', layout: 'hub', standby: 'calm', xmas: 'december', focusStyle: 'breathe', sound: false, soundVolume: 0.5, timeline: 'wave', companionFx: true };
+export const DEFAULT_APPEARANCE: AppearanceSettings = { palette: 'lime', ambient: 0.55, corners: 'precise', ambience: 'none', layout: 'hub', standby: 'calm', xmas: 'december', focusStyle: 'breathe', sound: false, soundVolume: 0.5, timeline: 'wave', companionFx: true };
 
 export const DEFAULT_MEDIA: MediaSettings = { enabled: true, inTopbar: false, rev: 2 };
 
@@ -56,8 +56,8 @@ export const DEFAULT_SETTINGS: Settings = {
   tourDone: false,
   companionIntroSeen: false,
   quickCapture: 'ctrl_alt_space',
-  // New installs follow Windows (light or dark) right from the first frame.
-  theme: 'system',
+  // Always dark (OLED redesign).
+  theme: 'dark',
   tone: 'direct',
   // Existing installs and anything unclear: neutral everyday wording.
   userContext: 'allround',

@@ -88,7 +88,7 @@
   position: absolute;
   inset: 10px 10px auto;
   height: 40%;
-  border-radius: 32px 32px 50% 50% / 32px 32px 20px 20px;
+  border-radius: calc(32px * var(--rs)) calc(32px * var(--rs)) 50% 50% / calc(32px * var(--rs)) calc(32px * var(--rs)) calc(20px * var(--rs)) calc(20px * var(--rs));
   background: linear-gradient(rgba(255, 255, 255, 0.35), transparent);
   pointer-events: none;
 }
@@ -216,7 +216,7 @@
   width: min(100%, 300px);
   aspect-ratio: 1 / 0.95;
   margin-bottom: 6px;
-  border-radius: 40px 40px 28px 28px;
+  border-radius: calc(40px * var(--rs)) calc(40px * var(--rs)) calc(28px * var(--rs)) calc(28px * var(--rs));
   border: 1px solid var(--glass-edge);
   background: linear-gradient(170deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04) 55%), rgb(var(--accent-rgb) / 0.08);
   box-shadow: var(--glass-inset),

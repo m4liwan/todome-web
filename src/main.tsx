@@ -24,6 +24,7 @@ import { Recovery, type RecoveryReason } from './components/Recovery';
 import { snapshotRaw, snapshotState, startDailySnapshots } from './app/vault';
 import './styles/index.css';
 import { installInputModality } from './lib/a11y';
+import { writeAmbient } from './app/theme';
 import { compactSessions } from './domain/archive';
 import { logApplicationBootstrapped, logApplicationDataReset, logApplicationFramePainted } from './services/posthog-logs';
 import { connectTelemetry, stopTelemetry, trackError, trackEvent } from './services/telemetry';
@@ -118,12 +119,13 @@ function bootstrap(mode: AppMode, key: string, parsed: AppState | null): Service
     }, 6 * 60 * 60_000);
   }
 
-  // Paint the first frame already in the right theme and colour world.
+  // Paint the first frame already dark, in the right light and corners.
   const root = document.documentElement;
-  const { theme, appearance } = initial.settings;
-  if (theme === 'system') root.removeAttribute('data-theme');
-  else root.setAttribute('data-theme', theme);
+  const { appearance } = initial.settings;
+  root.setAttribute('data-theme', 'dark');
   root.setAttribute('data-palette', appearance.palette);
+  root.setAttribute('data-corners', appearance.corners);
+  writeAmbient(appearance.ambient);
   root.setAttribute('data-layout', appearance.layout);
   if (desktop) root.classList.add('is-desktop');
 
@@ -287,10 +289,7 @@ if (isCompanionView) {
 function reportPageColor() {
   if (!desktop) return;
   const send = () => {
-    const root = document.documentElement;
-    const explicit = root.dataset.theme;
-    const mode = explicit === 'dark' || (!explicit && window.matchMedia?.('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-    desktop?.reportWindowBg(mode, getComputedStyle(root).backgroundColor);
+    desktop?.reportWindowBg('dark', getComputedStyle(document.documentElement).backgroundColor);
   };
   send();
   let timer = 0;
@@ -298,6 +297,5 @@ function reportPageColor() {
     window.clearTimeout(timer);
     // After the theme fade has settled.
     timer = window.setTimeout(send, 1200);
-  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-palette'] });
-  window.matchMedia?.('(prefers-color-scheme: dark)').addEventListener('change', () => window.setTimeout(send, 1200));
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-palette'] });
 }

@@ -296,7 +296,7 @@ export function Onboarding({ onLeave, onDone }: { onLeave: () => void; onDone: (
                 <input type="checkbox" checked={telemetry} onChange={(e) => setTelemetry(e.target.checked)} />
                 <span>{TELEMETRY_LABEL}</span>
               </label>
-              <p className="hint">{labels.focusTimes}, Wetterort und Farbwelt stellst du in den Einstellungen ein, wann immer du magst.</p>
+              <p className="hint">{labels.focusTimes}, Wetterort und Licht stellst du in den Einstellungen ein, wann immer du magst.</p>
             </>
           )}
         </div>

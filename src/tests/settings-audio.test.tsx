@@ -30,7 +30,8 @@ describe('settings: the atmosphere sound lives under "Audio"', () => {
     open('design');
     expect(inPanel().getByRole('radiogroup', { name: 'Atmosphäre im Hintergrund', hidden: true })).toBeTruthy();
     expect(soundToggle()).toBeNull();
-    expect(inPanel().queryByRole('slider', { hidden: true })).toBeNull();
+    // The only slider here is the ambient light's strength; no volume.
+    expect(inPanel().queryAllByRole('slider', { hidden: true }).map((s) => s.getAttribute('aria-label'))).toEqual(['Stärke des Ambient Light']);
     expect(panel().textContent).toMatch(/Den Klang dazu stellst du unter Audio ein/);
   });
 

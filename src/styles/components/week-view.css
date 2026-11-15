@@ -298,7 +298,7 @@
   display: grid;
   gap: 4px;
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: calc(18px * var(--rs));
   background: linear-gradient(160deg, rgb(var(--accent-rgb) / 0.12), transparent 70%), var(--surface-sunk);
 }
 .calm-stats__label {

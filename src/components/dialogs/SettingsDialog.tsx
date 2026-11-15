@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
-import type { AppState, Client, LayoutId, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
+import type { AppState, Client, CornerStyle, LayoutId, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
 import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
 import { desktop, type AutostartStatus } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
@@ -23,7 +23,7 @@ import { Select } from '../Select';
 import { AboutSection } from './AboutSection';
 import { ContactDialog } from './ContactDialog';
 import { downloadBackup } from '../../app/backup';
-import { AmbiencePicker, AmbienceSoundSection, BrainSection, CompanionFxSection, TimelineStyleField, MediaSection, MoodSection, OverlaySection, StandbySection } from './SettingsSections';
+import { AmbientField, AmbiencePicker, AmbienceSoundSection, BrainSection, CompanionFxSection, TimelineStyleField, MediaSection, MoodSection, OverlaySection, StandbySection } from './SettingsSections';
 import { USER_CONTEXTS, businessShown, contextLabels, normalizeUserContext, type ContextLabels } from '../../domain/userContext';
 
 export type SettingsTab = 'general' | 'companion' | 'design' | 'overlay' | 'media' | 'data' | 'about';
@@ -59,18 +59,21 @@ const TONES: Array<{ id: Tone; label: string; example: string }> = [
   { id: 'sporty', label: 'Sportlich', example: '„Nachspielzeit! Noch mal ran oder abpfeifen?“' },
 ];
 
-const PALETTES: Array<{ id: PaletteId; label: string; colors: [string, string, string] }> = [
-  { id: 'lime', label: 'Frühling', colors: ['#22c27a', '#c8f23c', '#ffb23f'] },
-  { id: 'rose', label: 'Rosé', colors: ['#ff4d6d', '#ff9fb8', '#ffc38b'] },
-  { id: 'ocean', label: 'Ozean', colors: ['#2f7cff', '#6fe3e0', '#9b8cff'] },
-  { id: 'midnight', label: 'Midnight', colors: ['#050505', '#dfe6ff', '#7b8cff'] },
-  { id: 'lavender', label: 'Lavendel', colors: ['#7c5cff', '#c6b3ff', '#ff9ed8'] },
-  { id: 'neon', label: 'Neon Cyber', colors: ['#0c0a1c', '#22e6f2', '#c04dff'] },
-  { id: 'pulse', label: 'Neon Pulse', colors: ['#12061c', '#ff3dbb', '#7a5cff'] },
-  { id: 'matrix', label: 'Matrix Frost', colors: ['#06140f', '#5dffb4', '#7fd8ff'] },
+/** Ambient light colours: a soft light behind the modules, muted in the accents. */
+const LIGHTS: Array<{ id: PaletteId; label: string; color: string }> = [
+  { id: 'lime', label: 'Fokus-Lime', color: '#c4e86a' },
+  { id: 'cyan', label: 'Tiefsee-Cyan', color: '#62d4dc' },
+  { id: 'amber', label: 'Warmes Bernstein', color: '#e9b46a' },
+  { id: 'mono', label: 'Reines Weiß', color: '#e6e8ee' },
+  { id: 'violet', label: 'Tiefes Violett', color: '#a593ff' },
+  { id: 'rose', label: 'Gedämpftes Rosé', color: '#e49aae' },
 ];
 
-const NIGHT_WORLDS = new Set<PaletteId>(['midnight', 'neon', 'pulse', 'matrix']);
+const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
+  { id: 'sharp', label: 'Kantig', text: 'Architektonisch, klare Kanten' },
+  { id: 'precise', label: 'Präzise', text: 'Ruhig und exakt' },
+  { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
+];
 
 const LAYOUTS: Array<{ id: LayoutId; label: string; text: string }> = [
   { id: 'hub', label: 'Companion Hub', text: 'Dein Begleiter im Mittelpunkt, in seinem Glas-Zuhause' },
@@ -105,7 +108,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
   const state = useAppState();
   const labels = contextLabels(state.settings.userContext);
   const s = state.settings;
-  // Level 15 of the companion opens the night worlds without Pro.
+  // Level 15 of the companion opens the exclusive light colours without Pro.
   const themes = themesUnlocked(state);
   const set = (patch: Partial<Settings>) => services.store.dispatch({ type: 'settings/update', patch });
   const setCompanion = (patch: Partial<Settings['companion']>) => set({ companion: { ...s.companion, ...patch } });
@@ -342,23 +345,11 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           {tab === 'design' && (
             <>
         <section>
-          <h3>Darstellung</h3>
-          <div className="segmented" role="radiogroup" aria-label="Design">
-            {(
-              [
-                ['light', 'Hell'],
-                ['dark', 'Dunkel'],
-                ['system', 'Wie System'],
-              ] as const
-            ).map(([value, label]) => (
-              <button key={value} type="button" role="radio" aria-checked={s.theme === value} className={s.theme === value ? 'is-on' : ''} onClick={() => set({ theme: value })}>
-                {label}
-              </button>
-            ))}
-          </div>
-          <p className="settings__label">Farbwelt</p>
-          <div className="palettes" role="radiogroup" aria-label="Farbwelt">
-            {PALETTES.map((p) => (
+          <h3>Ambient Light</h3>
+          <p className="muted small">Die Flächen bleiben dunkel. Hinter deinen Modulen liegt ein leises Licht, ganz nach deiner Stimmung.</p>
+          <p className="settings__label">Lichtfarbe</p>
+          <div className="palettes" role="radiogroup" aria-label="Lichtfarbe">
+            {LIGHTS.map((p) => (
               <button
                 key={p.id}
                 type="button"
@@ -369,15 +360,10 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
                 onClick={() => {
                   if (isProPalette(p.id, themes)) return openPro('palettes');
                   set({ appearance: { ...s.appearance, palette: p.id } });
-                  // The cyber worlds are night worlds: they come with the dark design.
-                  if (NIGHT_WORLDS.has(p.id) && s.theme !== 'dark') {
-                    set({ theme: 'dark' });
-                    services.announce(`${p.label} leuchtet im Dunkeln am schönsten, daher das dunkle Design.`);
-                  }
                 }}
               >
                 <span className="palette__frame" aria-hidden="true">
-                  <span className="palette__swatch" style={{ background: `radial-gradient(circle at 30% 30%, ${p.colors[1]}, transparent 60%), radial-gradient(circle at 75% 70%, ${p.colors[2]}, transparent 60%), ${p.colors[0]}` }} />
+                  <span className="palette__swatch" style={{ '--swatch': p.color } as React.CSSProperties} />
                   {isProPalette(p.id, themes) && (
                     <span className="pro-blur__lock">
                       <IconLock size={13} />
@@ -386,6 +372,25 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
                 </span>
                 <span>{p.label}</span>
                 {isProPalette(p.id, themes) && <ProLock />}
+              </button>
+            ))}
+          </div>
+          <AmbientField value={s.appearance.ambient} onCommit={(ambient) => set({ appearance: { ...services.store.getState().settings.appearance, ambient } })} />
+          <p className="settings__label">Ecken</p>
+          <div className="corners" role="radiogroup" aria-label="Ecken">
+            {CORNERS.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                role="radio"
+                aria-checked={s.appearance.corners === c.id}
+                className={`corner-opt${s.appearance.corners === c.id ? ' is-on' : ''}`}
+                data-corners-preview={c.id}
+                onClick={() => set({ appearance: { ...s.appearance, corners: c.id } })}
+              >
+                <span className="corner-opt__shape" aria-hidden="true" />
+                <strong>{c.label}</strong>
+                <span className="muted small">{c.text}</span>
               </button>
             ))}
           </div>
