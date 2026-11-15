@@ -4,18 +4,95 @@
 }
 .weekview__hero {
   display: grid;
-  gap: var(--gap);
+  gap: var(--s4);
+  padding-bottom: var(--s5);
 }
 .weekview__title {
-  max-width: 20ch;
+  max-width: 18ch;
+  font-size: 48px;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
 }
 .weekview__text {
   max-width: 58ch;
+  font-size: 17px;
   color: var(--ink-2);
 }
 .weekview__legend {
+  padding-top: var(--s3);
+  font-size: 12px;
   color: var(--ink-3);
 }
+/* ---------- the week as quiet columns ("lights") ---------- */
+.lights {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--s3);
+  height: 260px;
+  padding-top: var(--s4);
+}
+.lights li {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  justify-items: center;
+  gap: var(--s2);
+  min-width: 0;
+}
+.lights__value {
+  min-height: 1.2em;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.lights__track {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 28px;
+}
+.lights__col {
+  width: 100%;
+  height: max(2px, calc(var(--h) * 100%));
+  border-radius: 3px 3px 0 0;
+  background: rgba(255, 255, 255, 0.14);
+  transform-origin: bottom;
+  animation: rise var(--t-slow) var(--ease) both;
+}
+.lights li.is-today .lights__col {
+  background: var(--accent);
+}
+.lights li.is-today .lights__value {
+  color: var(--ink);
+}
+.lights__day {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.lights li.is-today .lights__day {
+  color: var(--ink);
+}
+.lights__water {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.lights__water.is-full {
+  background: var(--ink-2);
+}
+@media (max-width: 760px) {
+  .lights {
+    height: 200px;
+  }
+}
+
 .weekview > .weekview__row {
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: 0;
@@ -28,13 +105,23 @@
 .wins__list li {
   display: inline-flex;
   align-items: center;
-  gap: var(--gap);
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: var(--fs-meta);
 }
 .wins__proud {
   display: grid;
   gap: var(--gap);
 }
 .wins__proud h3 {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink-3);
 }
 .wins__proud ul {
@@ -49,7 +136,9 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
 }
 .people__name {
   overflow: hidden;
@@ -72,17 +161,20 @@
 }
 .care__track {
   fill: none;
-  stroke: var(--line);
-  stroke-width: 3;
+  stroke: var(--line-strong);
+  stroke-width: 2;
 }
 .care__fill {
   fill: none;
   stroke: var(--ink);
-  stroke-width: 3;
+  stroke-width: 2;
   stroke-linecap: round;
 }
 .care__score {
   position: absolute;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  letter-spacing: -0.03em;
 }
 .care__parts {
   display: grid;
@@ -98,7 +190,8 @@
 .care__bar {
   height: 2px;
   overflow: hidden;
-  background: var(--line);
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 .care__bar span {
   display: block;
@@ -112,7 +205,7 @@
   stroke-linecap: round;
 }
 .gauge__track {
-  stroke: var(--line);
+  stroke: var(--line-strong);
 }
 .gauge__zone {
   stroke: var(--ink-3);
@@ -130,7 +223,7 @@
 }
 .curve__line {
   fill: none;
-  stroke-width: 2;
+  stroke-width: 1.5;
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke: var(--ink);
@@ -141,14 +234,16 @@
   stroke-width: 2;
 }
 .curve__dot.is-today {
-  fill: var(--ink);
+  fill: var(--accent);
+  stroke: var(--accent);
 }
 .curve__empty {
   fill: var(--line-strong);
 }
 .curve__day {
   fill: var(--ink-3);
-  font-size: 11px;
+  font-family: var(--font-mono);
+  font-size: 10px;
 }
 @media (max-width: 1180px) {
   .weekview__care {

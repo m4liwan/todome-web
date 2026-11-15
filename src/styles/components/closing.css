@@ -1,87 +1,178 @@
+/* ========================================================================
+   Day end (components/ClosingView.tsx): one large sentence, what you did,
+   a proud note, tomorrow's first step and the times, divided by hairlines.
+   ======================================================================== */
+
 .closing {
   position: relative;
 }
 .closing__inner {
+  display: grid;
   max-width: 780px;
   margin: 0 auto;
-  display: grid;
-  gap: 0;
 }
 .closing__head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s6);
+  padding-bottom: var(--s7);
+}
+.closing__head > div {
+  display: grid;
+  gap: var(--s4);
+}
+.closing__head h1 {
+  max-width: 16ch;
+  font-size: 48px;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
 }
 .closing__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink-3);
 }
 .closing__lead {
   max-width: 52ch;
+  font-size: 17px;
   color: var(--ink-2);
-}
-.closing__block {
-  display: grid;
-  gap: var(--gap);
-}
-.closing__block .field {
-  gap: var(--gap);
-}
-.closing__wins {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap);
-}
-.closing__pick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap);
-}
-.closing__option {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap);
-  cursor: pointer;
-}
-.closing__times summary {
-  cursor: pointer;
 }
 .closing__note {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s3);
+  margin-bottom: var(--s5);
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: var(--fs-meta);
   color: var(--ink-2);
+}
+.closing__block {
+  display: grid;
+  gap: var(--s4);
+  padding-block: var(--s6);
+  border-top: 1px solid var(--line);
+}
+.closing__block h2 {
+  font-size: 17px;
+}
+.closing__block .field {
+  gap: var(--s2);
+}
+.closing__wins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.closing__wins li {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 var(--s3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: var(--fs-meta);
+  animation: rise var(--t-slow) var(--ease) both;
+  animation-delay: calc(min(var(--i, 0), 8) * 50ms);
+}
+.closing__pick {
+  display: grid;
+}
+.closing__option {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  text-align: left;
+  cursor: pointer;
+}
+.closing__option::before {
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+}
+.closing__option:hover {
+  color: var(--ink);
+}
+.closing__option.is-on {
+  color: var(--ink);
+}
+.closing__option.is-on::before {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 3px var(--bg), inset 0 0 0 7px var(--ink);
+}
+.closing__times summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+.closing__times summary::-webkit-details-marker {
+  display: none;
+}
+.closing__times summary::after {
+  content: '+';
+  margin-left: auto;
+  font-family: var(--font-mono);
+  color: var(--ink-3);
+}
+.closing__times[open] summary::after {
+  content: '−';
 }
 .closing__actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: var(--gap);
+  gap: var(--s2);
+  padding-top: var(--s6);
+  border-top: 1px solid var(--line);
 }
 .closing__sign {
+  padding-top: var(--s4);
+  font-size: 12px;
   text-align: right;
+  color: var(--ink-3);
 }
+
+/* After the day is closed: one calm message in the centre. */
 .closing--done {
   display: grid;
   place-items: center;
+  min-height: 60vh;
 }
 .closing__done {
   display: grid;
   justify-items: center;
-  gap: var(--gap);
-  text-align: center;
+  gap: var(--s4);
   max-width: 560px;
+  text-align: center;
 }
+.closing__done h1 {
+  font-size: 48px;
+  letter-spacing: -0.045em;
+}
+
 @media (max-width: 760px) {
-  /* order-pinned: belongs to components/active-session, kept here so the cascade stays as before */
-  .one,
   .closing__head {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
-}
-/* order-pinned: belongs to components/active-session, kept here so the cascade stays as before */
-.one {
-  grid-template-columns: minmax(0, 1fr) minmax(170px, 32%);
-  gap: var(--gap);
+  .closing__head h1,
+  .closing__done h1 {
+    font-size: 36px;
+  }
 }

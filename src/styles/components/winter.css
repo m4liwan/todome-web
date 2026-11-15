@@ -1,50 +1,3 @@
-.lights {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: var(--gap);
-  height: 250px;
-}
-.lights li {
-  display: grid;
-  grid-template-rows: auto 1fr auto auto;
-  justify-items: center;
-  gap: var(--gap);
-  min-width: 0;
-}
-.lights__value {
-  min-height: 1.2em;
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-.lights__track {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  width: 100%;
-  max-width: 14px;
-}
-.lights__col {
-  width: 100%;
-  height: max(6px, calc(var(--h) * 100%));
-  background: var(--ink-3);
-}
-.lights__day {
-  color: var(--ink-3);
-}
-.lights li.is-today .lights__day {
-  color: var(--ink);
-}
-.lights__water {
-  width: 8px;
-  height: 8px;
-  background: var(--ink-2);
-}
-@media (max-width: 760px) {
-  .lights {
-    height: 200px;
-  }
-}
 .garland {
   position: fixed;
   top: 0;
@@ -52,7 +5,4 @@
   right: 0;
   pointer-events: none;
   display: none;
-}
-.lights li.is-today .lights__col {
-  background: var(--ink);
 }

@@ -1,3 +1,9 @@
+/* ========================================================================
+   Companion hub (components/CompanionHub.tsx): the companion stands large in
+   the centre, level and XP in mono below, the numbers as one hairline row,
+   the reward path as a quiet vertical line.
+   ======================================================================== */
+
 .companion-hub {
   display: grid;
   gap: 0;
@@ -5,36 +11,42 @@
 .companion-hub__hero {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: var(--gap);
+  justify-items: center;
+  gap: var(--s5);
+  padding-bottom: var(--s8);
+  text-align: center;
 }
 .companion-hub__stage {
   position: relative;
   display: grid;
   place-items: center;
-  width: 228px;
+  width: 260px;
 }
 .companion-hub__stage > svg {
   width: 80%;
   height: auto;
 }
 .companion-hub__intro {
+  display: grid;
+  justify-items: center;
+  gap: var(--s4);
   min-width: 0;
 }
 .companion-hub__help {
   position: absolute;
-  top: 14px;
-  right: 14px;
+  top: 0;
+  right: 0;
   z-index: 2;
   display: grid;
   place-items: center;
   width: 32px;
   height: 32px;
+  border-radius: var(--radius);
   color: var(--ink-3);
   cursor: pointer;
 }
 .companion-hub__help:hover {
+  background: var(--hover);
   color: var(--ink);
 }
 
@@ -46,31 +58,51 @@
     scroll-margin-top: 136px;
   }
 }
+.companion-hub > * {
+  transition: opacity var(--t-slow) var(--ease);
+}
 .companion-hub.is-touring > :not(.is-spot) {
   opacity: 0.32;
 }
 
 .companion-hub__title {
   display: grid;
-  gap: var(--gap);
+  justify-items: center;
+  gap: var(--s2);
+  margin: 0;
 }
 .companion-hub__name {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink-3);
 }
 .companion-hub__level {
   display: flex;
   align-items: baseline;
-  gap: var(--gap);
+  gap: var(--s3);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.045em;
 }
 .companion-hub__level-word {
   color: var(--ink-3);
 }
 .companion-hub__level-num {
+  font-family: var(--font-mono);
+  font-weight: 300;
   color: var(--ink);
 }
 .companion-hub__line {
   max-width: 46ch;
+  font-size: 17px;
   color: var(--ink-2);
+}
+.companion-hub__next {
+  font-size: var(--fs-meta);
 }
 .companion-hub__next strong {
   color: var(--ink);
@@ -78,46 +110,80 @@
 
 .xp-bar {
   display: grid;
-  gap: var(--gap);
-  max-width: 560px;
+  gap: var(--s2);
+  width: min(100%, 480px);
 }
 .xp-bar__track {
-  height: 4px;
+  height: 2px;
   overflow: hidden;
-  background: var(--line);
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 .xp-bar__fill {
   display: block;
   height: 100%;
   transform-origin: left center;
-  background: var(--ink);
+  background: var(--accent);
+  transition: transform var(--t-slow) var(--ease);
 }
 .xp-bar__caption {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: var(--gap);
+  gap: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
   color: var(--ink-3);
 }
 
 .companion-hub__stats {
   --cols: 4;
+  padding-block: var(--s7);
+  border-top: 1px solid var(--line);
 }
 .companion-hub__stat-label {
   display: inline-flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink-3);
 }
+.companion-hub__stat-value {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+.companion-hub__stats .is-lit .companion-hub__stat-label {
+  color: var(--accent);
+}
 .companion-hub__stat-note {
+  font-size: var(--fs-meta);
   color: var(--ink-3);
 }
 .companion-hub__freezes {
   display: flex;
-  gap: var(--gap);
   align-items: center;
+  gap: 6px;
+  min-height: 38px;
+}
+.companion-hub__freezes span {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+}
+.companion-hub__freezes span.is-on {
+  border-color: var(--ink);
+  background: var(--ink);
 }
 
+/* ---------- reward path ---------- */
 .reward-path {
   display: grid;
   list-style: none;
@@ -125,62 +191,85 @@
 .reward-path__step {
   position: relative;
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  gap: var(--gap);
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--s5);
+  padding-bottom: var(--s6);
 }
 .reward-path__strand {
   position: absolute;
-  left: 18px;
-  top: 46px;
+  left: 15.5px;
+  top: 38px;
   bottom: 6px;
-  width: 4px;
-  background: var(--line);
+  width: 1px;
+  overflow: hidden;
+  background: var(--line-strong);
 }
 .reward-path__strand.is-dormant {
-  left: 19px;
-  width: 2px;
+  background: var(--line);
 }
 .reward-path__charge {
   position: absolute;
   inset: 0;
   transform-origin: top;
   scale: 1 var(--fill, 0);
-  background: var(--ink);
+  background: var(--accent);
+  transition: scale var(--t-slow) var(--ease);
 }
 .reward-path__node {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 12px;
   color: var(--ink-3);
+}
+.reward-path__step.is-reached .reward-path__node {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
 }
 .reward-path__step.is-next .reward-path__node {
+  border-color: var(--accent);
   color: var(--ink);
 }
-.reward-path__step.is-later .reward-path__node {
-  color: var(--ink-3);
-}
 .reward-path__body {
+  display: grid;
+  gap: var(--s2);
   min-width: 0;
+  padding-top: 5px;
 }
 .reward-path__level {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--gap);
-  color: var(--ink-2);
+  gap: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 .reward-path__togo {
   color: var(--ink);
 }
 .reward-path__rewards {
   display: grid;
-  gap: var(--gap);
+  gap: var(--s3);
   list-style: none;
 }
 .reward-path__rewards > li {
   display: grid;
-  gap: var(--gap);
+  gap: 2px;
+}
+.reward-path__rewards strong {
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.reward-path__step.is-later .reward-path__rewards {
+  opacity: 0.6;
 }
 .reward-path__rewards .muted {
   max-width: 60ch;

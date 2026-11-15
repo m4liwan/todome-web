@@ -86,9 +86,12 @@
   z-index: -1;
   pointer-events: none;
 }
+/* Review, companion and day end: one editorial column that rises in. */
 .view-fade {
   display: grid;
-  gap: var(--gap);
+  max-width: 1080px;
+  margin: 0 auto;
+  animation: rise var(--t-slow) var(--ease) both;
 }
 .pro-blur__lock {
   position: absolute;

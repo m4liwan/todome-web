@@ -1,8 +1,13 @@
 .zone {
   position: relative;
   display: grid;
-  gap: var(--gap);
-  padding-block: 24px;
+  gap: var(--s5);
+  padding-block: var(--s8);
+  border-top: 1px solid var(--line);
+}
+.zone:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 .zone .card__head p.muted,
 .zone__sub {
@@ -12,11 +17,27 @@
 .zone__label {
   display: inline-flex;
   align-items: center;
-  gap: var(--gap);
-  color: var(--ink-2);
+  gap: var(--s2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 .tile__label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink-3);
+}
+.tile__value {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
 }
 /* A band: equal columns divided by vertical hairlines (no boxes). */
 .band {
@@ -67,6 +88,10 @@
   align-content: start;
 }
 .tile__value small {
+  margin-left: 4px;
+  font-family: var(--font-sans);
+  font-size: var(--fs-meta);
+  letter-spacing: 0;
   color: var(--ink-3);
 }
 .band .muted.small {

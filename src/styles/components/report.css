@@ -56,23 +56,39 @@
 }
 .table th,
 .table td {
+  padding: var(--s3) var(--s3) var(--s3) 0;
+  border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
 }
 .table th {
-  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.table td {
+  font-size: 14px;
 }
 .table .num {
   text-align: right;
 }
 .totals {
   display: grid;
-  gap: var(--gap);
 }
 .totals li {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: var(--gap);
+  align-items: baseline;
+  gap: var(--s5);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.totals .num {
+  min-width: 6ch;
+  text-align: right;
 }
 @media (max-width: 600px) {
   .hide-sm {
