@@ -395,7 +395,7 @@ export function App() {
         <main id="main" className={`dash dash--${view}`}>
           {view === 'today' && <Cockpit panels={p} meta={{ anchors: anchorsDue.due.length ? `${anchorsDue.done}/${anchorsDue.due.length}` : undefined }} />}
           {view === 'times' && (
-            <div className="view-fade" key="times">
+            <div className="view-fade view-fade--wide" key="times">
               <WeekView state={state} projections={projections} now={now} />
               <CalmStats state={state} projections={projections} now={now} />
               <ReportPanel state={state} projections={projections} now={now} />

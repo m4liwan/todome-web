@@ -87,12 +87,16 @@
   z-index: -1;
   pointer-events: none;
 }
-/* Review, companion and day end: one editorial column that rises in. */
+/* Review, companion and day end: one editorial column that rises in. The
+   review goes wide: more of the week at a glance, nothing squeezed. */
 .view-fade {
   display: grid;
   max-width: 1080px;
   margin: 0 auto;
   animation: rise var(--t-slow) var(--ease) both;
+}
+.view-fade--wide {
+  max-width: 1440px;
 }
 .pro-blur__lock {
   position: absolute;
