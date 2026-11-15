@@ -1,0 +1,134 @@
+/* ========================================================================
+   Rail: the quiet icon column on the left (components/Rail.tsx).
+   Views on top with a gliding 2px mark, tools at the bottom, tooltips right.
+   ======================================================================== */
+
+.rail {
+  position: fixed;
+  top: var(--header-h);
+  bottom: 0;
+  left: 0;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: var(--rail-w);
+  padding: var(--s4) 0;
+  border-right: 1px solid var(--line);
+  background: var(--bg);
+  transition: opacity var(--t-slow) var(--ease);
+}
+.rail__stations,
+.rail__tools {
+  position: relative;
+  display: grid;
+  justify-items: center;
+}
+.rail__stations {
+  grid-auto-rows: 52px;
+}
+.rail__tools {
+  grid-auto-rows: 44px;
+}
+.rail__item {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  align-self: center;
+  border-radius: var(--radius);
+  color: var(--ink-3);
+}
+.rail__item:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.rail__item[aria-current='page'] {
+  color: var(--ink);
+}
+.rail__item[aria-pressed='true'] {
+  color: var(--ink);
+}
+/* The mark: a 2px line at the rail's left edge, gliding to the current view. */
+.rail__mark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 52px;
+  pointer-events: none;
+  transition: transform var(--t-base) var(--ease);
+}
+.rail__mark::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  left: 0;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--ink);
+}
+
+/* Tooltip: a small floating label right of the icon. */
+.rail__tip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 14px);
+  z-index: 2;
+  padding: 5px 9px;
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-4px, -50%);
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+.rail__item:hover .rail__tip,
+.rail__item:focus-visible .rail__tip {
+  opacity: 1;
+  transform: translate(0, -50%);
+  transition-delay: 220ms;
+}
+.rail__item:focus-visible .rail__tip {
+  transition-delay: 0ms;
+}
+
+/* The companion's level: a tiny mono number tucked under its icon. */
+.rail__item .level-badge {
+  position: absolute;
+  left: 50%;
+  bottom: -9px;
+  height: auto;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+}
+
+/* Focus: the rail steps back and returns on contact. */
+.shell.is-focusing .rail {
+  opacity: 0.4;
+}
+.shell.is-focusing .rail:hover,
+.shell.is-focusing .rail:focus-within {
+  opacity: 1;
+}
+
+@media (max-width: 760px) {
+  .rail__item {
+    width: 36px;
+    height: 36px;
+  }
+}

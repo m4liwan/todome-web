@@ -11,7 +11,7 @@ function Svg({ size = 20, children, ...rest }: IconProps & { children: ReactNode
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={1.8}
+      strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -22,6 +22,26 @@ function Svg({ size = 20, children, ...rest }: IconProps & { children: ReactNode
     </svg>
   );
 }
+
+/* ---------- rail stations ---------- */
+export const IconHome = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 10.5 12 4l8 6.5V19a1 1 0 01-1 1h-4.5v-5.5h-5V20H5a1 1 0 01-1-1z" />
+  </Svg>
+);
+export const IconChart = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M4 20h16" />
+    <path d="M7 16v-4M12 16V8M17 16v-6" />
+  </Svg>
+);
+export const IconCompanion = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="8" />
+    <path d="M9 10.5h.01M15 10.5h.01" strokeWidth={2.2} />
+    <path d="M9.5 14.5a3.5 3.5 0 005 0" />
+  </Svg>
+);
 
 export const IconPlay = (p: IconProps) => (
   <Svg {...p}>

@@ -1,6 +1,6 @@
 /* ========================================================================
-   Shell: app frame, home grids of the four layouts, focus styles, drag region.
-   The grids keep their areas and order; they only place the plain content.
+   Shell: the frame (content beside the rail), the ambient veil, view
+   entrance, focus dimming and the title bar strip of full-screen views.
    ======================================================================== */
 
 .skip-link {
@@ -14,9 +14,41 @@
 }
 .app {
   position: relative;
-  max-width: 1480px;
+  margin-left: var(--rail-w);
+}
+.dash {
+  max-width: 1440px;
   margin: 0 auto;
-  padding: 16px 28px 96px;
+  padding: var(--s8) var(--s8) var(--s10);
+}
+@media (max-width: 1180px) {
+  .dash {
+    padding: var(--s7) var(--s6) var(--s9);
+  }
+}
+@media (max-width: 760px) {
+  .dash {
+    padding: var(--s6) var(--s4) var(--s8);
+  }
+}
+
+/* The ambient veil: a large, very soft light in the chosen colour behind the
+   upper half of the window. Strength follows --ambient; never glaring. */
+.veil {
+  position: fixed;
+  top: -30vh;
+  left: 10vw;
+  right: -10vw;
+  z-index: -1;
+  height: 80vh;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 30% 45%, rgb(var(--accent-rgb) / 0.55), transparent 70%),
+    radial-gradient(35% 45% at 70% 35%, rgb(var(--accent-2-rgb) / 0.45), transparent 70%);
+  filter: blur(80px);
+  opacity: calc(var(--ambient) * 0.18);
+  animation: veil-breathe 24s var(--ease) infinite alternate;
+  transition: opacity var(--t-slow) var(--ease);
 }
 .card {
   position: relative;

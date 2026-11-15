@@ -1,6 +1,6 @@
 .anchors-fab {
   position: fixed;
-  left: max(24px, env(safe-area-inset-left, 0px));
+  left: calc(var(--rail-w) + var(--s5));
   bottom: max(22px, env(safe-area-inset-bottom, 0px));
   z-index: 40;
   background: var(--bg);

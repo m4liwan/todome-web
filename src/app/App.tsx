@@ -24,6 +24,7 @@ import { Standby } from '../components/Standby';
 import { Breathe } from '../components/Breathe';
 import { Timeline } from '../components/Timeline';
 import { Toasts } from '../components/Toasts';
+import { Rail } from '../components/Rail';
 import { Topbar, type View } from '../components/Topbar';
 import { WeatherCard } from '../components/WeatherCard';
 import { WeekView } from '../components/WeekView';
@@ -381,6 +382,7 @@ export function App() {
 
   return (
     <div className={`shell shell--${view}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
+      <div className="veil" aria-hidden="true" />
       <Ambience kind={state.settings.appearance.ambience} weather={state.weather} dark={theme === 'dark'} />
       {winter && state.settings.appearance.ambience !== 'snow' && <Ambience kind="snow" weather={null} dark={theme === 'dark'} />}
       {winter && <Garland />}
@@ -388,6 +390,7 @@ export function App() {
         Zum Inhalt springen
       </a>
       <Topbar state={state} view={view} onView={setView} onOpen={setModal} onResume={resumeFocus} />
+      <Rail state={state} view={view} onView={setView} onOpen={setModal} />
 
       <div className="app">
         <main id="main" className={`dash dash--${view}`}>

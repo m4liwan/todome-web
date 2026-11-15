@@ -38,6 +38,10 @@
   --s10: 96px;
   --gap: var(--s3);
 
+  /* Frame: header line and icon rail */
+  --header-h: 48px;
+  --rail-w: 64px;
+
   /* Type */
   --font-sans: 'Geist Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'Cascadia Mono', Consolas, monospace;
@@ -87,6 +91,12 @@
     linear-gradient(var(--hud-line), var(--hud-line)) left bottom / 1px 22px,
     linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 22px 1px,
     linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 1px 22px;
+}
+
+@media (max-width: 760px) {
+  :root {
+    --rail-w: 56px;
+  }
 }
 
 :root[data-corners='sharp'] {

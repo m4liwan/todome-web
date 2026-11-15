@@ -11,6 +11,7 @@
 @import './components/controls.css';
 @import './components/report.css';
 @import './components/topbar.css';
+@import './components/rail.css';
 @import './components/greeting.css';
 @import './components/timeline.css';
 @import './components/active-session.css';

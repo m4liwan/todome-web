@@ -1,59 +1,95 @@
-@media (max-width: 860px) {
-  .topbar {
-    grid-template-columns: 1fr auto;
-  }
-  .segnav {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-self: start;
-  }
-}
+/* ========================================================================
+   Header: one slim line over the whole window (the window's drag strip).
+   Wordmark over the rail, where you are, then media and the main action.
+   ======================================================================== */
+
 .topbar-wrap {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
   z-index: 30;
-  background: var(--bg);
-  padding: 12px 28px;
+  height: var(--header-h);
+  border-bottom: 1px solid var(--line);
+  background: rgb(5 5 5 / 0.82);
+  backdrop-filter: blur(16px);
 }
-@media (max-width: 600px) {
-  .topbar__actions {
-    gap: var(--gap);
-  }
-  .topbar__actions .round-btn {
-    width: 38px;
-    height: 38px;
-  }
-  .topbar__actions .pill {
-    min-height: 38px;
-  }
-  .topbar__brand .tag {
-    display: none;
-  }
+.topbar {
+  display: grid;
+  grid-template-columns: var(--rail-w) minmax(0, 1fr) auto;
+  align-items: center;
+  height: 100%;
+}
+.topbar__brand {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  border-right: 1px solid var(--line);
+}
+.topbar__where {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  min-width: 0;
+  padding-left: var(--s5);
+  white-space: nowrap;
+}
+.topbar__view {
+  color: var(--ink);
+}
+.topbar__date {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s3);
+  min-width: 0;
+  padding-right: var(--s5);
+}
+.topbar__main.is-current {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+.topbar__actions .media {
+  max-width: 280px;
+}
+
+/* Desktop: the header moves the window; every control inside stays a control,
+   and the window buttons (title bar overlay) keep their corner free. */
+html.is-desktop .topbar-wrap {
+  -webkit-app-region: drag;
 }
 html.is-desktop .topbar-wrap :is(button, a, input, select, textarea, label, summary, nav, .tag, [role='button'], [role='link'], [role='tab'], [role='radio'], [role='checkbox'], [role='switch'], [role='slider'], [role='menuitem'], [tabindex]:not([tabindex='-1'])) {
   -webkit-app-region: no-drag;
-}
-.segnav {
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  gap: var(--gap);
-  position: relative;
-}
-.segnav button {
-  min-height: 38px;
-  color: var(--ink-2);
-  cursor: pointer;
-  min-width: 110px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--gap);
 }
 html.is-desktop.has-modal .topbar-wrap,
 html.is-desktop.has-modal .topbar-wrap * {
   -webkit-app-region: no-drag;
 }
+html.is-desktop .topbar__actions {
+  --wco: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+  padding-right: max(var(--s5), calc(var(--wco) + var(--s3)));
+}
+
+/* Focus: the header steps back with the rail and returns on contact. */
+.shell.is-focusing .topbar__where,
+.shell.is-focusing .topbar__brand {
+  opacity: 0.4;
+  transition: opacity var(--t-slow) var(--ease);
+}
+.shell.is-focusing .topbar-wrap:hover :is(.topbar__where, .topbar__brand),
+.shell.is-focusing .topbar-wrap:focus-within :is(.topbar__where, .topbar__brand) {
+  opacity: 1;
+}
+.shell.is-covered .topbar-wrap,
+.shell.is-covered .app,
+.shell.is-covered .rail {
+  visibility: hidden;
+}
+
 @media (max-width: 1360px) {
   .topbar .media__label {
     display: none;
@@ -64,99 +100,6 @@ html.is-desktop.has-modal .topbar-wrap * {
     display: none;
   }
 }
-.topbar__brand .media {
-  max-width: 300px;
-}
-@media (max-width: 1360px) {
-  .topbar__brand .media__label {
-    display: none;
-  }
-}
-@media (max-width: 1060px) {
-  .topbar__brand .media {
-    display: none;
-  }
-}
-.brand-logo img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.brand-logo__light {
-  opacity: 0;
-}
-:root[data-theme='dark'] .brand-logo__ink {
-  opacity: 0;
-}
-:root[data-theme='dark'] .brand-logo__light {
-  opacity: 1;
-}
-.topbar {
-  position: relative;
-  gap: var(--gap);
-  max-width: 1424px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  column-gap: var(--gap);
-}
-.topbar__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--gap);
-  justify-self: start;
-  min-width: 0;
-}
-.topbar .segnav {
-  justify-self: center;
-  grid-column: 2;
-}
-.topbar__actions {
-  justify-content: flex-end;
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: var(--gap);
-  min-width: 0;
-}
-html.is-desktop .topbar-wrap {
-  -webkit-app-region: drag;
-}
-html.is-desktop .topbar__actions {
-  --wco: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 16px);
-  margin-right: max(0px, calc(var(--wco) - (100vw - min(1424px, 100vw - 56px)) / 2));
-}
-.tool-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap);
-  height: 48px;
-}
-.tool-pill__btn {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  flex: none;
-  color: var(--ink-2);
-  cursor: pointer;
-}
-.tool-pill__btn:hover {
-  color: var(--ink);
-}
-.tool-pill__btn.is-on {
-  color: var(--ink);
-}
-.topbar__main {
-  gap: var(--gap);
-  white-space: nowrap;
-}
-.topbar__main.is-current {
-  color: var(--ink);
-}
 @media (max-width: 1180px) {
   .topbar__main .lbl-long {
     display: none;
@@ -165,88 +108,31 @@ html.is-desktop .topbar__actions {
     display: inline;
   }
 }
-@media (max-width: 860px) {
-  .topbar {
-    column-gap: var(--gap);
+@media (max-width: 760px) {
+  .topbar__date {
+    display: none;
   }
-  .tool-pill {
-    height: 42px;
+  .topbar__where {
+    padding-left: var(--s4);
   }
-  .tool-pill__btn {
-    width: 36px;
-    height: 36px;
-  }
-  .topbar__main.glass-cta {
-    min-height: 42px;
+  .topbar__actions .tag {
+    display: none;
   }
 }
-@media (max-width: 980px) {
-  .topbar {
-    grid-template-columns: auto minmax(0, 1fr);
-    row-gap: var(--gap);
-  }
-  .topbar__brand {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  .topbar .segnav {
-    grid-column: 1 / -1;
-    grid-row: 2;
-  }
-  .topbar__actions {
-    grid-column: 2;
-    grid-row: 1;
-  }
+
+/* The wordmark: both versions are in the page, the light one shows on black. */
+.brand-logo {
+  position: relative;
+  display: inline-block;
+  flex: none;
 }
-.shell.fs-cocoon .topbar-wrap {
-  opacity: 0.35;
+.brand-logo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
-.shell.fs-cocoon .topbar-wrap:hover,
-.shell.fs-cocoon .topbar-wrap:focus-within {
-  opacity: 1;
-}
-.shell.is-covered .topbar-wrap,
-.shell.is-covered .app {
-  visibility: hidden;
-}
-@media (max-width: 520px) {
-  .topbar .segnav {
-    grid-auto-columns: auto;
-  }
-  .topbar .segnav button {
-    min-width: 0;
-    gap: var(--gap);
-  }
-}
-@media (max-width: 420px) {
-  .topbar__brand .logo {
-    height: 18px !important;
-    width: 96px !important;
-  }
-  .topbar__actions {
-    gap: var(--gap);
-  }
-  .topbar .tool-pill {
-    height: 38px;
-  }
-  .topbar .tool-pill__btn {
-    width: 32px;
-    height: 32px;
-  }
-  .topbar .topbar__main.glass-cta {
-    min-height: 38px;
-  }
-}
-@media (max-width: 350px) {
-  .topbar {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .topbar__actions {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
-  }
-  .topbar .segnav {
-    grid-row: 3;
-  }
+.brand-logo__ink {
+  opacity: 0;
 }
