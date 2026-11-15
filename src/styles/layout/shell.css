@@ -147,25 +147,23 @@
 .app {
   padding-top: 4px;
 }
+/* Borderless: a module has no fill of its own, only one hairline frame.
+   Everything lies on the one black. */
 .card {
   position: relative;
   padding: 22px 24px;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-edge);
+  border: 1px solid var(--hairline);
   overflow: hidden;
-  background: radial-gradient(520px circle at var(--mx, -600px) var(--my, -600px), var(--spot), transparent 45%),
-    linear-gradient(160deg, var(--glass-sheen), transparent 38%),
-    var(--surface);
-  box-shadow: var(--glass-inset), var(--shadow);
-  backdrop-filter: blur(28px) saturate(130%);
-  -webkit-backdrop-filter: blur(28px) saturate(130%);
+  background: none;
+  box-shadow: none;
   transition: border-color 0.3s ease,
     box-shadow 0.3s ease,
     opacity 0.5s ease,
     filter 0.5s ease;
 }
 .card:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.09);
 }
 @media (prefers-reduced-motion: reduce) {
   .ambience {
@@ -175,7 +173,7 @@
 }
 .view-fade {
   display: grid;
-  gap: 20px;
+  gap: var(--module-gap);
   animation: view-in 0.5s var(--ease-out) both;
 }
 .dash {
@@ -186,7 +184,7 @@
 }
 .home {
   display: grid;
-  gap: 20px;
+  gap: var(--module-gap);
   align-items: stretch;
 }
 .panel--focus {
@@ -609,7 +607,7 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
   /* Small cards fill gaps next to big ones, no empty glass. */
   grid-auto-flow: row dense;
-  gap: 20px;
+  gap: var(--module-gap);
   align-items: stretch;
 }
 .home--custom > .panel {

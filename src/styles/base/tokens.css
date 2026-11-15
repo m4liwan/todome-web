@@ -15,31 +15,38 @@
   --ambient: 0.55;
   --rs: 0.23;
 
-  /* ---------- OLED surfaces: architectural calm ---------- */
+  /* ---------- OLED: one infinite black, no boxes ----------
+     Containers have no fill of their own: everything lies on the black and is
+     divided only by space and one hairline. Only what floats over content
+     (dialogs, pop-ups, toasts, the mini overlay) keeps an opaque black body,
+     otherwise text would show through it. */
   --bg: #050505;
-  --surface: rgba(12, 12, 14, 0.8);
-  --surface-strong: rgba(15, 15, 18, 0.94);
-  --surface-solid: #0c0c0f;
-  --surface-sunk: rgba(255, 255, 255, 0.035);
-  --glass-edge: rgba(255, 255, 255, 0.08);
-  --glass-sheen: rgba(255, 255, 255, 0.025);
-  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.045);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.15);
-  /* Borderless UI: zones are separated by space and this one fine line. */
-  --hairline: rgba(255, 255, 255, 0.06);
-  --grid-line: rgba(255, 255, 255, 0.014);
+  --surface: transparent;
+  --surface-strong: rgba(5, 5, 5, 0.96);
+  --surface-solid: #050505;
+  /* Fields and hover states only: a breath of white, never a visible box. */
+  --surface-sunk: rgba(255, 255, 255, 0.022);
+  --glass-edge: rgba(255, 255, 255, 0.05);
+  --glass-sheen: transparent;
+  --glass-inset: 0 0 0 0 transparent;
+  --line: rgba(255, 255, 255, 0.05);
+  --line-strong: rgba(255, 255, 255, 0.1);
+  /* Borderless UI: the one fine line. */
+  --hairline: rgba(255, 255, 255, 0.05);
+  /* No background grid: pure black. Only the welcome screen keeps its HUD grid. */
+  --grid-line: transparent;
 
   /* ---------- ink: quiet greys, one clear white ---------- */
-  --ink: #f2f2f4;
-  --ink-2: #9c9ea7;
-  --ink-3: #62656e;
+  /* One clear white for what matters; secondary text whispers. */
+  --ink: #f4f4f5;
+  --ink-2: #8e9099;
+  --ink-3: #5f6169;
   --primary: #f2f2f4;
   --on-primary: #050505;
 
   /* ---------- ambient light (scales with --ambient) ---------- */
-  --bg-tint-a: rgb(var(--accent-rgb) / calc(0.17 * var(--ambient)));
-  --bg-tint-b: rgb(var(--tint-b-rgb) / calc(0.1 * var(--ambient)));
+  --bg-tint-a: rgb(var(--accent-rgb) / calc(0.11 * var(--ambient)));
+  --bg-tint-b: rgb(var(--tint-b-rgb) / calc(0.07 * var(--ambient)));
   --tint-c: rgb(var(--accent-2-rgb) / calc(0.08 * var(--ambient)));
   --spot: rgb(var(--accent-rgb) / calc(0.07 * var(--ambient)));
   /* The light falls softly from behind each floating module. */
@@ -63,9 +70,9 @@
   --field-glass-strong: rgba(5, 5, 7, 0.52);
   --field-veil: rgba(5, 5, 7, 0.42);
 
-  /* ---------- depth: black shadows plus the light behind ---------- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45), 0 4px 14px -6px rgba(0, 0, 0, 0.6);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 18px 40px -18px rgba(0, 0, 0, 0.85), var(--halo);
+  /* ---------- depth: flat. Only floating layers keep a shadow ---------- */
+  --shadow-sm: 0 0 0 0 transparent;
+  --shadow: 0 0 0 0 transparent;
   --shadow-lg: 0 30px 80px -24px rgba(0, 0, 0, 0.92), 0 40px 110px -56px rgb(var(--accent-rgb) / calc(0.3 * var(--ambient)));
   --ring: 0 0 0 3px rgb(var(--accent-rgb) / 0.26);
 
@@ -86,6 +93,9 @@
   --scroll-rail: transparent;
   --scroll-thumb: rgba(255, 255, 255, 0.12);
   --scroll-thumb-hover: rgba(255, 255, 255, 0.26);
+
+  /* ---------- negative space: the app breathes between its modules ---------- */
+  --module-gap: clamp(32px, 3.2vw, 52px);
 
   /* ---------- HUD: the shared language of the calm screens ----------
      (welcome, rest, breathing, Feierabend): white hairlines, corner
@@ -115,16 +125,16 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* ---------- light colour (Fokus-Lime unless data-palette says otherwise) ---------- */
-  --accent-rgb: 196 232 106;
-  --accent-mesh: #c4e86a;
-  --accent-2: #94c455;
-  --accent-2-rgb: 148 196 85;
+  --accent-rgb: 163 230 53;
+  --accent-mesh: #a3e635;
+  --accent-2: #84cc16;
+  --accent-2-rgb: 132 204 22;
   --accent-3: #e2b46a;
-  --tint-b-rgb: 150 200 120;
-  --lime: #c4e86a;
+  --tint-b-rgb: 120 190 60;
+  --lime: #a3e635;
   --lime-ink: #0a0d05;
-  --green: #94c455;
-  --good: #8dbd55;
+  --green: #84cc16;
+  --good: #84cc16;
 }
 
 /* ---------- corners ---------- */

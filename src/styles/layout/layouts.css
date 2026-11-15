@@ -43,7 +43,7 @@
 .flow__slide {
   scroll-snap-align: center;
   display: grid;
-  gap: 20px;
+  gap: var(--module-gap);
   min-height: 560px;
   align-content: stretch;
   transition: opacity 0.5s ease,

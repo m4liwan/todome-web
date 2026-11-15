@@ -23,8 +23,8 @@
   position: absolute;
   border-radius: 50%;
   filter: blur(54px);
-  /* OLED: the colour is a light glowing out of the dark glass, it scales with the ambient light. */
-  opacity: calc(0.16 + 0.3 * var(--ambient));
+  /* No surface: only a faint light inside the frame, scaled by the ambient light. */
+  opacity: calc(0.05 + 0.18 * var(--ambient));
   transition: background-color 0.8s ease;
 }
 .mesh__blob--a {
@@ -292,10 +292,13 @@
   gap: 12px;
   min-width: 0;
 }
+/* "JETZT DRAN": the one label that carries the light colour. */
 .one__label {
-  font-size: 0.86rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: var(--field-ink-2);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(var(--accent-rgb));
 }
 .one__title {
   font-size: clamp(1.9rem, 3.2vw, 2.75rem);
@@ -399,14 +402,14 @@
   inset: 0;
   z-index: 2;
   border-radius: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   pointer-events: none;
 }
 .mesh {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: #0a0a0c;
+  background: none;
   transition: background-color 0.8s ease;
   border-radius: inherit;
   /* Blurred colour blobs are clipped exactly to the rounded corners. */
@@ -428,8 +431,9 @@
 }
 :root[data-theme='dark'] .one__buddy,
 :root[data-theme='dark'] .focus__buddy {
-  background: linear-gradient(170deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
-  border-color: rgba(255, 255, 255, 0.12);
+  /* The companion stands free in the focus module: a small light, no glass box. */
+  background: none;
+  border-color: transparent;
 }
 .one__buddy {
   width: min(100%, 230px);

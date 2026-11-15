@@ -65,6 +65,7 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
    at the top (always below the title bar strip, 36px, WindowDrag), open
    space, then the telemetry corners with the way in between them. */
 .splash {
+  --grid-line: rgba(255, 255, 255, 0.03);
   /* Hairlines come from the tokens (--hud-line, white); the light colour is
      kept for the wordmark and the status lights, the only things that glow. */
   --hud-glow: rgb(var(--accent-rgb) / 0.55);

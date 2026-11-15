@@ -61,7 +61,7 @@ const TONES: Array<{ id: Tone; label: string; example: string }> = [
 
 /** Ambient light colours: a soft light behind the modules, muted in the accents. */
 const LIGHTS: Array<{ id: PaletteId; label: string; color: string }> = [
-  { id: 'lime', label: 'Fokus-Lime', color: '#c4e86a' },
+  { id: 'lime', label: 'Fokus-Lime', color: '#a3e635' },
   { id: 'cyan', label: 'Tiefsee-Cyan', color: '#62d4dc' },
   { id: 'amber', label: 'Warmes Bernstein', color: '#e9b46a' },
   { id: 'mono', label: 'Reines Weiß', color: '#e6e8ee' },
