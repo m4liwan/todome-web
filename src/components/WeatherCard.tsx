@@ -59,7 +59,6 @@ export function WeatherCard({ state, now, onOpen }: Props) {
         if (!(e.target as Element).closest('button')) onOpen({ kind: 'weather' });
       }}
     >
-      <div className="weather__glow" aria-hidden="true" />
       <header className="card__head">
         <div>
           <h2>Wetter</h2>

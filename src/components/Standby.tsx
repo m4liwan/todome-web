@@ -37,21 +37,11 @@ export function Standby({ state, now, onWake }: Props) {
   return (
     <div ref={trap} data-focus-trap="" className={`standby standby--${layout}`} role="dialog" aria-modal="true" aria-label="Ruhemodus. Klicken, Leertaste, Enter oder Escape, um weiterzumachen." onClick={onWake}>
       <WindowDrag />
-      <div className="standby__aura" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
 
       {layout === 'drift' ? (
         <Drift time={timeOf(wall)} />
       ) : (
         <div className="standby__center">
-          {layout === 'breath' && (
-            <div className="standby__orb" aria-hidden="true">
-              <span />
-            </div>
-          )}
           <p className="standby__time">{timeOf(wall)}</p>
           {layout !== 'bigclock' && <p className="standby__date">{dateOf(wall)}</p>}
           {layout === 'calm' && (

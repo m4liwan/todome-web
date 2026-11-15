@@ -132,11 +132,6 @@ export function Onboarding({ onLeave, onDone }: { onLeave: () => void; onDone: (
       }}
     >
       <WindowDrag />
-      <div className="splash__grid" aria-hidden="true" />
-      <div className="onboard__aura" aria-hidden="true">
-        <span />
-        <span />
-      </div>
       <Logo className="onboard__logo" height={24} />
 
       <form

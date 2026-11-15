@@ -72,32 +72,6 @@ function splashAlreadyShown(): boolean {
   }
 }
 
-/** Soft light that follows the pointer across glass cards. */
-function useSpotlight() {
-  useEffect(() => {
-    let frame = 0;
-    let last: PointerEvent | null = null;
-    const apply = () => {
-      frame = 0;
-      const e = last;
-      if (!e) return;
-      const el = (e.target as Element | null)?.closest?.('.card, .focus, .segnav') as HTMLElement | null;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-      el.style.setProperty('--my', `${e.clientY - r.top}px`);
-    };
-    const onMove = (e: PointerEvent) => {
-      last = e;
-      if (!frame) frame = requestAnimationFrame(apply);
-    };
-    window.addEventListener('pointermove', onMove, { passive: true });
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-      cancelAnimationFrame(frame);
-    };
-  }, []);
-}
 
 /** True after a stretch without any input (real time, also in the demo). */
 /**
@@ -180,7 +154,6 @@ export function App() {
   // Focus timer (level 10): starts its breaks and lets the companion comment.
   usePomodoro();
   useAttention();
-  useSpotlight();
 
   const { state, now, projections, foreground } = useProjections();
   useApplyTheme(state.settings.appearance);
@@ -426,12 +399,6 @@ export function App() {
 
   return (
     <div className={`shell shell--${view} shell--${layout}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
-      <div className="ambient" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
-      <div className="gridlines" aria-hidden="true" />
       <Ambience kind={state.settings.appearance.ambience} weather={state.weather} dark={theme === 'dark'} />
       {winter && state.settings.appearance.ambience !== 'snow' && <Ambience kind="snow" weather={null} dark={theme === 'dark'} />}
       {winter && <Garland />}

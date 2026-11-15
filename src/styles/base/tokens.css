@@ -1,105 +1,56 @@
 /* ========================================================================
-   Design tokens: OLED darkness, ambient light, corner rounding, type.
-
-   ToDoMe is always dark. Colour lives only in a soft ambient light behind
-   the floating modules and, muted, in the accents. Three knobs on <html>:
-     data-palette  the light colour (lime, cyan, amber, mono, violet, rose)
-     --ambient     its strength, 0 (pure darkness) … 1 (a soft glow, never glaring)
-     data-corners  sharp | precise | soft: scales every radius via --rs
+   Tokens. Wireframe stage: one black page, plain text, no surfaces.
    ======================================================================== */
 
 :root {
   color-scheme: dark;
 
-  /* ---------- knobs (overridden by boot.js / app/theme.ts) ---------- */
-  --ambient: 0.55;
-  --rs: 0.23;
-
-  /* ---------- OLED: one infinite black, no boxes ----------
-     Containers have no fill of their own: everything lies on the black and is
-     divided only by space and one hairline. Only what floats over content
-     (dialogs, pop-ups, toasts, the mini overlay) keeps an opaque black body,
-     otherwise text would show through it. */
+  /* Page and text */
   --bg: #050505;
-  --surface: transparent;
-  --surface-strong: rgba(5, 5, 5, 0.96);
-  --surface-solid: #050505;
-  /* Fields and hover states only: a breath of white, never a visible box. */
-  --surface-sunk: rgba(255, 255, 255, 0.022);
-  --glass-edge: rgba(255, 255, 255, 0.05);
-  --glass-sheen: transparent;
-  --glass-inset: 0 0 0 0 transparent;
-  --line: rgba(255, 255, 255, 0.05);
-  --line-strong: rgba(255, 255, 255, 0.1);
-  /* Borderless UI: the one fine line. */
-  --hairline: rgba(255, 255, 255, 0.05);
-  /* No background grid: pure black. Only the welcome screen keeps its HUD grid. */
-  --grid-line: transparent;
-
-  /* ---------- ink: quiet greys, one clear white ---------- */
-  /* One clear white for what matters; secondary text whispers. */
   --ink: #f4f4f5;
-  --ink-2: #8e9099;
-  --ink-3: #5f6169;
-  --primary: #f2f2f4;
-  --on-primary: #050505;
-
-  /* ---------- ambient light (scales with --ambient) ---------- */
-  --bg-tint-a: rgb(var(--accent-rgb) / calc(0.11 * var(--ambient)));
-  --bg-tint-b: rgb(var(--tint-b-rgb) / calc(0.07 * var(--ambient)));
-  --tint-c: rgb(var(--accent-2-rgb) / calc(0.08 * var(--ambient)));
-  --spot: rgb(var(--accent-rgb) / calc(0.07 * var(--ambient)));
-  /* The light falls softly from behind each floating module. */
-  --halo: 0 34px 80px -44px rgb(var(--accent-rgb) / calc(0.34 * var(--ambient)));
-
-  /* ---------- semantic colours, muted (no shrill tones) ---------- */
-  --orange: #e2995a;
-  --pink: #e2788c;
-  --blue: #7f9be0;
-  --lavender: #a99ae6;
-  --amber: #e2b46a;
+  --ink-2: #9a9ca4;
+  --ink-3: #66686f;
+  --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.24);
   --danger: #e2615e;
-  --g-work: linear-gradient(90deg, var(--accent-2), var(--accent-mesh));
-  --g-interrupt: linear-gradient(90deg, #7590d8, #a395e0);
-  --g-pause: linear-gradient(90deg, #dcb46e, #d48d55);
 
-  /* ---------- focus card text on its colour field ---------- */
-  --field-ink: #ffffff;
-  --field-ink-2: rgba(255, 255, 255, 0.72);
-  --field-glass: rgba(5, 5, 7, 0.36);
-  --field-glass-strong: rgba(5, 5, 7, 0.52);
-  --field-veil: rgba(5, 5, 7, 0.42);
+  /* The one spacing step */
+  --gap: 12px;
+  --font-body: 'Manrope Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
 
-  /* ---------- depth: flat. Only floating layers keep a shadow ---------- */
-  --shadow-sm: 0 0 0 0 transparent;
-  --shadow: 0 0 0 0 transparent;
-  --shadow-lg: 0 30px 80px -24px rgba(0, 0, 0, 0.92), 0 40px 110px -56px rgb(var(--accent-rgb) / calc(0.3 * var(--ambient)));
-  --ring: 0 0 0 3px rgb(var(--accent-rgb) / 0.26);
+  /* Accent of the chosen light colour. Read by JS (app/theme.ts) for WebGL and
+     canvas, and used by data marks (charts, rings). */
+  --accent-rgb: 163 230 53;
+  --accent-mesh: #a3e635;
+  --accent-2: #84cc16;
+  --accent-2-rgb: 132 204 22;
+  --accent-3: #e2b46a;
+  --lime: #a3e635;
+  --lime-ink: #0a0d05;
 
-  /* ---------- props, sky and scenery ---------- */
-  --glass-fill: rgba(150, 170, 220, 0.06);
-  --glass-stroke: rgba(255, 255, 255, 0.24);
+  /* Companion figure and props (inline SVG fills in the components) */
   --prop-a: #3a3d47;
   --prop-b: var(--accent-2);
   --prop-paper: #dfe1e8;
   --prop-line: rgba(10, 10, 12, 0.5);
   --prop-belt: #24262d;
   --prop-shadow: rgba(0, 0, 0, 0.4);
-  --sky-a: #0e0e11;
-  --sky-b: #09090b;
-  --sky-c: #050505;
-  --warm-a: #e2b46a;
-  --warm-b: #d48d55;
-  --scroll-rail: transparent;
-  --scroll-thumb: rgba(255, 255, 255, 0.12);
-  --scroll-thumb-hover: rgba(255, 255, 255, 0.26);
+  --glass-fill: rgba(150, 170, 220, 0.06);
+  --glass-stroke: rgba(255, 255, 255, 0.24);
+  --surface-solid: var(--bg);
+  --blue: #7f9be0;
+  --pink: #e2788c;
+  --lavender: #a99ae6;
 
-  /* ---------- negative space: the app breathes between its modules ---------- */
-  --module-gap: clamp(32px, 3.2vw, 52px);
-
-  /* ---------- HUD: the shared language of the calm screens ----------
-     (welcome, rest, breathing, Feierabend): white hairlines, corner
-     brackets, small tracked labels. Only the light colour glows. */
+  /* Welcome screen (components/splash.css) only */
+  --ambient: 0.55;
+  --rs: 0.23;
+  --surface: transparent;
+  --surface-sunk: rgba(255, 255, 255, 0.022);
+  --glass-inset: 0 0 0 0 transparent;
+  --grid-line: transparent;
+  --font-display: 'Urbanist Variable', 'Segoe UI', system-ui, sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --hud-line: rgba(255, 255, 255, 0.16);
   --hud-frame: linear-gradient(var(--hud-line), var(--hud-line)) left top / 22px 1px,
     linear-gradient(var(--hud-line), var(--hud-line)) left top / 1px 22px,
@@ -111,56 +62,17 @@
     linear-gradient(var(--hud-line), var(--hud-line)) right bottom / 1px 22px,
     linear-gradient(var(--hud-line), var(--hud-line)) left center / 10px 1px,
     linear-gradient(var(--hud-line), var(--hud-line)) right center / 10px 1px;
-
-  /* ---------- corners: every radius scales with --rs ---------- */
-  --radius-xl: calc(32px * var(--rs));
-  --radius-lg: calc(26px * var(--rs));
-  --radius: calc(18px * var(--rs));
-  --radius-sm: calc(12px * var(--rs));
-
-  /* ---------- type and motion ---------- */
-  --font-display: 'Urbanist Variable', 'Segoe UI', system-ui, sans-serif;
-  --font-body: 'Manrope Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  /* ---------- light colour (Fokus-Lime unless data-palette says otherwise) ---------- */
-  --accent-rgb: 163 230 53;
-  --accent-mesh: #a3e635;
-  --accent-2: #84cc16;
-  --accent-2-rgb: 132 204 22;
-  --accent-3: #e2b46a;
-  --tint-b-rgb: 120 190 60;
-  --lime: #a3e635;
-  --lime-ink: #0a0d05;
-  --green: #84cc16;
-  --good: #84cc16;
 }
 
-/* ---------- corners ---------- */
-:root[data-corners='sharp'] {
-  --rs: 0.12;
-}
-:root[data-corners='precise'] {
-  /* About 6px on a card: taut, architectural, never clumsy. */
-  --rs: 0.23;
-}
-:root[data-corners='soft'] {
-  --rs: 1;
-}
-
-/* ---------- light colours: calm, muted, never neon ---------- */
+/* Light colours (data-palette on <html>, set by boot.js / app/theme.ts) */
 :root[data-palette='cyan'] {
   --accent-rgb: 98 212 220;
   --accent-mesh: #62d4dc;
   --accent-2: #3fa3c0;
   --accent-2-rgb: 63 163 192;
   --accent-3: #8fb2f0;
-  --tint-b-rgb: 70 130 200;
   --lime: #62d4dc;
   --lime-ink: #031416;
-  --green: #3fa3c0;
-  --good: #44a8bf;
 }
 :root[data-palette='amber'] {
   --accent-rgb: 233 180 106;
@@ -168,11 +80,8 @@
   --accent-2: #cf8a4c;
   --accent-2-rgb: 207 138 76;
   --accent-3: #e2a0ae;
-  --tint-b-rgb: 210 130 80;
   --lime: #e9b46a;
   --lime-ink: #1a1004;
-  --green: #cf8a4c;
-  --good: #c99050;
 }
 :root[data-palette='mono'] {
   --accent-rgb: 230 232 238;
@@ -180,11 +89,8 @@
   --accent-2: #a7acb8;
   --accent-2-rgb: 167 172 184;
   --accent-3: #c9ccd4;
-  --tint-b-rgb: 190 196 210;
   --lime: #e6e8ee;
   --lime-ink: #050505;
-  --green: #a7acb8;
-  --good: #b4b9c4;
 }
 :root[data-palette='violet'] {
   --accent-rgb: 165 147 255;
@@ -192,11 +98,8 @@
   --accent-2: #7d6bea;
   --accent-2-rgb: 125 107 234;
   --accent-3: #e2a0ae;
-  --tint-b-rgb: 110 90 220;
   --lime: #b3a4ff;
   --lime-ink: #0e0820;
-  --green: #7d6bea;
-  --good: #8a78f0;
 }
 :root[data-palette='rose'] {
   --accent-rgb: 228 154 174;
@@ -204,9 +107,6 @@
   --accent-2: #c46a86;
   --accent-2-rgb: 196 106 134;
   --accent-3: #e2b46a;
-  --tint-b-rgb: 180 100 150;
   --lime: #e8a7b8;
   --lime-ink: #1e0a10;
-  --green: #c46a86;
-  --good: #c87590;
 }

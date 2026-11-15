@@ -1,129 +1,45 @@
-/* ========================================================================
-   Week view (Rückblick) and calm statistics.
-   Borderless: a monumental headline in the open dark, one band of numbers,
-   then calm zones under hairlines (see layout/zones.css).
-   ======================================================================== */
-
 .weekview {
   display: grid;
   gap: 0;
 }
-/* No box: the headline stands in the open dark, monumental and calm. */
 .weekview__hero {
-  position: relative;
   display: grid;
-  gap: 18px;
-  padding: clamp(32px, 5vw, 72px) 0 clamp(36px, 5vw, 64px);
-}
-.weekview__glow {
-  position: absolute;
-  inset: -30% -10% auto auto;
-  width: 60%;
-  height: 120%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgb(var(--accent-rgb) / calc(0.32 * var(--ambient))), transparent 65%);
-  filter: blur(60px);
-  pointer-events: none;
-}
-.weekview__hero .zone__label {
-  position: relative;
+  gap: var(--gap);
 }
 .weekview__title {
-  position: relative;
   max-width: 20ch;
-  font-size: clamp(2.4rem, 5vw, 4.4rem);
-  font-weight: 600;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
 }
 .weekview__text {
-  position: relative;
   max-width: 58ch;
-  font-size: 1.08rem;
-  font-weight: 450;
-  line-height: 1.55;
   color: var(--ink-2);
 }
 .weekview__legend {
-  position: relative;
   color: var(--ink-3);
 }
-
-/* ---------- wins and people: two columns, one vertical hairline ---------- */
-/* Beats the zone gap: the hairline between the columns is the gap. */
 .weekview > .weekview__row {
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: 0;
 }
-.weekview__row > .wins {
-  padding-right: clamp(24px, 3vw, 48px);
-}
-.weekview__row > .people {
-  padding-left: clamp(24px, 3vw, 48px);
-  border-left: 1px solid var(--hairline);
-}
-.wins h2,
-.people h2 {
-  margin-bottom: 18px;
-}
 .wins__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--gap);
 }
 .wins__list li {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 14px 7px 9px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-weight: 550;
-  font-size: 0.9rem;
-  animation: pop 0.5s var(--ease-spring) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
-}
-.wins__list li::before {
-  content: '';
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
-      center / 12px no-repeat,
-    rgb(var(--accent-rgb) / 0.32);
+  gap: var(--gap);
 }
 .wins__proud {
-  margin-top: 28px;
   display: grid;
-  gap: 10px;
+  gap: var(--gap);
 }
 .wins__proud h3 {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: var(--ink-3);
 }
 .wins__proud ul {
   display: grid;
-  gap: 14px;
-}
-.wins__proud p {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-}
-.people__bar {
-  display: flex;
-  gap: 3px;
-  height: 6px;
-  margin-bottom: 20px;
-}
-.people__bar span {
-  min-width: 6px;
-  border-radius: 99px;
-  background: var(--pc);
+  gap: var(--gap);
 }
 .people__list {
   display: grid;
@@ -133,42 +49,20 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 12px;
-  padding-block: 12px;
-  border-bottom: 1px solid var(--hairline);
-}
-.people__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--pc);
+  gap: var(--gap);
 }
 .people__name {
-  font-weight: 550;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.people__share {
-  font-size: 0.8rem;
 }
 @media (max-width: 1180px) {
   .weekview__row {
     grid-template-columns: 1fr;
   }
-  .weekview__row > .wins {
-    padding-right: 0;
-  }
-  .weekview__row > .people {
-    padding: 32px 0 0;
-    border-left: 0;
-    border-top: 1px solid var(--hairline);
-  }
 }
-
-/* ---------- balance: three calm readings in one band ---------- */
 .care {
-  gap: 14px;
+  gap: var(--gap);
 }
 .care__ring {
   position: relative;
@@ -178,94 +72,76 @@
 }
 .care__track {
   fill: none;
-  stroke: var(--hairline);
-  stroke-width: 6;
+  stroke: var(--line);
+  stroke-width: 3;
 }
 .care__fill {
   fill: none;
-  stroke: var(--accent-2);
-  stroke-width: 6;
+  stroke: var(--ink);
+  stroke-width: 3;
   stroke-linecap: round;
-  transition: stroke-dashoffset 1.2s var(--ease-out);
 }
 .care__score {
   position: absolute;
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 500;
-  letter-spacing: -0.04em;
-}
-.care__word {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  line-height: 1.35;
 }
 .care__parts {
   display: grid;
-  gap: 8px;
-  margin-top: 4px;
+  gap: var(--gap);
 }
 .care__parts li {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 90px;
   align-items: center;
-  gap: 10px;
-  font-size: 0.82rem;
+  gap: var(--gap);
   color: var(--ink-3);
 }
 .care__bar {
   height: 2px;
-  border-radius: 99px;
-  background: var(--hairline);
   overflow: hidden;
+  background: var(--line);
 }
 .care__bar span {
   display: block;
   height: 100%;
-  border-radius: inherit;
-  background: rgb(var(--accent-rgb) / 0.8);
+  background: var(--ink-2);
 }
 .gauge__track,
 .gauge__zone {
   fill: none;
-  stroke-width: 6;
+  stroke-width: 3;
   stroke-linecap: round;
 }
 .gauge__track {
-  stroke: var(--hairline);
+  stroke: var(--line);
 }
 .gauge__zone {
-  stroke: rgb(var(--accent-rgb) / 0.45);
+  stroke: var(--ink-3);
 }
 .gauge__dot {
-  fill: var(--accent-2);
+  fill: var(--ink);
   stroke: var(--bg);
   stroke-width: 3;
 }
 .gauge__value {
   fill: var(--ink);
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 500;
 }
 .curve__grid {
-  stroke: var(--hairline);
+  stroke: var(--line);
 }
 .curve__line {
   fill: none;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  stroke: var(--ink);
 }
 .curve__dot {
   fill: var(--bg);
-  stroke: var(--accent-2);
+  stroke: var(--ink);
   stroke-width: 2;
 }
 .curve__dot.is-today {
-  fill: var(--accent-2);
+  fill: var(--ink);
 }
 .curve__empty {
   fill: var(--line-strong);
@@ -273,50 +149,23 @@
 .curve__day {
   fill: var(--ink-3);
   font-size: 11px;
-  font-weight: 600;
 }
 @media (max-width: 1180px) {
   .weekview__care {
     grid-template-columns: minmax(0, 1fr);
   }
-  .weekview__care > * {
-    padding-inline: 0;
-    border-left: 0 !important;
-  }
-  .weekview__care > * + * {
-    border-top: 1px solid var(--hairline);
-  }
 }
-
-/* ---------- calm statistics (Pro / level 5): one band ---------- */
 .calm-stats .card__head {
   align-items: flex-start;
 }
 .calm-stats__label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
   color: var(--ink-3);
-}
-.calm-stats__value {
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 3vw, 2.6rem);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
 }
 .calm-stats__note {
   color: var(--ink-3);
-  font-size: 0.8rem;
-  line-height: 1.45;
 }
 .calm-stats__grid.pro-veil {
-  filter: blur(5px) saturate(0.7);
   opacity: 0.55;
   pointer-events: none;
   user-select: none;
-}
-.calm-stats .pro-veil__note {
-  margin-top: -110px;
 }

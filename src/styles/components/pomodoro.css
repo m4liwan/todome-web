@@ -1,30 +1,17 @@
-/* Focus timer (level 10): round marks in the focus card, lengths in the settings. */
 .pomo-rounds {
   display: flex;
-  gap: 6px;
-  margin: 8px 0 0;
-  padding: 0;
+  gap: var(--gap);
   list-style: none;
 }
 .pomo-rounds li {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: var(--line-strong);
-  transition:
-    background 0.3s ease,
-    transform 0.3s ease;
-}
-.pomo-rounds li.is-done {
-  background: var(--ink);
-  opacity: 0.55;
-}
-.pomo-rounds li.is-on {
-  background: linear-gradient(135deg, var(--accent-2), var(--accent-mesh));
-  transform: scale(1.25);
+  background: var(--line);
 }
 .timer-lengths {
   display: grid;
-  gap: 2px;
-  margin-top: 12px;
+  gap: var(--gap);
+}
+.pomo-rounds li.is-done, .pomo-rounds li.is-on {
+  background: var(--ink);
 }

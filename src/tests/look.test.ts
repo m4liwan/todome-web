@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { toggledAmbient, writeAmbient } from '../app/theme';
 
 /*
- * OLED redesign (1.18): always dark, ambient light instead of colour worlds,
- * and one corner setting for the whole app.
+ * Always dark on #050505. The ambient light strength and the corner setting
+ * stay in the settings and on <html>.
  */
 // jsdom gives import.meta.url an http scheme, so resolve from the project root.
 const styles = join(process.cwd(), 'src', 'styles');
@@ -36,16 +36,12 @@ describe('design tokens', () => {
       });
       return found;
     });
-    // A 4px wide strand is a pill on purpose; the corner previews in the
-    // settings show each step itself, whatever is set right now.
-    expect(offenders.filter((o) => !o.startsWith('.reward-path__strand') && !o.includes('.corner-opt__shape'))).toEqual([]);
+    expect(offenders).toEqual([]);
   });
 
-  it('lets the ambient light scale every light it paints', () => {
+  it('paints the page in one deep black', () => {
     const tokens = readFileSync(join(styles, 'base', 'tokens.css'), 'utf8');
-    for (const name of ['--bg-tint-a', '--bg-tint-b', '--tint-c', '--spot', '--halo']) {
-      expect(tokens, name).toMatch(new RegExp(`${name}:[^;]*var\\(--ambient\\)`));
-    }
+    expect(tokens).toMatch(/--bg:\s*#050505;/);
   });
 });
 

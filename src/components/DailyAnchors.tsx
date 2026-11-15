@@ -229,7 +229,6 @@ export function AnchorsDialog({ open, state, now, onClose, onImpulse }: DialogPr
           </button>
         ) : (
           <div className="anchor__main">
-            <span className="anchor__dot" aria-hidden="true" />
             <span className="anchor__text">
               <span className="anchor__title">{a.title}</span>
               <span className="anchor__rhythm">{rhythmLabel(a.days)}</span>

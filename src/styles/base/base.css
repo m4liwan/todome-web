@@ -1,5 +1,6 @@
 /* ========================================================================
-   Base: reset, elements, typography, utilities
+   Base: reset and the raw wireframe look of plain elements.
+   Text on black, buttons read as underlined words, fields as one line.
    ======================================================================== */
 
 *,
@@ -7,34 +8,45 @@
 *::after {
   box-sizing: border-box;
 }
-html.theme-fade body,
-html.theme-fade .card,
-html.theme-fade .pill,
-html.theme-fade .round-btn,
-html.theme-fade .dialog,
-html.theme-fade .segnav,
-html.theme-fade input,
-html.theme-fade select {
-  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--bg);
 }
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font: 400 15px/1.5 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  background: transparent;
+}
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- text ---------- */
 h1,
 h2,
-h3 {
+h3,
+p {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 650;
-  letter-spacing: -0.015em;
-  line-height: 1.12;
-  text-wrap: balance;
+}
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 h2 {
-  font-size: 1.22rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
 }
 h3 {
   font-size: 1rem;
+  font-weight: 700;
 }
-p {
-  margin: 0;
+small {
+  color: var(--ink-2);
 }
 ul,
 ol {
@@ -42,6 +54,15 @@ ol {
   padding: 0;
   list-style: none;
 }
+a {
+  color: inherit;
+}
+::selection {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* ---------- buttons: plain underlined words ---------- */
 button,
 input,
 select,
@@ -50,33 +71,80 @@ textarea {
   color: inherit;
 }
 button {
+  margin: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--ink-3);
+  text-underline-offset: 3px;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-::selection {
-  background: var(--lime);
-  color: var(--lime-ink);
+button:hover:not(:disabled) {
+  text-decoration-color: currentColor;
 }
-input:not([type='checkbox']):not([type='radio']),
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* The current choice (tabs, toggles, options, steps) is bold and fully underlined. */
+[aria-current='page'],
+[aria-current='step'],
+[aria-current='true'],
+[aria-pressed='true'],
+[aria-selected='true'],
+[aria-checked='true'],
+:is(button, label, li, a).is-on,
+:is(button, label, li, a).is-active,
+:is(button, label, li, a).is-current,
+:is(button, label, li, a).is-selected {
+  font-weight: 700;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+:is(li, label).is-done {
+  color: var(--ink-3);
+}
+
+/* ---------- fields: one line underneath ---------- */
+input:not([type='checkbox']):not([type='radio']):not([type='range']),
 select,
 textarea {
   width: 100%;
-  min-height: 46px;
-  padding: 10px 16px;
-  border: 1px solid var(--line-strong);
-  border-radius: calc(14px * var(--rs));
-  background: var(--surface-solid);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  min-height: 34px;
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+}
+select option {
+  background: var(--bg);
 }
 textarea {
   resize: vertical;
   line-height: 1.45;
 }
-input:focus-visible,
+input:not([type='checkbox']):not([type='radio']):not([type='range']):focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline: none;
-  border-color: var(--ink);
-  box-shadow: 0 0 0 4px rgb(var(--accent-rgb) / 0.45);
+  border-bottom-color: var(--ink);
+}
+input[type='checkbox'],
+input[type='radio'],
+input[type='range'] {
+  accent-color: var(--ink);
+}
+
+/* ---------- focus and motion ---------- */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -88,88 +156,28 @@ textarea:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-::view-transition-new(root) {
-  filter: saturate(1.08);
-}
-.shell {
-  position: relative;
-  min-height: 100vh;
-  overflow-x: clip;
-}
-:focus-visible {
-  outline: 2px solid var(--accent-2);
-  outline-offset: 2px;
-}
-input:not([type='checkbox']):not([type='radio']):not([type='range']):hover,
-textarea:hover,
-.select:hover:not(:disabled) {
-  border-color: var(--ink-3);
-}
-input:focus-visible,
-textarea:focus-visible,
-.select:focus-visible,
-.select.is-open {
-  outline: none;
-  border-color: var(--accent-2);
-  box-shadow: var(--ring);
-}
-@starting-style {
-  .select__list:popover-open {
-    opacity: 0;
-    transform: translateY(-4px) scale(0.98);
-  }
-  .select__list--up:popover-open {
-    transform: translateY(4px) scale(0.98);
-  }
-}
+
+/* ---------- scrollbars ---------- */
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track,
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
-::-webkit-scrollbar-track {
-  background: var(--scroll-rail);
-  border-radius: 99px;
-  margin-block: 6px;
-}
 ::-webkit-scrollbar-thumb {
-  border-radius: 99px;
   min-height: 40px;
-  background-color: var(--scroll-thumb);
   border: 3px solid transparent;
-  background-clip: padding-box;
-  transition: background-color 0.3s;
+  background: var(--line-strong) padding-box;
 }
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--scroll-thumb-hover);
-}
-@supports not selector(::-webkit-scrollbar) {
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--scroll-thumb) var(--scroll-rail);
-  }
+
+/* ---------- shell ---------- */
+.shell {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: clip;
 }
 .lbl-short {
   display: none;
-}
-html {
-  -webkit-text-size-adjust: 100%;
-  background: var(--bg);
-}
-body {
-  margin: 0;
-  min-height: 100vh;
-  color: var(--ink);
-  font: 450 15px/1.5 var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'tnum' 1;
-  background: transparent;
 }

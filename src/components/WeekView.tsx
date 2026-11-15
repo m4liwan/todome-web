@@ -11,7 +11,6 @@ interface Props {
   now: Millis;
 }
 
-const PEOPLE_COLORS = ['var(--accent-2)', 'var(--accent-mesh)', 'var(--accent-3)', 'var(--blue)', 'var(--lavender)', 'var(--pink)'];
 
 const weekday = (day: string, style: 'short' | 'long' = 'short') => new Date(`${day}T12:00:00`).toLocaleDateString('de-DE', { weekday: style });
 
@@ -49,7 +48,6 @@ export function WeekView({ state, projections, now }: Props) {
   return (
     <section className="weekview rise" aria-label="Deine Woche">
       <div className="weekview__hero">
-        <div className="weekview__glow" aria-hidden="true" />
         <p className="zone__label">Dein Rückblick · die letzten sieben Tage</p>
         <h1 className="weekview__title">{r.title}</h1>
         <p className="weekview__text">{r.text}</p>
@@ -177,23 +175,15 @@ export function WeekView({ state, projections, now }: Props) {
           {w.clients.length === 0 ? (
             <p className="muted">Noch keine Zeiten in dieser Woche.</p>
           ) : (
-            <>
-              <div className="people__bar" aria-hidden="true">
-                {w.clients.map((c, i) => (
-                  <span key={c.clientId ?? 'internal'} style={{ flexGrow: c.netMs, '--pc': PEOPLE_COLORS[i % PEOPLE_COLORS.length] } as React.CSSProperties} />
-                ))}
-              </div>
               <ul className="people__list">
-                {w.clients.map((c, i) => (
-                  <li key={c.clientId ?? 'internal'} style={{ '--pc': PEOPLE_COLORS[i % PEOPLE_COLORS.length] } as React.CSSProperties}>
-                    <span className="people__dot" aria-hidden="true" />
+                {w.clients.map((c) => (
+                  <li key={c.clientId ?? 'internal'}>
                     <span className="people__name">{c.clientName}</span>
                     <span className="people__share muted">{clientTotal > 0 ? `${Math.round((c.netMs / clientTotal) * 100)} %` : ''}</span>
                     <span className="num">{formatDuration(c.netMs)}</span>
                   </li>
                 ))}
               </ul>
-            </>
           )}
         </article>
       </div>

@@ -203,9 +203,6 @@ export function StandbySection() {
             className={`layout-opt${a.standby === l.id ? ' is-on' : ''}`}
             onClick={() => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...a, standby: l.id } } })}
           >
-            <span className={`standby-prev standby-prev--${l.id}`} aria-hidden="true">
-              <i />
-            </span>
             <strong>{l.label}</strong>
             <span>{l.text}</span>
           </button>
@@ -309,11 +306,6 @@ export function MoodSection() {
               className={`layout-opt focus-style-opt${a.focusStyle === f.id ? ' is-on' : ''}${locked ? ' is-locked' : ''}`}
               onClick={() => (locked ? services.announce(FOCUS_TIMER_LOCKED) : setA({ focusStyle: f.id }))}
             >
-              <span className={`focus-style-opt__preview focus-style-opt__preview--${f.id}`} aria-hidden="true">
-                <i />
-                <i />
-                <i />
-              </span>
               <strong>{f.label}</strong>
               {locked && <TimerLock />}
               <span>

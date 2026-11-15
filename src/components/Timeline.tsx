@@ -131,7 +131,6 @@ export function Timeline({ state, projections, now }: Props) {
           </div>
 
           <div className={`track${live ? ' is-live' : ''}`}>
-            <div className="track__past" style={{ width: pct(now) }} />
             <div className="track__lunch" style={{ left: pct(lunchS), width: width(lunchS, lunchE) }} title="Mittag, geschützt" />
             <div className="track__ticks" aria-hidden="true">
               {ticks.map((t) => (
@@ -153,7 +152,6 @@ export function Timeline({ state, projections, now }: Props) {
               ),
             )}
             <div className="now" style={{ left: pct(now) }}>
-              <span className="now__dot" />
               <span className="now__label">{formatTime(now)}</span>
             </div>
           </div>

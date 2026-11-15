@@ -57,7 +57,6 @@ export function ActiveSession({ state, projections, foreground, now, onOpen, onS
               const client = task?.clientId ? state.clients[task.clientId] : undefined;
               return (
                 <li key={p.sessionId}>
-                  <span className="stack__dot" aria-hidden="true" />
                   <div className="stack__text">
                     <strong>{task?.title}</strong>
                     <span className="muted small">
@@ -83,16 +82,6 @@ export function ActiveSession({ state, projections, foreground, now, onOpen, onS
   );
 }
 
-function Mesh() {
-  return (
-    <div className="mesh" aria-hidden="true">
-      <span className="mesh__blob mesh__blob--a" />
-      <span className="mesh__blob mesh__blob--b" />
-      <span className="mesh__blob mesh__blob--c" />
-      <span className="mesh__grain" />
-    </div>
-  );
-}
 
 /**
  * Radical micro-commitment: when nothing runs, the home screen shows only
@@ -125,7 +114,6 @@ function OneThing({ state, now, onOpen, onShowPlan, returnTo }: { state: AppStat
   const activity = profile?.mode === 'low' ? 'tea' : 'writing';
   return (
     <article className="focus focus--one" data-state="idle">
-      <Mesh />
       <div className="focus__inner">
         <div className="one">
           <div className="one__text">
@@ -144,7 +132,6 @@ function OneThing({ state, now, onOpen, onShowPlan, returnTo }: { state: AppStat
             </p>
             {one && (
               <p className="one__meta">
-                <span className={`type-dot type--${one.type}`} aria-hidden="true" />
                 {typeLabel(one)}
                 {client ? `, für ${client.name}` : ''}
                 {one.priority === 'high' && <span className="chip chip--glass chip--xs">{PRIORITY_LABELS.high}</span>}
@@ -224,12 +211,10 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
 
   return (
     <article className="focus" data-state={stateName}>
-      <Mesh />
       <div className="focus__inner">
         <div className="focus__top">
           <div className="chips">
             <span className="chip chip--glass">
-              <span className={`type-dot type--${task.type}`} aria-hidden="true" />
               {typeLabel(task)}
             </span>
             {client && <span className="chip chip--glass">{client.name}</span>}
@@ -237,7 +222,6 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
             {task.billable && client && <span className="chip chip--glass">abrechenbar</span>}
           </div>
           <span className={`status-pill status-pill--${stateName}`}>
-            <span className="status-pill__dot" />
             {timer?.kind === 'break' ? PAUSE_REASON_LABELS.pomodoro : paused ? labels.breakShort : over ? 'Länger als geplant' : 'Im Fluss'}
           </span>
         </div>
@@ -322,9 +306,6 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
                       checked={item.doneAt !== null}
                       onChange={() => services.run(toggleChecklistItem(state, services.deps(), task.id, item.id))}
                     />
-                    <span className="step__box" aria-hidden="true">
-                      <IconCheck size={12} />
-                    </span>
                     <span className="step__label">{item.label}</span>
                   </label>
                 </li>
@@ -398,11 +379,6 @@ function MicroBites({ task, state }: { task: Task; state: AppState }) {
       <p className="steps__title">
         Häppchen {Math.min(index + 1, items.length)} von {items.length}
       </p>
-      <ol className="bites__track" aria-hidden="true">
-        {items.map((i) => (
-          <li key={i.id} className={i.doneAt !== null ? 'is-done' : i === current ? 'is-on' : undefined} />
-        ))}
-      </ol>
       {current ? (
         <>
           <p className="bites__now">{current.label}</p>

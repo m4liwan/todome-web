@@ -354,3 +354,9 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
     row-gap: 2px;
   }
 }
+.splash__grid {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}

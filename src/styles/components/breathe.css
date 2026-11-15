@@ -1,42 +1,19 @@
-/* ========================================================================
-   Durchatmen (calm breath)
-   ======================================================================== */
-
 .calm-breath {
   position: fixed;
   inset: 0;
   z-index: 260;
   display: grid;
   place-items: center;
-  padding: 24px;
-  background: radial-gradient(60vmax 60vmax at 50% 45%, rgb(var(--accent-rgb) / calc(0.16 * var(--ambient))), transparent 60%),
-    #050505;
   color: var(--ink);
   -webkit-app-region: no-drag;
-  animation: breathe-in 1.2s ease both;
-}
-.calm-breath__aura {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(62vmin, 520px);
-  height: min(62vmin, 520px);
-  margin: calc(min(62vmin, 520px) / -2) 0 0 calc(min(62vmin, 520px) / -2);
-  /* The pacer: a fine ring of light that widens and narrows with the breath.
-     It stays visible at 0 % ambient light, because it carries the rhythm. */
-  border-radius: 50%;
-  border: 1px solid rgb(var(--accent-rgb) / 0.32);
-  background: radial-gradient(circle, transparent 54%, rgb(var(--accent-rgb) / calc(0.06 + 0.12 * var(--ambient))) 70%, transparent 71%),
-    radial-gradient(circle, rgb(var(--accent-rgb) / calc(0.04 + 0.12 * var(--ambient))), transparent 62%);
-  box-shadow: 0 0 60px -10px rgb(var(--accent-rgb) / calc(0.1 + 0.25 * var(--ambient))),
-    inset 0 0 50px -20px rgb(var(--accent-rgb) / 0.35);
-  animation: breath var(--cycle, 10s) ease-in-out infinite;
+  background: var(--bg);
+  padding: 24px;
 }
 .calm-breath__center {
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 18px;
+  gap: var(--gap);
   text-align: center;
 }
 .calm-breath__buddy {
@@ -46,47 +23,27 @@
   position: relative;
   height: 1.6em;
   min-width: 10ch;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 300;
-  letter-spacing: 0.02em;
 }
 .calm-breath__cue span {
   position: absolute;
   inset: 0;
   opacity: 0;
 }
-.calm-breath__in {
-  animation: cue-in var(--cycle, 10s) ease-in-out infinite;
-}
-.calm-breath__out {
-  animation: cue-out var(--cycle, 10s) ease-in-out infinite;
-}
 .calm-breath__line {
   max-width: 34ch;
-  margin: 0;
   color: var(--ink-2);
 }
 .calm-breath__ask {
   display: grid;
   justify-items: center;
-  gap: 14px;
-  animation: fade-up 1.2s var(--ease-out) both;
-}
-.calm-breath__question {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  gap: var(--gap);
 }
 .calm-breath__actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: var(--gap);
 }
 .calm-breath__leave {
   position: absolute;
@@ -95,19 +52,9 @@
   transform: translateX(-50%);
   color: var(--ink-3);
 }
-@media (prefers-reduced-motion: reduce) {
-  .calm-breath__aura,
-  .calm-breath__buddy {
-    animation-duration: 20s;
-  }
+.calm-breath__in {
+  animation: cue-in var(--cycle, 10s) ease-in-out infinite;
 }
-/* The same HUD frame as the welcome and rest screens. */
-.calm-breath::after {
-  content: '';
-  position: absolute;
-  inset: calc(env(titlebar-area-height, 36px) + 6px) clamp(10px, 2vw, 22px) clamp(10px, 2vh, 22px);
-  pointer-events: none;
-  background: var(--hud-frame);
-  background-repeat: no-repeat;
-  opacity: 0.8;
+.calm-breath__out {
+  animation: cue-out var(--cycle, 10s) ease-in-out infinite;
 }

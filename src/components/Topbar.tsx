@@ -15,7 +15,6 @@ import { contextLabels } from '../domain/userContext';
 export type View = 'today' | 'times' | 'companion' | 'closing';
 
 /** Position of each tab in the segmented nav (the sliding pill follows it). */
-const TAB_INDEX: Partial<Record<View, number>> = { today: 0, times: 1, companion: 2 };
 
 interface Props {
   state: AppState;
@@ -53,8 +52,7 @@ export function Topbar({ state, view, onView, onOpen, onResume }: Props) {
           )}
         </div>
 
-        <nav className="segnav" aria-label="Ansicht" data-active={TAB_INDEX[view] ?? -1}>
-          <span className="segnav__pill" aria-hidden="true" />
+        <nav className="segnav" aria-label="Ansicht">
           <button type="button" className={view === 'today' ? 'is-active' : ''} aria-current={view === 'today' ? 'page' : undefined} onClick={() => onView('today')}>
             Heute
           </button>

@@ -87,7 +87,6 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
     const first = state.taskOrder.map((id) => state.tasks[id]).find((t) => t && t.plannedDay > today && t.status === 'planned');
     return (
       <section className="closing closing--done" aria-label={labels.dayEnd}>
-        <div className="closing__sky" aria-hidden="true" />
         <div className="closing__done">
           <AvatarScene avatar={avatar} activity="sleeping" size={150} />
           <h1>{labels.dayEndDone}</h1>
@@ -105,7 +104,6 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
 
   return (
     <section className="closing" aria-label={labels.dayEnd}>
-      <div className="closing__sky" aria-hidden="true" />
       <div className="closing__inner">
         <header className="closing__head">
           <div>
@@ -165,7 +163,6 @@ export function ClosingView({ state, projections, foreground, now, onOpen, onBac
             <div className="closing__pick" role="radiogroup" aria-label="Erster Schritt für morgen">
               {openTasks.slice(0, 6).map((t) => (
                 <button key={t.id} type="button" role="radio" aria-checked={chosen === t.id} className={`closing__option${chosen === t.id ? ' is-on' : ''}`} onClick={() => setNext(t.id)}>
-                  <span className={`type-dot type--${t.type}`} aria-hidden="true" />
                   {t.title}
                 </button>
               ))}

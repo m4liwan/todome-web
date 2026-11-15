@@ -55,7 +55,6 @@ export function Breathe({ avatar, sound, onClose }: Props) {
   return (
     <div ref={trap} data-focus-trap="" className="calm-breath" role="dialog" aria-modal="true" aria-label="Durchatmen" style={{ '--cycle': `${CYCLE_S}s` } as React.CSSProperties}>
       <WindowDrag />
-      <div className="calm-breath__aura" aria-hidden="true" />
       <div className="calm-breath__center">
         <div className="calm-breath__buddy" aria-hidden="true">
           <AvatarScene avatar={avatar} activity="sleeping" size={170} />

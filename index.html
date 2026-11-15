@@ -9,8 +9,7 @@
     <title>ToDoMe.</title>
     <!-- First frame already in the right colours (no white flash before the CSS loads). -->
     <style>
-      /* Only <html> paints the page colour, so the background layers
-         (ambient light, grid, atmosphere) stay visible above it. */
+      /* Only <html> paints the page colour; overlay windows stay transparent. */
       html { background: #050505; color-scheme: dark; }
       body { margin: 0; background: transparent; }
       html.is-overlay, html.is-overlay body, html.is-companion, html.is-companion body { background: transparent !important; }

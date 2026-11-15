@@ -1,7 +1,3 @@
-/* ========================================================================
-   Toasts and the storage notice
-   ======================================================================== */
-
 .toasts {
   position: fixed;
   left: 50%;
@@ -9,60 +5,33 @@
   transform: translateX(-50%);
   z-index: 60;
   display: grid;
-  gap: 8px;
+  gap: var(--gap);
   width: min(480px, calc(100vw - 32px));
 }
 .toast {
-  padding: 13px 18px;
-  border-radius: 999px;
-  /* A notice, not an alarm: dark glass with a hairline, never a bright slab. */
-  border: 1px solid var(--line-strong);
-  background: var(--surface-strong);
-  backdrop-filter: blur(18px);
   color: var(--ink);
-  font-weight: 600;
-  font-size: 0.9rem;
   text-align: center;
-  box-shadow: var(--shadow-lg);
   cursor: pointer;
-  animation: pop-in 0.4s var(--ease-spring) both;
+  background: var(--bg);
+  padding: 10px 14px;
 }
 .storage-note {
   display: grid;
-  gap: 10px;
+  gap: var(--gap);
   max-width: 52ch;
-  line-height: 1.55;
-}
-.storage-note p {
-  margin: 0;
 }
 .storage-note__status {
-  padding: 10px 14px;
-  border-radius: calc(14px * var(--rs));
-  background: rgb(var(--accent-2-rgb) / 0.14);
   color: var(--ink);
 }
 .toast--action {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  padding: 8px 8px 8px 18px;
+  gap: var(--gap);
   text-align: left;
 }
 .toast__action {
   flex: none;
-  min-height: 32px;
-  padding: 6px 14px;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  background: transparent;
   color: inherit;
-  font: inherit;
-  font-weight: 700;
   cursor: pointer;
-}
-.toast__action:hover,
-.toast__action:focus-visible {
-  background: rgb(127 127 127 / 0.18);
 }

@@ -4,7 +4,6 @@ import { PRIORITY_LABELS } from '../domain/companion';
 import { energyProfile, theOneThing } from '../domain/energy';
 import { estimationFactor } from '../domain/reports';
 import type { SessionProjection } from '../domain/session';
-import { typeLabel } from '../domain/taskTypes';
 import type { AppState, Millis, Task } from '../domain/types';
 import { addDays, atTimeOfDay, dayKey, formatDuration, formatTime, MIN } from '../lib/time';
 import { deferTask, updateTask } from '../state/commands';
@@ -75,7 +74,6 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
             <ul className="later__list">
               {after.slice(0, 2).map((t) => (
                 <li key={t.id}>
-                  <span className={`type-dot type--${t.type}`} aria-hidden="true" />
                   <span className="later__title">{t.title}</span>
                   <span className="later__note">wartet geduldig</span>
                 </li>
@@ -156,7 +154,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
                   )}
                   {running ? (
                     <span className="live-badge">
-                      <span /> läuft
+                      läuft
                     </span>
                   ) : (
                     <button
@@ -220,7 +218,6 @@ function TaskLine({ task, state, minutes, adjusted }: { task: Task; state: AppSt
   const client = task.clientId ? state.clients[task.clientId] : undefined;
   return (
     <div className="task__main">
-      <span className={`type-dot type--${task.type}`} title={typeLabel(task)} aria-hidden="true" />
       <div className="task__text">
         <p className="task__title">
           {task.title}

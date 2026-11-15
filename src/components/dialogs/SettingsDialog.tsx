@@ -83,7 +83,6 @@ const LAYOUTS: Array<{ id: LayoutId; label: string; text: string }> = [
 ];
 
 /** Position of the sliding tab highlight (moves with transform only, no layout work). */
-const tabPill = (i: number) => ({ '--i': i, '--c4': i % 4, '--r4': Math.floor(i / 4) }) as React.CSSProperties;
 
 const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minuten-Takt', fifteen: '15-Minuten-Takt' };
 
@@ -137,8 +136,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
   return (
     <Dialog open={open} title="Einstellungen" wide onClose={onClose} className="dialog--settings">
       <div className="settings">
-        <div className="settings__tabs" role="tablist" aria-label="Bereiche" style={tabPill(TABS.findIndex((t) => t.id === tab))}>
-          <span className="settings__tabs-pill" aria-hidden="true" />
+        <div className="settings__tabs" role="tablist" aria-label="Bereiche">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -388,7 +386,6 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
                 data-corners-preview={c.id}
                 onClick={() => set({ appearance: { ...s.appearance, corners: c.id } })}
               >
-                <span className="corner-opt__shape" aria-hidden="true" />
                 <strong>{c.label}</strong>
                 <span className="muted small">{c.text}</span>
               </button>
@@ -406,13 +403,6 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
                 className={`layout-opt${s.appearance.layout === l.id ? ' is-on' : ''}${isProLayout(l.id) ? ' is-pro' : ''}`}
                 onClick={() => (isProLayout(l.id) ? openPro('flow') : set({ appearance: { ...s.appearance, layout: l.id } }))}
               >
-                <span className={`layout-opt__preview layout-opt__preview--${l.id}`} aria-hidden="true">
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                </span>
                 <strong>{l.label}</strong>
                 {l.id === 'hub' && <span className="layout-opt__badge">Standard</span>}
                 <span>{l.text}</span>

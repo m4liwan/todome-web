@@ -77,23 +77,15 @@ export function Greeting({ state, projections, now, onOpen, onLogin, onStandby, 
         </p>
         <div className="hello__chips">
           <button type="button" className={`energy-chip${energy !== null ? ` energy-chip--${profile?.mode}` : ''}`} onClick={() => onOpen({ kind: 'energy' })}>
-          <span className="energy-chip__meter" aria-hidden="true">
-            {Array.from({ length: 5 }, (_, i) => (
-              <span key={i} className={energy !== null && energy >= (i + 1) * 2 - 1 ? 'is-on' : undefined} />
-            ))}
-          </span>
           {energy !== null ? `Energie ${energy}, ${ENERGY_WORDS[energy]}. ${profile?.label}` : 'Wie ist deine Energie heute?'}
         </button>
           <button type="button" className="energy-chip" onClick={onLogin} title="Kurz bewusst ankommen">
-            <span className="hello__dot hello__dot--login" aria-hidden="true" />
             Mentaler Login
           </button>
           <button type="button" className="energy-chip" onClick={onStandby} title="Bildschirm zur Ruhe bringen">
-            <span className="hello__dot hello__dot--rest" aria-hidden="true" />
             Ruhemodus
           </button>
           <button type="button" className="energy-chip energy-chip--breathe" onClick={onBreathe} title="Alles ausblenden und kurz durchatmen">
-            <span className="hello__dot hello__dot--breathe" aria-hidden="true" />
             Durchatmen
           </button>
         </div>

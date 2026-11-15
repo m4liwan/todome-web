@@ -1,7 +1,3 @@
-/* ========================================================================
-   Topbar: logo, navigation, tool pills
-   ======================================================================== */
-
 @media (max-width: 860px) {
   .topbar {
     grid-template-columns: 1fr auto;
@@ -16,57 +12,12 @@
   position: sticky;
   top: env(safe-area-inset-top, 0px);
   z-index: 30;
-  padding-left: max(28px, env(safe-area-inset-left, 0px));
-  padding-right: max(28px, env(safe-area-inset-right, 0px));
-  /* One hairline under the header, as on the website (a shadow: no extra height). */
-  box-shadow: inset 0 -1px 0 var(--hairline);
-}
-/* Level 50 (shell.is-legendary): a fine holo hairline under the header, breathing slowly. */
-.shell.is-legendary .topbar-wrap::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  pointer-events: none;
-  background: linear-gradient(90deg, #ff8ad8, #ffe27a, #8cf5c4, #7cc8ff, #c49bff, #ff8ad8);
-  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-  opacity: 0.7;
-  animation: fx-wash 9s ease-in-out infinite;
-}
-.shell.is-fx-calm .topbar-wrap::after {
-  animation: none;
-}
-.shell.is-focusing .topbar-wrap::after {
-  animation-play-state: paused;
-}
-.topbar-wrap::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 -22px;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--bg) 78%, transparent) 0%,
-    color-mix(in srgb, var(--bg) 55%, transparent) 60%,
-    color-mix(in srgb, var(--bg) 0%, transparent) 100%
-  );
-  backdrop-filter: blur(18px) saturate(130%);
-  -webkit-backdrop-filter: blur(18px) saturate(130%);
-  mask-image: linear-gradient(to bottom, #000 62%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
-}
-@media (max-width: 760px) {
-  .topbar-wrap {
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-  }
+  background: var(--bg);
+  padding: 12px 28px;
 }
 @media (max-width: 600px) {
   .topbar__actions {
-    gap: 6px;
+    gap: var(--gap);
   }
   .topbar__actions .round-btn {
     width: 38px;
@@ -74,81 +25,30 @@
   }
   .topbar__actions .pill {
     min-height: 38px;
-    padding: 8px 12px;
-    font-size: 0.82rem;
   }
   .topbar__brand .tag {
     display: none;
   }
 }
-/* The header is the window's title bar: everything you can use in it stays a
-   control, only the empty glass between moves the window. */
 html.is-desktop .topbar-wrap :is(button, a, input, select, textarea, label, summary, nav, .tag, [role='button'], [role='link'], [role='tab'], [role='radio'], [role='checkbox'], [role='switch'], [role='slider'], [role='menuitem'], [tabindex]:not([tabindex='-1'])) {
   -webkit-app-region: no-drag;
 }
 .segnav {
-  /* Equal tabs, as wide as the widest one (the companion tab carries a badge). */
   display: inline-grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 999px;
-  border: 1px solid var(--glass-edge);
-  backdrop-filter: blur(20px) saturate(130%);
-  background: radial-gradient(160px circle at var(--mx, -300px) var(--my, -300px), var(--spot), transparent 60%),
-    var(--surface);
-  box-shadow: var(--glass-inset), var(--shadow-sm);
+  gap: var(--gap);
   position: relative;
-  isolation: isolate;
-}
-.segnav button.is-active {
-  background: var(--primary);
-  color: var(--on-primary);
-}
-.segnav__pill {
-  position: absolute;
-  z-index: 0;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc((100% - 16px) / 3);
-  border-radius: 999px;
-  background: var(--primary);
-  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.45);
-  transform: translateX(calc(var(--seg-x, 0) * (100% + 4px)));
-  transition: transform 0.45s var(--ease-out),
-    opacity 0.3s ease,
-    background-color 0.6s ease;
-}
-.segnav[data-active='0'] {
-  --seg-x: 0;
-}
-.segnav[data-active='1'] {
-  --seg-x: 1;
-}
-.segnav[data-active='2'] {
-  --seg-x: 2;
-}
-.segnav[data-active='-1'] .segnav__pill {
-  opacity: 0;
 }
 .segnav button {
   min-height: 38px;
-  padding: 6px 20px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  font-weight: 650;
-  font-size: 0.9rem;
   color: var(--ink-2);
   cursor: pointer;
-  transition: background-color 0.25s, color 0.25s;
   min-width: 110px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--gap);
 }
 html.is-desktop.has-modal .topbar-wrap,
 html.is-desktop.has-modal .topbar-wrap * {
@@ -165,7 +65,6 @@ html.is-desktop.has-modal .topbar-wrap * {
   }
 }
 .topbar__brand .media {
-  margin-left: 6px;
   max-width: 300px;
 }
 @media (max-width: 1360px) {
@@ -196,19 +95,18 @@ html.is-desktop.has-modal .topbar-wrap * {
 }
 .topbar {
   position: relative;
-  gap: 16px;
-  padding: 18px 0 16px;
+  gap: var(--gap);
   max-width: 1424px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  column-gap: 16px;
+  column-gap: var(--gap);
 }
 .topbar__brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--gap);
   justify-self: start;
   min-width: 0;
 }
@@ -221,14 +119,11 @@ html.is-desktop.has-modal .topbar-wrap * {
   justify-self: end;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--gap);
   min-width: 0;
 }
 html.is-desktop .topbar-wrap {
   -webkit-app-region: drag;
-  padding-top: 6px;
-  padding-left: max(28px, env(safe-area-inset-left, 0px));
-  padding-right: max(28px, env(safe-area-inset-right, 0px));
 }
 html.is-desktop .topbar__actions {
   --wco: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 16px);
@@ -237,15 +132,8 @@ html.is-desktop .topbar__actions {
 .tool-pill {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--gap);
   height: 48px;
-  padding: 4px;
-  border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--glass-edge);
-  box-shadow: var(--glass-inset), var(--shadow-sm);
-  backdrop-filter: blur(20px) saturate(1.6);
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
 }
 .tool-pill__btn {
   display: grid;
@@ -253,40 +141,20 @@ html.is-desktop .topbar__actions {
   width: 38px;
   height: 38px;
   flex: none;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
   color: var(--ink-2);
   cursor: pointer;
-  transform: translateZ(0);
-  will-change: transform;
-  transition: background-color 0.3s ease,
-    color 0.3s ease,
-    transform 0.3s var(--ease-out);
 }
 .tool-pill__btn:hover {
-  background: var(--surface-sunk);
   color: var(--ink);
-  transform: translateZ(0) scale(1.06);
 }
 .tool-pill__btn.is-on {
-  background: rgb(var(--accent-rgb) / 0.22);
   color: var(--ink);
 }
-.tool-pill__btn:focus-visible {
-  outline: 2px solid var(--accent-2);
-  outline-offset: -3px;
-}
 .topbar__main {
-  gap: 8px;
+  gap: var(--gap);
   white-space: nowrap;
-  will-change: transform;
 }
-/* On the Feierabend view itself the button steps back into an outline. */
 .topbar__main.is-current {
-  border-color: var(--line-strong);
-  background: transparent;
   color: var(--ink);
 }
 @media (max-width: 1180px) {
@@ -299,11 +167,10 @@ html.is-desktop .topbar__actions {
 }
 @media (max-width: 860px) {
   .topbar {
-    column-gap: 8px;
+    column-gap: var(--gap);
   }
   .tool-pill {
     height: 42px;
-    padding: 2px;
   }
   .tool-pill__btn {
     width: 36px;
@@ -311,14 +178,12 @@ html.is-desktop .topbar__actions {
   }
   .topbar__main.glass-cta {
     min-height: 42px;
-    padding: 8px 18px;
-    font-size: 0.86rem;
   }
 }
 @media (max-width: 980px) {
   .topbar {
     grid-template-columns: auto minmax(0, 1fr);
-    row-gap: 10px;
+    row-gap: var(--gap);
   }
   .topbar__brand {
     grid-column: 1;
@@ -335,7 +200,6 @@ html.is-desktop .topbar__actions {
 }
 .shell.fs-cocoon .topbar-wrap {
   opacity: 0.35;
-  transition: opacity 0.6s ease;
 }
 .shell.fs-cocoon .topbar-wrap:hover,
 .shell.fs-cocoon .topbar-wrap:focus-within {
@@ -346,53 +210,25 @@ html.is-desktop .topbar__actions {
 .shell.is-covered .ws-fab {
   visibility: hidden;
 }
-.shell.is-landing .topbar-wrap,
-.shell.is-landing .app,
-.shell.is-landing .ws-fab {
-  animation: landing-in 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .shell.is-landing .topbar-wrap,
-  .shell.is-landing .app,
-  .shell.is-landing .ws-fab {
-    animation-duration: 0.4s;
-  }
-}
 @media (max-width: 520px) {
-  /* Three tabs on a phone: each as wide as its label (equal widths would not
-     fit "Begleiter Lv. 12"), so the active tab carries its own fill instead
-     of the sliding pill. */
   .topbar .segnav {
     grid-auto-columns: auto;
   }
-  .topbar .segnav__pill {
-    display: none;
-  }
   .topbar .segnav button {
     min-width: 0;
-    padding: 6px 12px;
-    gap: 6px;
-    font-size: 0.86rem;
-  }
-  .topbar .segnav button.is-active {
-    background: var(--primary);
-    color: var(--on-primary);
+    gap: var(--gap);
   }
 }
 @media (max-width: 420px) {
-  /* Narrow phones: logo, tools and the day-end button get compact, so the
-     first row fits side by side (at 360 px the logo was covered by ~30 px). */
   .topbar__brand .logo {
-    /* Overrides the Logo's inline size (1200:225 wordmark). */
     height: 18px !important;
     width: 96px !important;
   }
   .topbar__actions {
-    gap: 6px;
+    gap: var(--gap);
   }
   .topbar .tool-pill {
     height: 38px;
-    padding: 2px;
   }
   .topbar .tool-pill__btn {
     width: 32px;
@@ -400,12 +236,9 @@ html.is-desktop .topbar__actions {
   }
   .topbar .topbar__main.glass-cta {
     min-height: 38px;
-    padding: 6px 12px;
-    font-size: 0.8rem;
   }
 }
 @media (max-width: 350px) {
-  /* Very narrow: the tools take their own row instead of covering the logo. */
   .topbar {
     grid-template-columns: minmax(0, 1fr);
   }

@@ -422,11 +422,6 @@ export function RoutineTimer({ routine, onClose }: { routine: Routine; onClose: 
   return (
     <div className="pause-room" role="dialog" aria-modal="true" aria-label={routine.label}>
       <WindowDrag />
-      <div className="standby__aura" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
       <div className="pause-room__center">
         <svg className={`pause-room__ring${breathe && !prefersReducedMotion() ? ' is-breathing' : ''}`} viewBox="0 0 220 220" width="220" height="220" aria-hidden="true">
           <circle cx="110" cy="110" r={r} className="pause-room__track" />
@@ -467,13 +462,10 @@ export function CompanionHome({ state, now, fgTaskId, onCustomize }: { state: Ap
       <a className="home-hub__feedback" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer" aria-label="Feedback zu ToDoMe. geben" title="Feedback geben">
         <IconChat size={16} />
       </a>
-      <div className="home-hub__space" aria-hidden="true" />
       <div className="home-hub__house">
-        <div className="home-hub__glow" aria-hidden="true" />
         <AvatarFx level={state.progression.stats.level} enabled={state.settings.appearance.companionFx}>
           <AvatarScene avatar={avatar} activity={activity} size={190} holo={holoFor(state.progression.stats.level, state.settings.appearance.companionFx)} />
         </AvatarFx>
-        <div className="home-hub__floor" aria-hidden="true" />
       </div>
       <div className="home-hub__info">
         <h2 className="home-hub__name">{avatarName(avatar)}</h2>

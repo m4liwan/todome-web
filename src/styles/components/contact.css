@@ -1,27 +1,15 @@
-/* ========================================================================
-   Feedback & Kontakt (settings → Allgemein)
-   ======================================================================== */
-
 .contact__form {
   display: grid;
-  gap: 14px;
-}
-.contact__form p {
-  margin: 0;
+  gap: var(--gap);
 }
 .contact__form textarea {
-  min-height: 140px;
   resize: vertical;
 }
 .contact__error {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: calc(14px * var(--rs));
-  background: rgb(var(--accent-2-rgb) / 0.14);
+  gap: var(--gap);
   color: var(--ink);
-  line-height: 1.45;
 }
 .contact__error-buddy {
   flex: 0 0 auto;
