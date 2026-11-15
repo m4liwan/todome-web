@@ -25,13 +25,138 @@
   }
 }
 
-/* The ambient veil drifts very slowly, like light behind frosted glass. */
-@keyframes veil-breathe {
+/* The ambient light: three sources wander across the whole background,
+   each on its own slow path (components/ambient-light.css). */
+@keyframes light-drift-a {
+  0% {
+    transform: translate3d(-30vw, -24vh, 0) scale(1);
+  }
+  35% {
+    transform: translate3d(-4vw, -32vh, 0) scale(1.08);
+  }
+  70% {
+    transform: translate3d(-22vw, 8vh, 0) scale(0.94);
+  }
+  100% {
+    transform: translate3d(-36vw, -6vh, 0) scale(1.04);
+  }
+}
+@keyframes light-drift-b {
+  0% {
+    transform: translate3d(28vw, -16vh, 0) scale(0.96);
+  }
+  40% {
+    transform: translate3d(10vw, 16vh, 0) scale(1.06);
+  }
+  75% {
+    transform: translate3d(34vw, 26vh, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(20vw, -28vh, 0) scale(1.1);
+  }
+}
+@keyframes light-drift-c {
+  0% {
+    transform: translate3d(4vw, 34vh, 0) scale(0.9);
+  }
+  50% {
+    transform: translate3d(-24vw, 20vh, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(18vw, 40vh, 0) scale(1);
+  }
+}
+/* Breathing focus: the halo breathes at six breaths a minute. */
+@keyframes light-breath {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+/* Focus timer: the horizon swells in a slow, even rhythm. */
+@keyframes light-rhythm {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scaleY(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.08);
+  }
+}
+/* A light that settles in (tunnel, micro step). */
+@keyframes light-settle {
   from {
-    transform: translate3d(-2%, 0, 0) scale(1);
+    opacity: 0;
+    transform: scale(1.25);
   }
   to {
-    transform: translate3d(2%, 3%, 0) scale(1.08);
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Entering a focus style: each one has its own threshold. */
+@keyframes stage-open {
+  from {
+    opacity: 0.6;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes stage-float {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes stage-enclose {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes stage-step {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* The style's name, for a moment. */
+@keyframes focus-cue {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  18%,
+  70% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -4px);
   }
 }
 

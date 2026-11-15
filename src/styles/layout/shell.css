@@ -1,5 +1,5 @@
 /* ========================================================================
-   Shell: the frame (content beside the dock), the ambient veil, view
+   Shell: the frame (content beside the dock), view
    entrance, focus dimming and the title bar strip of full-screen views.
    ======================================================================== */
 
@@ -17,6 +17,24 @@
   padding: var(--frame-t) var(--frame-r) var(--frame-b) var(--frame-l);
   transition: padding var(--t-slow) var(--ease);
 }
+/* The tunnel's and the cocoon's edge: the room darkens towards the window
+   frame, the stage keeps the light. Above the content, never in the way. */
+.app::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 75% at 50% 48%, rgb(5 5 5 / 0) 40%, rgb(5 5 5 / 0.85) 100%);
+  opacity: 0;
+  transition: opacity 1600ms var(--ease);
+}
+.shell.fs-tunnel .app::after {
+  opacity: 0.6;
+}
+.shell.fs-cocoon .app::after {
+  opacity: 1;
+}
 .dash {
   max-width: 1680px;
   margin: 0 auto;
@@ -33,24 +51,6 @@
   }
 }
 
-/* The ambient veil: a large, very soft light in the chosen colour behind the
-   upper half of the window. Strength follows --ambient; never glaring. */
-.veil {
-  position: fixed;
-  top: -30vh;
-  left: 10vw;
-  right: -10vw;
-  z-index: -1;
-  height: 80vh;
-  pointer-events: none;
-  background:
-    radial-gradient(40% 50% at 30% 45%, rgb(var(--accent-rgb) / 0.55), transparent 70%),
-    radial-gradient(35% 45% at 70% 35%, rgb(var(--accent-2-rgb) / 0.45), transparent 70%);
-  filter: blur(80px);
-  opacity: calc(var(--ambient) * 0.18);
-  animation: veil-breathe 24s var(--ease) infinite alternate;
-  transition: opacity var(--t-slow) var(--ease);
-}
 .card {
   position: relative;
 }

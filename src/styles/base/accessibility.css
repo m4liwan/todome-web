@@ -49,8 +49,12 @@
     transition-duration: 0.01ms !important;
   }
 }
-.shell.is-fx-calm .enter,
-.shell.is-fx-calm .veil,
-.shell.is-focusing .veil {
+.shell.is-fx-calm .enter {
   animation: none;
+}
+/* The wandering light holds where it is (no jump back to its start): in calm
+   motion, and during a block, where peripheral movement would pull at the eye. */
+.shell.is-fx-calm .light__source,
+.shell.is-focusing .light__source {
+  animation-play-state: paused;
 }

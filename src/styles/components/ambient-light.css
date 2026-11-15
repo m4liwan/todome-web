@@ -1,0 +1,150 @@
+/* ========================================================================
+   Ambient light (components/AmbientLight.tsx): three soft sources in the
+   chosen colour wander across the whole background; a fine grain inside the
+   light keeps its gradients smooth (no banding) and gives it a little tooth.
+   Strength follows --ambient (0 = pure darkness). Each focus style turns it
+   into its own light: the wandering pauses where it is and fades, and the
+   halo takes over with the style's profile.
+   ======================================================================== */
+
+.light {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: calc(var(--ambient) * 0.3);
+  transition: opacity var(--t-slow) var(--ease);
+}
+.light__source,
+.light__halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  /* A gaussian-like falloff in many small steps: no hard rim, no blur filter. */
+  background: radial-gradient(
+    closest-side,
+    rgb(var(--tone) / 0.55),
+    rgb(var(--tone) / 0.38) 20%,
+    rgb(var(--tone) / 0.2) 42%,
+    rgb(var(--tone) / 0.08) 63%,
+    rgb(var(--tone) / 0.02) 82%,
+    rgb(var(--tone) / 0)
+  );
+  will-change: transform;
+}
+.light__source {
+  transition: opacity 1600ms var(--ease);
+}
+.light__source--a {
+  --size: 72vmax;
+  --tone: var(--accent-rgb);
+  animation: light-drift-a 74s ease-in-out infinite alternate;
+}
+.light__source--b {
+  --size: 60vmax;
+  --tone: var(--accent-2-rgb);
+  animation: light-drift-b 92s ease-in-out infinite alternate;
+}
+.light__source--c {
+  --size: 44vmax;
+  --tone: var(--accent-rgb);
+  opacity: 0.7;
+  animation: light-drift-c 116s ease-in-out infinite alternate;
+}
+/* The grain only dithers the light: grey noise at a few percent, so the
+   black between the lights stays black. */
+.light__grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px;
+}
+
+/* The halo: the focus style's own light, off while nothing runs. */
+.light__halo {
+  --size: 56vmax;
+  --tone: var(--accent-rgb);
+  opacity: 0;
+  transition: opacity 1600ms var(--ease);
+}
+
+/* ---------- focus profiles ---------- */
+
+/* Atmender Fokus: open and warm. The wandering lights stay, softer; a wide
+   halo gathers behind the stage and breathes at six breaths a minute. */
+.shell.fs-breathe .light__source {
+  opacity: 0.5;
+}
+.shell.fs-breathe .light__halo {
+  top: 52%;
+  left: 40%;
+  --size: 78vmax;
+  animation: light-breath 10s ease-in-out infinite;
+}
+
+/* Schwebender Tunnel: still concentration. The room goes dark, one tall,
+   narrow light stands behind the floating stage. */
+.shell.fs-tunnel .light__source {
+  opacity: 0.12;
+}
+.shell.fs-tunnel .light__halo {
+  --size: 64vmax;
+  left: calc(50% + (var(--frame-l) - var(--frame-r)) / 2);
+  border-radius: 50% / 50%;
+  scale: 0.62 1.15;
+  animation: light-settle 1800ms var(--ease) both;
+}
+
+/* Deep-Work-Kokon: almost nothing. A trace of light, the rest is night. */
+.shell.fs-cocoon .light__source {
+  opacity: 0.05;
+}
+
+/* Mikro-Schritt: clear and light. One small, crisp spot in the second tone,
+   low over the step that matters. */
+.shell.fs-micro .light__source {
+  opacity: 0.22;
+}
+.shell.fs-micro .light__halo {
+  --size: 30vmax;
+  --tone: var(--accent-2-rgb);
+  top: 64%;
+  left: calc(50% + (var(--frame-l) - var(--frame-r)) / 2);
+  animation: light-settle 1200ms var(--ease) both;
+}
+
+/* Fokus-Timer: rhythm. A horizon of light along the bottom edge swells and
+   ebbs evenly, like a metronome you only feel. */
+.shell.fs-breathe.fs-pomodoro .light__source {
+  opacity: 0.32;
+}
+.shell.fs-breathe.fs-pomodoro .light__halo {
+  --size: 70vmax;
+  top: 100%;
+  left: 50%;
+  scale: 2.2 0.6;
+  animation: light-rhythm 8s ease-in-out infinite;
+}
+
+/* ---------- the threshold: the style's name, for a moment ---------- */
+.focus-cue {
+  position: fixed;
+  top: calc(var(--frame-t) + var(--s4));
+  left: calc(50% + (var(--frame-l) - var(--frame-r)) / 2);
+  z-index: 29;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  animation: focus-cue 2600ms var(--ease) 200ms both;
+}

@@ -190,34 +190,78 @@
   }
 }
 
-/* ---------- focus styles: the rest of the cockpit steps back ---------- */
+/* ---------- focus styles: each one arranges the cockpit its own way ----------
+   The light changes with them (components/ambient-light.css); the stage
+   crosses its own threshold as the style begins. */
 .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more),
 .cockpit .panel--greet {
   transition:
     opacity var(--t-slow) var(--ease),
     filter var(--t-slow) var(--ease);
 }
-/* Breathe, micro and the focus timer: dim and soften, back on contact. */
-.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more) {
+
+/* Atmender Fokus (open, soft): everything stays in place, gently out of
+   focus, and comes back on contact. The stage simply settles. */
+.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more) {
   opacity: 0.35;
   filter: blur(1.5px);
 }
-.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more):is(:hover, :focus-within) {
+.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more):is(:hover, :focus-within) {
   opacity: 0.92;
   filter: none;
 }
-/* Tunnel and cocoon: only the stage stays, centred. */
-.shell:is(.fs-tunnel, .fs-cocoon) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more) {
+.shell.fs-breathe .cockpit__stage {
+  animation: stage-open 900ms var(--ease) both;
+}
+
+/* Fokus-Timer (rhythm): the stage and what comes next; the rest waits. */
+.shell.fs-breathe.fs-pomodoro .cockpit :is(.cockpit__day, .cockpit__more) {
   display: none;
 }
-.shell:is(.fs-tunnel, .fs-cocoon) .cockpit__stage {
+.shell.fs-breathe.fs-pomodoro .cockpit__side {
+  opacity: 0.5;
+  filter: none;
+}
+
+/* Schwebender Tunnel (still concentration): everything else leaves, the
+   stage floats up into the middle of a darkened room. */
+.shell:is(.fs-tunnel, .fs-cocoon, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__more) {
+  display: none;
+}
+.shell:is(.fs-tunnel, .fs-cocoon) .cockpit__day {
+  display: none;
+}
+.shell:is(.fs-tunnel, .fs-cocoon, .fs-micro) .cockpit__stage {
   grid-column: 1 / -1;
   justify-self: center;
   width: min(100%, 880px);
 }
+.shell.fs-tunnel .cockpit__stage {
+  animation: stage-float 1100ms var(--ease) both;
+}
+
+/* Deep-Work-Kokon (nothing else): no greeting either; the stage closes in
+   around you from a little larger. */
 .shell.fs-cocoon .cockpit .panel--greet {
   display: none;
 }
-.shell.fs-cocoon .cockpit .panel--focus {
+.shell.fs-cocoon .cockpit__stage {
   margin-top: var(--s8);
+  animation: stage-enclose 1400ms var(--ease) both;
+}
+
+/* Mikro-Schritt (one bite at a time): a narrower stage that steps in from
+   the side, the day stays faintly below for orientation. */
+.shell.fs-micro .cockpit .panel--greet {
+  display: none;
+}
+.shell.fs-micro .cockpit__stage {
+  width: min(100%, 760px);
+  animation: stage-step 700ms var(--ease) both;
+}
+.shell.fs-micro .cockpit__day {
+  opacity: 0.4;
+}
+.shell.fs-micro .cockpit__day:is(:hover, :focus-within) {
+  opacity: 1;
 }

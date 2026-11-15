@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ActiveSession } from '../components/ActiveSession';
 import { Ambience, resolveAmbience } from '../components/Ambience';
+import { AmbientLight } from '../components/AmbientLight';
 import { ClosingView } from '../components/ClosingView';
 import { CompanionHub } from '../components/CompanionHub';
 import { useLegendaryShell } from '../components/AvatarFx';
@@ -25,6 +26,7 @@ import { Breathe } from '../components/Breathe';
 import { Timeline } from '../components/Timeline';
 import { Toasts } from '../components/Toasts';
 import { Cockpit } from '../components/Cockpit';
+import { focusStyleLabel } from '../components/FocusStyle';
 import { Dock } from '../components/Dock';
 import { Topbar, type View } from '../components/Topbar';
 import { WeatherCard } from '../components/WeatherCard';
@@ -379,7 +381,7 @@ export function App() {
 
   return (
     <div className={`shell shell--${view}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
-      <div className="veil" aria-hidden="true" />
+      <AmbientLight />
       <Ambience kind={state.settings.appearance.ambience} weather={state.weather} dark={theme === 'dark'} />
       {winter && state.settings.appearance.ambience !== 'snow' && <Ambience kind="snow" weather={null} dark={theme === 'dark'} />}
       {winter && <Garland />}
@@ -418,6 +420,12 @@ export function App() {
           <PromptCenter state={state} now={now} openPrompts={open} onOpen={setModal} />
           <InlineCompanion onOpen={setModal} />
         </>
+      )}
+      {/* The threshold: the chosen style says its name for a moment as the block begins. */}
+      {style && (
+        <p className="focus-cue" key={focusStyle} aria-hidden="true">
+          {focusStyleLabel(style)}
+        </p>
       )}
       <Toasts />
       <StorageNotice />

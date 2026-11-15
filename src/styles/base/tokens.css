@@ -72,7 +72,7 @@
   --ambient: 0.55;
 
   /* Accent of the chosen light colour. Read by JS (app/theme.ts) for WebGL and
-     canvas; in CSS only for running, progress, "now", focus ring and the veil. */
+     canvas; in CSS only for running, progress, "now", focus ring and the ambient light. */
   --accent-rgb: 163 230 53;
   --accent-mesh: #a3e635;
   --accent-2: #84cc16;
