@@ -48,7 +48,7 @@ describe('the living settings', () => {
 
   it('opens out of the dock, on whichever side it sits', () => {
     const css = readFileSync(join(process.cwd(), 'src', 'styles', 'components', 'dialogs.css'), 'utf8');
-    for (const side of ['right', 'top', 'bottom']) expect(css, side).toMatch(new RegExp(`\[data-dock='${side}'\][^{]*\.dialog--settings`));
+    for (const side of ['right', 'top', 'bottom']) expect(css, side).toMatch(new RegExp(String.raw`\[data-dock='${side}'\][^{]*\.dialog--settings`));
     expect(css).toMatch(/\.dialog--settings\[open\][^}]*animation: settings-in/);
   });
 });
