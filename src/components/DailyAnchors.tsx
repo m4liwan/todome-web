@@ -11,74 +11,140 @@ import {
   isAnchorDone,
   MAX_ANCHORS,
   rhythmLabel,
+  weekdayOf,
   WEEKDAYS,
 } from '../domain/anchors';
 import type { AppState, DailyAnchor, Millis } from '../domain/types';
 import { dayKey } from '../lib/time';
 import { Dialog } from './Dialog';
-import { IconAnchor, IconArrowUp, IconCheck, IconClose, IconPlus } from './icons';
+import { IconArrowUp, IconCheck, IconClose, IconPlus } from './icons';
 
 /* ------------------------------------------------------------------------
-   Trigger: the floating glass pill
+   The section on the home: a small week calendar and today's anchors
    ------------------------------------------------------------------------ */
 
-const NUDGE_KEY = (day: string) => `todome:anchors:nudge:${day}`;
+const DAY_NAMES = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'] as const;
 
-/** Once per day, for allround users: a soft pulse on the first look. Per-device convenience only. */
-function useDailyNudge(wanted: boolean, day: string): boolean {
-  const [nudge, setNudge] = useState(false);
-  useEffect(() => {
-    if (!wanted) return;
-    try {
-      if (window.localStorage.getItem(NUDGE_KEY(day))) return;
-      window.localStorage.setItem(NUDGE_KEY(day), '1');
-    } catch {
-      return;
-    }
-    setNudge(true);
-    const id = window.setTimeout(() => setNudge(false), 9000);
-    return () => window.clearTimeout(id);
-  }, [wanted, day]);
-  return nudge;
+/** One calm sentence about today; never a count against you. */
+function anchorsLead(total: number, due: number, done: number): string {
+  if (total === 0) return 'Kleine Dinge, die zu deinem Tag gehören. Täglich oder an bestimmten Tagen.';
+  if (due === 0) return 'Heute ist frei. Deine Anker warten ganz entspannt auf ihren Tag.';
+  if (done === due) return 'Heute ist alles verankert. Der Rest des Tages gehört dir.';
+  return 'Jeden Morgen frisch, ohne Rückstand.';
+}
+
+interface SectionProps {
+  state: AppState;
+  now: Millis;
+  /** The pop-up for adding, renaming and the rhythm. */
+  onManage: () => void;
+  onImpulse: (anchor: DailyAnchor) => void;
 }
 
 /**
- * Tages-Anker trigger: a quiet glass pill floating at the bottom left (it
- * never moves anything in the layouts). Shows today's state (2/3) and glows
- * softly in the accent colour while something for today is still open.
+ * Tages-Anker as a section of the home: this week as a small calendar (each
+ * day shows its anchors as dots, today's set ones lit), and the chosen day's
+ * anchors beside it. Today ticks with one click or starts the five-minute
+ * impulse; other days only show what belongs to them. Nothing about earlier
+ * days is kept, so nothing can be missed.
  */
-export function AnchorsPill({ state, now, onOpen }: { state: AppState; now: Millis; onOpen: () => void }) {
+export function AnchorsSection({ state, now, onManage, onImpulse }: SectionProps) {
+  const services = useServices();
   const day = dayKey(now);
+  const today = weekdayOf(now);
+  const [picked, setPicked] = useState(today);
   const { due, done } = anchorsToday(state.anchors, now, day);
-  const open = due.length - done;
-  // Neither study nor work chosen: the anchors carry a bit more of the day.
-  const allround = state.settings.userContext === 'allround';
-  const nudge = useDailyNudge(allround && (open > 0 || state.anchors.length === 0), day);
-  const label =
-    state.anchors.length === 0
-      ? 'Tages-Anker setzen'
-      : due.length === 0
-        ? 'Tages-Anker: heute frei'
-        : `Tages-Anker: ${done} von ${due.length} für heute gesetzt`;
+  const base = new Date(now);
+  const week = WEEKDAYS.map((name, i) => ({ i, name, date: new Date(base.getFullYear(), base.getMonth(), base.getDate() - today + i).getDate() }));
+  const dueOn = (weekday: number) => state.anchors.filter((a) => a.days.includes(weekday));
+  const list = dueOn(picked);
+  const isToday = picked === today;
+
+  const mark = (anchor: DailyAnchor, isDone: boolean) => {
+    services.store.dispatch({ type: 'anchor/mark', id: anchor.id, day, done: isDone });
+    if (isDone) services.announce(`„${anchor.title}“ ist für heute verankert.`);
+  };
+
   return (
-    <div className="anchors-fab">
-      <button
-        type="button"
-        className={`anchors-pill${open > 0 ? ' is-open' : ''}${allround ? ' is-allround' : ''}${nudge ? ' is-nudging' : ''}`}
-        onClick={onOpen}
-        aria-label={label}
-        title={label}
-      >
-        <IconAnchor size={15} />
-        <span>Tages-Anker</span>
-        {due.length > 0 ? (
-          <span className="anchors-pill__count">
-            {done}/{due.length}
-          </span>
+    <div className="anchors-sec">
+      <div className="anchors-sec__week">
+        <p className="anchors-sec__lead">{anchorsLead(state.anchors.length, due.length, done)}</p>
+        <div className="week-cal" role="group" aria-label="Diese Woche">
+          {week.map((d) => {
+            const items = dueOn(d.i);
+            return (
+              <button
+                key={d.name}
+                type="button"
+                className={`week-cal__day${d.i === today ? ' is-today' : ''}${d.i === picked ? ' is-picked' : ''}`}
+                aria-pressed={d.i === picked}
+                aria-label={`${DAY_NAMES[d.i]}, ${d.date}.: ${items.length === 1 ? 'ein Anker' : `${items.length} Anker`}`}
+                onClick={() => setPicked(d.i)}
+              >
+                <span className="week-cal__name">{d.name}</span>
+                <span className="week-cal__date">{d.date}</span>
+                <span className="week-cal__dots" aria-hidden="true">
+                  {items.slice(0, 5).map((a) => (
+                    <i key={a.id} className={d.i === today && isAnchorDone(a, day) ? 'is-done' : undefined} />
+                  ))}
+                  {items.length > 5 && <em>+{items.length - 5}</em>}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="anchors-sec__day">
+        <p className="label">{isToday ? (due.length ? `Heute · ${done} von ${due.length}` : 'Heute') : DAY_NAMES[picked]}</p>
+        {list.length > 0 ? (
+          <ul className="anchors__list">
+            {list.map((a) => {
+              const isDone = isToday && isAnchorDone(a, day);
+              return isToday ? (
+                <li key={a.id} className={`anchor${isDone ? ' is-done' : ''}`}>
+                  <button type="button" className="anchor__main" role="checkbox" aria-checked={isDone} onClick={() => mark(a, !isDone)}>
+                    <span className="anchor__dot" aria-hidden="true">
+                      <IconCheck size={12} />
+                    </span>
+                    <span className="anchor__text">
+                      <span className="anchor__title">{a.title}</span>
+                    </span>
+                  </button>
+                  {!isDone && (
+                    <button type="button" className="btn btn--small anchor__impulse" onClick={() => onImpulse(a)} title="Nur fünf Minuten. Danach darfst du aufhören.">
+                      5 Min.
+                    </button>
+                  )}
+                </li>
+              ) : (
+                <li key={a.id} className="anchor is-free">
+                  <div className="anchor__main">
+                    <span className="anchor__text">
+                      <span className="anchor__title">{a.title}</span>
+                      <span className="anchor__rhythm">{rhythmLabel(a.days)}</span>
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         ) : (
-          state.anchors.length === 0 && <IconPlus size={13} />
+          state.anchors.length > 0 && <p className="anchors-sec__free">An diesem Tag ist frei.</p>
         )}
-      </button>
+        <div className="anchors-sec__actions">
+          <button type="button" className={`btn btn--small${state.anchors.length ? '' : ' btn--primary'}`} onClick={onManage}>
+            {state.anchors.length ? (
+              'Anker anpassen'
+            ) : (
+              <>
+                <IconPlus size={13} />
+                Ersten Anker setzen
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -163,14 +229,7 @@ export function AnchorsDialog({ open, state, now, onClose, onImpulse }: DialogPr
     setDraftDays([...EVERY_DAY]);
   };
 
-  const lead =
-    state.anchors.length === 0
-      ? 'Kleine Dinge, die zu deinem Tag gehören. Täglich oder an bestimmten Tagen.'
-      : due.length === 0
-        ? 'Heute ist frei. Deine Anker warten ganz entspannt auf ihren Tag.'
-        : done === due.length
-          ? 'Heute ist alles verankert. Der Rest des Tages gehört dir.'
-          : 'Jeden Morgen frisch, ohne Rückstand.';
+  const lead = anchorsLead(state.anchors.length, due.length, done);
 
   const row = (a: DailyAnchor, today: boolean) => {
     const isDone = today && isAnchorDone(a, day);

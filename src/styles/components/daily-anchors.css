@@ -1,45 +1,154 @@
-.anchors-fab {
-  position: fixed;
-  left: calc(var(--rail-w) + var(--s5));
-  bottom: max(var(--s5), env(safe-area-inset-bottom, 0px));
-  z-index: 40;
-  animation: rise var(--t-slow) var(--ease) both;
+/* ========================================================================
+   Tages-Anker: the section in the home's areas (a small week calendar and
+   the chosen day) and the pop-up for adding, renaming and the rhythm.
+   ======================================================================== */
+
+.anchors-sec {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--s8);
+  align-items: start;
 }
-.anchors-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s2);
-  min-height: 34px;
-  padding: 0 var(--s3);
-  border: 1px solid var(--line-float);
-  border-radius: 999px;
-  background: rgb(11 11 12 / 0.86);
-  backdrop-filter: blur(14px);
-  box-shadow: var(--shadow-float);
-  font-size: var(--fs-meta);
-  font-weight: 500;
+.anchors-sec__week {
+  display: grid;
+  gap: var(--s5);
+}
+.anchors-sec__lead {
+  max-width: 46ch;
+  font-size: var(--fs-body);
   color: var(--ink-2);
-  cursor: pointer;
+}
+.week-cal {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+}
+.week-cal__day {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: var(--s2);
+  min-height: 112px;
+  padding: var(--s4) var(--s3);
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  text-align: left;
+  color: var(--ink-3);
   transition:
-    color var(--t-fast) var(--ease),
-    border-color var(--t-fast) var(--ease);
+    color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease);
 }
-.anchors-pill:hover,
-.anchors-pill:focus-visible {
-  border-color: var(--line-strong);
+.week-cal__day:first-child {
+  border-left: 0;
+}
+.week-cal__day:hover {
+  background: var(--hover);
+  color: var(--ink-2);
+}
+/* The chosen day: a line on top, pulled out of the hairline. */
+.week-cal__day::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--ink);
+  opacity: 0;
+  transform: scaleX(0.4);
+  transition:
+    opacity var(--t-base) var(--ease),
+    transform var(--t-slow) var(--ease);
+}
+.week-cal__day.is-picked::before {
+  opacity: 1;
+  transform: none;
+}
+.week-cal__day.is-picked {
   color: var(--ink);
 }
-.anchors-pill.is-open {
-  color: var(--ink);
-}
-.anchors-pill__count {
+.week-cal__name {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+}
+.week-cal__date {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.week-cal__day.is-today .week-cal__name {
+  color: var(--accent);
+}
+.week-cal__dots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-height: 6px;
+  margin-top: var(--s1);
+}
+.week-cal__dots i {
+  width: 5px;
+  height: 5px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+.week-cal__dots i.is-done {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.6);
+  opacity: 1;
+}
+.week-cal__dots em {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-style: normal;
+}
+.anchors-sec__day {
+  display: grid;
+  gap: var(--s4);
+  padding-left: var(--s7);
+  border-left: 1px solid var(--line);
+}
+.anchors-sec__day .anchors__list {
+  animation: fade-in var(--t-base) var(--ease) both;
+}
+.anchors-sec__free {
+  font-size: var(--fs-meta);
   color: var(--ink-3);
 }
-.anchors-pill.is-open .anchors-pill__count {
-  color: var(--ink);
+.anchors-sec__actions {
+  display: flex;
+  gap: var(--s2);
+  padding-top: var(--s2);
 }
+@media (max-width: 1180px) {
+  .anchors-sec {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s6);
+  }
+  .anchors-sec__day {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+@media (max-width: 640px) {
+  .week-cal__day {
+    min-height: 88px;
+    padding: var(--s3) var(--s1);
+  }
+  .week-cal__date {
+    font-size: 20px;
+  }
+}
+
 .anchors {
   display: grid;
   gap: var(--gap);

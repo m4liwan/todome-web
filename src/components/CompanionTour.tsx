@@ -9,6 +9,7 @@ import { desktop } from '../lib/desktop';
 import { Avatar } from './Avatar';
 import { IconLock } from './icons';
 import { showSettingsTab, type SettingsTab } from './dialogs/SettingsDialog';
+import { showArea, type AreaId } from './Cockpit';
 
 /** Where the companion sits relative to what it explains. */
 type Place = 'corner' | 'top' | 'left';
@@ -22,6 +23,8 @@ interface Step {
   place: Place;
   /** Steps inside the settings sheet. */
   tab?: SettingsTab;
+  /** Steps in an area of the home (behind its tab row). */
+  area?: AreaId;
   /** A small chip next to the title (e.g. "Pro-Vorschau"). */
   badge?: string;
 }
@@ -49,6 +52,7 @@ export function buildSteps(name: string, user: string, labels: ContextLabels, br
     },
     {
       id: 'thoughts',
+      area: 'mind',
       targets: ['.panel--thoughts'],
       title: 'Der Gedanken-Parkplatz',
       text: 'Alles, was dir zwischendurch durch den Kopf geht, parkst du hier. Es geht nicht verloren und stört deinen Fokus nicht. Oder du lässt es bewusst los.',
@@ -258,6 +262,7 @@ export function CompanionTour({ avatar, userName, onOpenSettings, onCloseSetting
       else onOpenSettings(step.tab);
     } else {
       if (settingsOpen) onCloseSettings();
+      if (step.area) showArea(step.area);
     }
     // Give the sheet a moment, then make sure the target is in view.
     const t = window.setTimeout(() => {
@@ -272,7 +277,7 @@ export function CompanionTour({ avatar, userName, onOpenSettings, onCloseSetting
         const r = el.getBoundingClientRect();
         if (r.top < 90 || r.bottom > window.innerHeight - 40) el.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
       }
-    }, step.tab ? 260 : 120);
+    }, step.tab ? 260 : step.area ? 560 : 120);
     return () => window.clearTimeout(t);
     // Runs once per station.
     // eslint-disable-next-line react-hooks/exhaustive-deps

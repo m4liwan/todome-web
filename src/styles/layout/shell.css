@@ -18,9 +18,9 @@
   transition: padding var(--t-slow) var(--ease);
 }
 .dash {
-  max-width: 1440px;
+  max-width: 1680px;
   margin: 0 auto;
-  padding: var(--s8) var(--s8) var(--s10);
+  padding: var(--s7) var(--s8) var(--s10);
 }
 @media (max-width: 1180px) {
   .dash {

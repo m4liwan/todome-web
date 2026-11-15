@@ -20,7 +20,7 @@
   .shell.is-focusing .timeline,
   .shell.fs-breathe .hello__chips,
   .shell.fs-breathe .vitals,
-  .shell.is-focusing .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band) {
+  .shell.is-focusing .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more) {
     opacity: 1 !important;
     filter: none !important;
   }

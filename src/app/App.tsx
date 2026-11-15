@@ -11,8 +11,8 @@ import { Greeting } from '../components/Greeting';
 import { PromptCenter } from '../components/PromptCenter';
 import { ReportPanel, TodayTimesCard } from '../components/ReportPanel';
 import { CompanionHome, DailyImpulse, MicroRoutines, RoutineTimer, ThoughtParking, WeekTeaser, type Routine } from '../components/HomeExtras';
-import { AnchorsDialog, AnchorsPill } from '../components/DailyAnchors';
-import { ANCHOR_IMPULSE_SECONDS } from '../domain/anchors';
+import { AnchorsDialog, AnchorsSection } from '../components/DailyAnchors';
+import { ANCHOR_IMPULSE_SECONDS, anchorsToday } from '../domain/anchors';
 import type { DailyAnchor } from '../domain/types';
 import { Onboarding } from '../components/Onboarding';
 import { StorageNotice } from '../components/StorageNotice';
@@ -373,7 +373,9 @@ export function App() {
     thoughts: <ThoughtParking state={state} now={now} />,
     routines: <MicroRoutines state={state} now={now} onStart={setRoutine} />,
     week: <WeekTeaser state={state} projections={projections} now={now} onOpen={() => setView('times')} />,
+    anchors: <AnchorsSection state={state} now={now} onManage={() => setModal({ kind: 'anchors' })} onImpulse={startImpulse} />,
   };
+  const anchorsDue = anchorsToday(state.anchors, now, today);
 
   return (
     <div className={`shell shell--${view}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
@@ -389,7 +391,7 @@ export function App() {
 
       <div className="app">
         <main id="main" className={`dash dash--${view}`}>
-          {view === 'today' && <Cockpit panels={p} />}
+          {view === 'today' && <Cockpit panels={p} meta={{ anchors: anchorsDue.due.length ? `${anchorsDue.done}/${anchorsDue.due.length}` : undefined }} />}
           {view === 'times' && (
             <div className="view-fade" key="times">
               <WeekView state={state} projections={projections} now={now} />
@@ -416,10 +418,6 @@ export function App() {
           <PromptCenter state={state} now={now} openPrompts={open} onOpen={setModal} />
           <InlineCompanion onOpen={setModal} />
         </>
-      )}
-      {/* Tages-Anker: a floating glass pill (bottom left), never part of the cockpit; steps back while you focus. */}
-      {state.settings.onboarded && !onboarding && !landing && !focusing && (
-        <AnchorsPill state={state} now={now} onOpen={() => setModal({ kind: 'anchors' })} />
       )}
       <Toasts />
       <StorageNotice />

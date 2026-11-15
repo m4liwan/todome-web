@@ -1,8 +1,9 @@
 /* ========================================================================
    Cockpit: the one home screen (components/Cockpit.tsx).
    Stage (8 of 12) and side column (4 of 12), the day across the full width,
-   two quiet bands below. No boxes: hairlines and space carry the order.
-   While a block runs, everything but the stage steps back (fs-* styles).
+   then the areas (one at a time, behind a tab row). No boxes: hairlines and
+   space carry the order. While a block runs, everything but the stage steps
+   back (fs-* styles).
    ======================================================================== */
 
 .cockpit {
@@ -28,19 +29,99 @@
   border-left: 1px solid var(--line);
 }
 .cockpit__day,
-.cockpit__band {
+.cockpit__more {
   grid-column: 1 / -1;
   min-width: 0;
   margin-top: var(--s8);
   padding-top: var(--s7);
   border-top: 1px solid var(--line);
 }
-.cockpit__band {
+.cockpit__more {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* ---------- areas: a tab row with a gliding underline, one pane at a time ---------- */
+.areas {
   display: grid;
   gap: var(--s6);
 }
-.cockpit__label {
-  margin: 0;
+.areas__nav {
+  position: relative;
+  display: flex;
+  box-shadow: inset 0 1px var(--line);
+  gap: var(--s6);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.areas__tab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s2);
+  flex: none;
+  padding: var(--s5) 0 var(--s4);
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink-3);
+  white-space: nowrap;
+  transition: color var(--t-base) var(--ease);
+}
+.areas__tab:hover,
+.areas__tab[aria-selected='true'] {
+  color: var(--ink);
+}
+.areas__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  color: var(--ink-3);
+}
+.areas__tab[aria-selected='true'] .areas__meta {
+  color: var(--accent);
+}
+/* The underline sits on the hairline above the row, like a tab pulled out of it. */
+.areas__ink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  background: var(--ink);
+  pointer-events: none;
+  transform-origin: left;
+  transform: translateX(var(--x)) scaleX(var(--w));
+  transition: transform var(--t-slow) var(--ease);
+}
+.areas__stack {
+  position: relative;
+}
+/* Only the active pane takes room (the areas end the page, nothing below can
+   jump); the others wait beside it, out of flow. */
+.areas__pane {
+  transition:
+    opacity var(--t-slow) var(--ease),
+    transform var(--t-slow) var(--ease),
+    visibility 0s linear var(--t-slow);
+}
+.areas__pane.is-before,
+.areas__pane.is-after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.areas__pane.is-before {
+  transform: translateX(-48px);
+}
+.areas__pane.is-after {
+  transform: translateX(48px);
+}
+.areas__pane.is-on {
+  transition-delay: 80ms, 80ms, 0s;
 }
 
 /* Every module: a plain column, no surface. */
@@ -110,23 +191,23 @@
 }
 
 /* ---------- focus styles: the rest of the cockpit steps back ---------- */
-.cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band),
+.cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more),
 .cockpit .panel--greet {
   transition:
     opacity var(--t-slow) var(--ease),
     filter var(--t-slow) var(--ease);
 }
 /* Breathe, micro and the focus timer: dim and soften, back on contact. */
-.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band) {
+.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more) {
   opacity: 0.35;
   filter: blur(1.5px);
 }
-.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band):is(:hover, :focus-within) {
+.shell:is(.fs-breathe, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more):is(:hover, :focus-within) {
   opacity: 0.92;
   filter: none;
 }
 /* Tunnel and cocoon: only the stage stays, centred. */
-.shell:is(.fs-tunnel, .fs-cocoon) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__band) {
+.shell:is(.fs-tunnel, .fs-cocoon) .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more) {
   display: none;
 }
 .shell:is(.fs-tunnel, .fs-cocoon) .cockpit__stage {

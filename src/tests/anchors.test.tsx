@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ServicesContext, type Services } from '../app/services';
-import { AnchorsDialog, AnchorsPill } from '../components/DailyAnchors';
+import { AnchorsDialog, AnchorsSection } from '../components/DailyAnchors';
 import { anchorsToday, anchorTitle, isAnchorDone, MAX_ANCHORS, normalizeDays, rhythmLabel, sanitizeAnchors, weekdayOf } from '../domain/anchors';
 import type { AppState, DailyAnchor } from '../domain/types';
 import { createMemoryStore } from '../lib/storage';
@@ -102,57 +102,66 @@ describe('Tages-Anker: reducer', () => {
   });
 });
 
-function mount(state: AppState, ui: 'pill' | 'dialog', onImpulse = vi.fn()) {
+function mount(state: AppState, ui: 'section' | 'dialog', onImpulse = vi.fn()) {
   const store = createStore({ storage: createMemoryStore(), key: 'k', initial: state, persistDelayMs: 0 });
   let n = 0;
   const services = { store, announce: () => {}, clock: { now: () => NOW }, deps: () => ({ newId: () => `id-${++n}` }) } as unknown as Services;
   const onOpen = vi.fn();
   const view = (s: AppState) => (
     <ServicesContext.Provider value={services}>
-      {ui === 'pill' ? <AnchorsPill state={s} now={NOW} onOpen={onOpen} /> : <AnchorsDialog open state={s} now={NOW} onClose={() => {}} onImpulse={onImpulse} />}
+      {ui === 'section' ? <AnchorsSection state={s} now={NOW} onManage={onOpen} onImpulse={onImpulse} /> : <AnchorsDialog open state={s} now={NOW} onClose={() => {}} onImpulse={onImpulse} />}
     </ServicesContext.Provider>
   );
   const r = render(view(state));
   return { store, onOpen, onImpulse, rerender: () => r.rerender(view(store.getState())) };
 }
 
-describe('Tages-Anker: glass pill', () => {
-  it('shows today’s state and glows while something for today is open', () => {
-    const { onOpen } = mount(withAnchors(anchor('a', 'Post', TODAY), anchor('b'), anchor('w', 'Werktags', null, [0, 1, 2, 3, 4])), 'pill');
-    const pill = screen.getByRole('button', { name: /Tages-Anker: 1 von 2 für heute gesetzt/ });
-    expect(pill.textContent).toContain('1/2');
-    expect(pill.className).toContain('is-open');
-    fireEvent.click(pill);
-    expect(onOpen).toHaveBeenCalled();
+describe('Tages-Anker: the section on the home', () => {
+  it('shows this week as a calendar: today marked, each day with its anchors as dots', () => {
+    mount(withAnchors(anchor('a', 'Post', TODAY), anchor('b'), anchor('w', 'Werktags', null, [0, 1, 2, 3, 4])), 'section');
+    const week = screen.getByRole('group', { name: 'Diese Woche' });
+    const days = within(week).getAllByRole('button');
+    expect(days).toHaveLength(7);
+    // Saturday the 14th: two anchors, one of them set today.
+    const saturday = within(week).getByRole('button', { name: 'Samstag, 14.: 2 Anker' });
+    expect(saturday.className).toContain('is-today');
+    expect(saturday.querySelectorAll('.week-cal__dots i')).toHaveLength(2);
+    expect(saturday.querySelectorAll('.week-cal__dots i.is-done')).toHaveLength(1);
+    expect(within(week).getByRole('button', { name: 'Montag, 9.: 3 Anker' })).toBeTruthy();
   });
 
-  it('rests calmly when everything for today is set, and invites when there are none yet', () => {
-    mount(withAnchors(anchor('a', 'Post', TODAY)), 'pill');
-    expect(screen.getByRole('button', { name: /1 von 1/ }).className).not.toContain('is-open');
-    document.body.innerHTML = '';
-    mount(emptyState(), 'pill');
-    expect(screen.getByRole('button', { name: 'Tages-Anker setzen' })).toBeTruthy();
+  it('ticks today with one click and offers the five-minute impulse', () => {
+    const { store, rerender, onImpulse } = mount(withAnchors(anchor('a', 'Post'), anchor('b', 'Lesen')), 'section');
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Post' }));
+    expect(isAnchorDone(store.getState().anchors[0]!, TODAY)).toBe(true);
+    rerender();
+    expect(screen.getByText('Heute · 1 von 2')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '5 Min.' }));
+    expect(onImpulse).toHaveBeenCalledWith(expect.objectContaining({ id: 'b' }));
   });
 
-  it('stands out a little for allround users, and nudges them once a day', () => {
-    const allround = withAnchors(anchor('a'));
-    allround.settings = { ...allround.settings, userContext: 'allround' };
-    const first = mount(allround, 'pill');
-    const pill = () => screen.getByRole('button', { name: /Tages-Anker/ });
-    expect(pill().className).toContain('is-allround');
-    expect(pill().className).toContain('is-nudging');
-    first.rerender();
-    document.body.innerHTML = '';
-    mount(allround, 'pill');
-    expect(pill().className).not.toContain('is-nudging');
+  it('shows another day’s anchors without a tick', () => {
+    mount(withAnchors(anchor('a', 'Post'), anchor('w', 'Werktags', null, [0, 1, 2, 3, 4])), 'section');
+    fireEvent.click(screen.getByRole('button', { name: /^Montag/ }));
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    expect(screen.getByText('Werktags', { selector: '.anchor__title' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /^Sonntag/ }));
+    expect(screen.queryByText('Werktags', { selector: '.anchor__title' })).toBeNull();
+  });
 
+  it('invites to the first anchor and opens the pop-up for everything else', () => {
+    const empty = mount(emptyState(), 'section');
+    fireEvent.click(screen.getByRole('button', { name: 'Ersten Anker setzen' }));
+    expect(empty.onOpen).toHaveBeenCalled();
     document.body.innerHTML = '';
-    const work = withAnchors(anchor('a'));
-    work.settings = { ...work.settings, userContext: 'work' };
-    window.localStorage.clear();
-    mount(work, 'pill');
-    expect(pill().className).not.toContain('is-allround');
-    expect(pill().className).not.toContain('is-nudging');
+    const some = mount(withAnchors(anchor('a')), 'section');
+    fireEvent.click(screen.getByRole('button', { name: 'Anker anpassen' }));
+    expect(some.onOpen).toHaveBeenCalled();
+  });
+
+  it('never shows anything red, overdue or a streak', () => {
+    mount(withAnchors(anchor('a', 'Post', '2026-11-01'), anchor('b', 'Lesen')), 'section');
+    expect(document.body.textContent ?? '').not.toMatch(/Serie|Streak|überfällig|verpasst|nachholen/i);
   });
 });
 
@@ -223,14 +232,13 @@ describe('Tages-Anker: pop-up', () => {
   });
 });
 
-describe('Tages-Anker: never part of the cockpit', () => {
-  it('leaves the home cockpit and the welcome screen untouched', () => {
+describe('Tages-Anker: a section of the home', () => {
+  it('lives in the areas of the cockpit, no longer as a floating pill, and stays off the welcome screen', () => {
     const read = (p: string) => readFileSync(fileURLToPath(new URL(p, import.meta.url)), 'utf8');
     const app = read('../app/App.tsx');
-    // The four home layouts are gone: one cockpit, and the anchors stay a floating pill.
-    expect(app).not.toMatch(/WorkspaceHome|FlowSlider|layout ===/);
-    expect(app).not.toMatch(/panel\('anchors'\)|anchors: </);
-    expect(read('../styles/layout/shell.css')).not.toMatch(/anchors/);
+    expect(app).toMatch(/anchors: <AnchorsSection/);
+    expect(app).not.toMatch(/AnchorsPill|anchors-fab/);
+    expect(read('../components/Cockpit.tsx')).toMatch(/id: 'anchors', label: 'Tages-Anker'/);
     expect(read('../components/Splash.tsx')).not.toMatch(/nchor/);
   });
 });
