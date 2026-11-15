@@ -39,6 +39,10 @@
   filter: blur(30px);
   animation: sunset 30s ease-in-out infinite alternate;
 }
+/* Midnight: a cool moon instead of the warm evening sun. */
+:root[data-palette='midnight'] .closing__sky::after {
+  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.12), transparent 65%);
+}
 .closing__inner {
   max-width: 780px;
   margin: 0 auto;

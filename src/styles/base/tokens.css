@@ -120,17 +120,48 @@
   --green: #2f7cff;
   --good: #1f6fe0;
 }
-:root[data-palette='sunset'] {
-  --accent-rgb: 255 200 87;
-  --accent-mesh: #ffcf6e;
-  --accent-2: #ff7a3d;
-  --accent-2-rgb: 255 122 61;
-  --accent-3: #ff6f91;
-  --tint-b-rgb: 255 120 140;
-  --lime: #ffcf6e;
-  --lime-ink: #2b1600;
-  --green: #ff7a3d;
-  --good: #d85f22;
+:root[data-palette='midnight'] {
+  --accent-rgb: 223 230 255;
+  --accent-mesh: #dfe6ff;
+  --accent-2: #7b8cff;
+  --accent-2-rgb: 123 140 255;
+  --accent-3: #b8c4d9;
+  --tint-b-rgb: 123 140 255;
+  --lime: #dfe6ff;
+  --lime-ink: #050505;
+  --green: #7b8cff;
+  --good: #5f70f0;
+}
+/* Midnight: true OLED black, matte cards, moonlight accents. */
+:root[data-palette='midnight'][data-theme='dark'] {
+  --bg: #050505;
+  --bg-tint-a: rgb(var(--accent-rgb) / 0.04);
+  --bg-tint-b: rgb(var(--tint-b-rgb) / 0.05);
+  --tint-c: rgb(var(--accent-2-rgb) / 0.04);
+  --surface: rgba(18, 18, 20, 0.82);
+  --surface-strong: rgba(24, 24, 27, 0.92);
+  --surface-solid: #121214;
+  --glass-edge: rgba(255, 255, 255, 0.08);
+  --grid-line: rgba(255, 255, 255, 0.025);
+  --sky-a: #121214;
+  --sky-b: #09090b;
+  --sky-c: #050505;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-palette='midnight']:not([data-theme='light']) {
+    --bg: #050505;
+    --bg-tint-a: rgb(var(--accent-rgb) / 0.04);
+    --bg-tint-b: rgb(var(--tint-b-rgb) / 0.05);
+    --tint-c: rgb(var(--accent-2-rgb) / 0.04);
+    --surface: rgba(18, 18, 20, 0.82);
+    --surface-strong: rgba(24, 24, 27, 0.92);
+    --surface-solid: #121214;
+    --glass-edge: rgba(255, 255, 255, 0.08);
+    --grid-line: rgba(255, 255, 255, 0.025);
+    --sky-a: #121214;
+    --sky-b: #09090b;
+    --sky-c: #050505;
+  }
 }
 :root[data-palette='lavender'] {
   --accent-rgb: 201 182 255;

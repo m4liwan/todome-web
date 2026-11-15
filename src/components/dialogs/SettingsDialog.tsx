@@ -63,14 +63,14 @@ const PALETTES: Array<{ id: PaletteId; label: string; colors: [string, string, s
   { id: 'lime', label: 'Frühling', colors: ['#22c27a', '#c8f23c', '#ffb23f'] },
   { id: 'rose', label: 'Rosé', colors: ['#ff4d6d', '#ff9fb8', '#ffc38b'] },
   { id: 'ocean', label: 'Ozean', colors: ['#2f7cff', '#6fe3e0', '#9b8cff'] },
-  { id: 'sunset', label: 'Abendrot', colors: ['#ff7a3d', '#ffcf6e', '#ff6f91'] },
+  { id: 'midnight', label: 'Midnight', colors: ['#050505', '#dfe6ff', '#7b8cff'] },
   { id: 'lavender', label: 'Lavendel', colors: ['#7c5cff', '#c6b3ff', '#ff9ed8'] },
   { id: 'neon', label: 'Neon Cyber', colors: ['#0c0a1c', '#22e6f2', '#c04dff'] },
   { id: 'pulse', label: 'Neon Pulse', colors: ['#12061c', '#ff3dbb', '#7a5cff'] },
   { id: 'matrix', label: 'Matrix Frost', colors: ['#06140f', '#5dffb4', '#7fd8ff'] },
 ];
 
-const NIGHT_WORLDS = new Set<PaletteId>(['neon', 'pulse', 'matrix']);
+const NIGHT_WORLDS = new Set<PaletteId>(['midnight', 'neon', 'pulse', 'matrix']);
 
 const LAYOUTS: Array<{ id: LayoutId; label: string; text: string }> = [
   { id: 'hub', label: 'Companion Hub', text: 'Dein Begleiter im Mittelpunkt, in seinem Glas-Zuhause' },

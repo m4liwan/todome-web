@@ -34,13 +34,16 @@ describe('settings from 1.3 and older', () => {
       },
     };
     const s = parseState(JSON.stringify(raw));
-    expect(s?.settings.appearance).toMatchObject({ palette: 'sunset', layout: 'hub', standby: 'calm' });
+    expect(s?.settings.appearance).toMatchObject({ palette: 'midnight', layout: 'hub', standby: 'calm' });
     expect(s?.settings.overlay).toMatchObject({ enabled: true, opacity: 0.6, modules: { avatar: true, anchor: true } });
     // 1.7: the player leaves the home screen once and stays in the overlay.
     expect(s?.settings.media).toEqual({ enabled: true, inTopbar: false, rev: 2 });
     expect(s?.settings.overlay.modules.media).toBe(true);
     const moss = parseState(JSON.stringify({ ...raw, settings: { ...raw.settings, appearance: { palette: 'moss' } } }));
     expect(moss?.settings.appearance.palette).toBe('lime');
+    // 1.17: Abendrot became Midnight.
+    const sunset = parseState(JSON.stringify({ ...raw, settings: { ...raw.settings, appearance: { palette: 'sunset' } } }));
+    expect(sunset?.settings.appearance.palette).toBe('midnight');
   });
 
   it('starts new installs in the system theme (no bright flash)', () => {

@@ -27,9 +27,9 @@ const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === 'obj
  *  v1 → v2: task priority, theme, companion, location, wellbeing, weather.
  *  v2 → v3: appearance (palette, ambience), overlay, energy, water log, proud notes.
  */
-/** Colour worlds retired in 1.4 map to their closest successor. */
-const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = { solaris: 'sunset', moss: 'lime' };
-const PALETTES = new Set(['lime', 'rose', 'ocean', 'sunset', 'lavender', 'neon', 'pulse', 'matrix']);
+/** Retired colour worlds map to their successor (1.4: solaris, moss; 1.17: Abendrot became Midnight). */
+const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = { solaris: 'midnight', moss: 'lime', sunset: 'midnight' };
+const PALETTES = new Set(['lime', 'rose', 'ocean', 'midnight', 'lavender', 'neon', 'pulse', 'matrix']);
 
 function migrateAppearance(raw: unknown): AppearanceSettings {
   const a = { ...DEFAULT_APPEARANCE, ...(isRecord(raw) ? (raw as Partial<AppearanceSettings>) : {}) };

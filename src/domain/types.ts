@@ -185,7 +185,7 @@ export type ThemePreference = 'system' | 'light' | 'dark';
 export type AvatarId = 'spike' | 'mark' | 'bit' | 'spark' | 'kiki' | 'pixie' | 'keimi' | 'woody';
 
 /** Accent palette of the whole app. */
-export type PaletteId = 'lime' | 'rose' | 'ocean' | 'sunset' | 'lavender' | 'neon' | 'pulse' | 'matrix';
+export type PaletteId = 'lime' | 'rose' | 'ocean' | 'midnight' | 'lavender' | 'neon' | 'pulse' | 'matrix';
 
 /** How the rest screen looks. */
 export type StandbyLayout = 'calm' | 'bigclock' | 'drift' | 'breath';
