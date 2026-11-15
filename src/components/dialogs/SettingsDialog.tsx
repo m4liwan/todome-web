@@ -3,7 +3,7 @@ import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
 import type { AppState, Client, LayoutId, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
 import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
-import { desktop } from '../../lib/desktop';
+import { desktop, type AutostartStatus } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
 import { freeState, hasPro, isProLayout, isProPalette, openPro, themesUnlocked } from '../../app/pro';
 import { IconChat, IconLock } from '../icons';
@@ -526,7 +526,8 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
 
 function DesktopSection() {
   const services = useServices();
-  const [autostart, setAutostart] = useState<{ supported: boolean; enabled: boolean } | null>(null);
+  const [autostart, setAutostart] = useState<AutostartStatus | null>(null);
+  const [busy, setBusy] = useState(false);
   const [version, setVersion] = useState('');
 
   useEffect(() => {
@@ -541,23 +542,36 @@ function DesktopSection() {
   return (
     <section>
       <h3>Desktop</h3>
-      <label className="check">
+      <label className="switch-row">
+        <span className="switch-row__text">
+          <strong>Mit Windows starten</strong>
+          <span className="muted small">
+            {autostart && !autostart.supported
+              ? 'Nur in der installierten App.'
+              : autostart?.blocked
+                ? 'In Windows ausgeschaltet. Unter Task-Manager › Autostart-Apps kannst du ToDoMe wieder einschalten.'
+                : 'Startet leise im Infobereich, ohne Fenster. Dein Tag ist da, wenn du ihn brauchst.'}
+          </span>
+        </span>
         <input
           type="checkbox"
+          role="switch"
+          className="switch"
           checked={autostart?.enabled ?? false}
-          disabled={!autostart?.supported}
+          aria-checked={autostart?.enabled ?? false}
+          disabled={!autostart?.supported || busy}
           onChange={async (e) => {
+            const next = e.target.checked;
+            setBusy(true);
             try {
-              setAutostart(await desktop!.setAutostart(e.target.checked));
+              setAutostart(await desktop!.setAutostart(next));
             } catch {
               services.announce('Autostart konnte nicht geändert werden.');
+            } finally {
+              setBusy(false);
             }
           }}
         />
-        <span>
-          Mit Windows starten (unsichtbar im Infobereich)
-          {autostart && !autostart.supported && <em className="muted"> – nur in der installierten App</em>}
-        </span>
       </label>
       <p className="muted small">
         Das Fenster zu schließen beendet ToDoMe nicht: Sessions und Nachfragen laufen im Infobereich neben der Uhr weiter. Beenden über

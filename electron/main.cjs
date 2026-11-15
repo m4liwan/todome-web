@@ -34,6 +34,7 @@ const { createMediaBridge } = require('./media.cjs');
 const { createUpdater } = require('./updater.cjs');
 const { attachZoom } = require('./zoom.cjs');
 const overlayBounds = require('./overlay-bounds.cjs');
+const autostart = require('./autostart.cjs');
 const { createContact } = require('./contact.cjs');
 const { createVault } = require('./vault.cjs');
 const { createCrashGuard } = require('./crash-guard.cjs');
@@ -564,14 +565,35 @@ function trayImage(attention) {
   return img.isEmpty() ? nativeImage.createFromPath(path.join(ASSETS_DIR, 'icon.png')).resize({ width: 16, height: 16 }) : img;
 }
 
+// "Mit Windows starten": Windows keeps the login item, shell-state.json the
+// user's choice (see electron/autostart.cjs).
+const AUTOSTART_ARGS = ['--hidden'];
 const autostartSupported = () => app.isPackaged && (process.platform === 'win32' || process.platform === 'darwin');
-const getAutostart = () => (autostartSupported() ? app.getLoginItemSettings({ args: ['--hidden'] }).openAtLogin : false);
+const loginItem = () => (autostartSupported() ? app.getLoginItemSettings({ args: AUTOSTART_ARGS }) : null);
+const getAutostart = () => Boolean(loginItem()?.openAtLogin);
+const autostartStatus = () => autostart.status(autostartSupported(), loginItem());
 
 function setAutostart(enabled) {
   if (!autostartSupported()) return false;
-  app.setLoginItemSettings({ openAtLogin: Boolean(enabled), args: ['--hidden'] });
+  app.setLoginItemSettings({ openAtLogin: Boolean(enabled), args: AUTOSTART_ARGS });
+  writeShellState({ autostart: Boolean(enabled) });
   rebuildTrayMenu();
   return getAutostart();
+}
+
+/** At launch: a login item that went missing comes back (never against the Task Manager). */
+function syncAutostart() {
+  if (!autostartSupported()) return;
+  try {
+    const plan = autostart.reconcile(readShellState().autostart, getAutostart());
+    if (plan.register) {
+      app.setLoginItemSettings({ openAtLogin: true, args: AUTOSTART_ARGS });
+      log.info('[autostart] login item was missing, registered again');
+    }
+    if (plan.record !== null) writeShellState({ autostart: plan.record });
+  } catch (err) {
+    log.warn('[autostart] could not sync', err);
+  }
 }
 
 function rebuildTrayMenu() {
@@ -764,11 +786,12 @@ function registerIpc() {
   });
   ipcMain.handle('todome:get-autostart', (event) => {
     if (!fromApp(event)) throw new Error('untrusted sender');
-    return { supported: autostartSupported(), enabled: getAutostart() };
+    return autostartStatus();
   });
   ipcMain.handle('todome:set-autostart', (event, enabled) => {
     if (!fromApp(event)) throw new Error('untrusted sender');
-    return { supported: autostartSupported(), enabled: setAutostart(enabled === true) };
+    setAutostart(enabled === true);
+    return autostartStatus();
   });
   ipcMain.handle('todome:info', (event) => {
     if (!fromApp(event) && !fromCompanion(event) && !(overlay && event.sender === overlay.webContents)) throw new Error('untrusted sender');
@@ -1126,6 +1149,7 @@ if (!app.requestSingleInstanceLock()) {
     registerIpc();
     registerPowerEvents();
     startUpdater();
+    syncAutostart();
     createTray();
     createWindow(START_HIDDEN);
     app.on('activate', () => showWindow());

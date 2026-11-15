@@ -98,12 +98,21 @@ export interface ContactInfo {
 }
 export type ContactResult = { ok: true; via: 'form' | 'mail' } | { ok: false; reason: 'invalid' | 'email' | 'not_configured' | 'mail' | 'slow_down' | 'server' | 'offline' };
 
+/** "Mit Windows starten" as Windows sees it (see electron/autostart.cjs). */
+export interface AutostartStatus {
+  /** Only the installed app (Windows, macOS) can start with the system. */
+  supported: boolean;
+  enabled: boolean;
+  /** The login item exists, but is switched off in the Task Manager (Startup apps). */
+  blocked: boolean;
+}
+
 export interface DesktopBridge {
   isDesktop: true;
   platform: string;
   getIdleState(thresholdSec: number): Promise<{ state: SystemIdleState; idleSeconds: number }>;
-  getAutostart(): Promise<{ supported: boolean; enabled: boolean }>;
-  setAutostart(enabled: boolean): Promise<{ supported: boolean; enabled: boolean }>;
+  getAutostart(): Promise<AutostartStatus>;
+  setAutostart(enabled: boolean): Promise<AutostartStatus>;
   getInfo(): Promise<{ version: string; platform: string; packaged: boolean }>;
   focus(): void;
   appReady(): void;

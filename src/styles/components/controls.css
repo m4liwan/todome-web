@@ -396,6 +396,67 @@ span.chip {
   accent-color: var(--ink);
   flex: none;
 }
+/* A setting as a row with a switch on the right (input[role=switch]). */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-sunk);
+  cursor: pointer;
+}
+.switch-row__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.switch {
+  appearance: none;
+  flex: none;
+  position: relative;
+  width: 46px;
+  height: 26px;
+  margin: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  cursor: pointer;
+  transition: background-color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface-solid);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.35s var(--ease-spring);
+}
+.switch:checked {
+  border-color: rgb(var(--accent-rgb) / 0.6);
+  background: rgb(var(--accent-rgb) / 0.55);
+  box-shadow: 0 0 14px -4px rgb(var(--accent-rgb) / 0.7);
+}
+.switch:checked::before {
+  transform: translateX(20px);
+}
+.switch:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.switch:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb));
+  outline-offset: 2px;
+}
 .form__actions {
   display: flex;
   flex-wrap: wrap;
