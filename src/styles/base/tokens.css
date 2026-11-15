@@ -70,7 +70,6 @@
   --accent-mesh: #a3e635;
   --accent-2: #84cc16;
   --accent-2-rgb: 132 204 22;
-  --accent-3: #e2b46a;
   --accent: rgb(var(--accent-rgb));
 
   /* Companion figure and props (inline SVG fills in the components) */
@@ -115,33 +114,28 @@
   --accent-mesh: #62d4dc;
   --accent-2: #3fa3c0;
   --accent-2-rgb: 63 163 192;
-  --accent-3: #8fb2f0;
 }
 :root[data-palette='amber'] {
   --accent-rgb: 233 180 106;
   --accent-mesh: #e9b46a;
   --accent-2: #cf8a4c;
   --accent-2-rgb: 207 138 76;
-  --accent-3: #e2a0ae;
 }
 :root[data-palette='mono'] {
   --accent-rgb: 230 232 238;
   --accent-mesh: #e6e8ee;
   --accent-2: #a7acb8;
   --accent-2-rgb: 167 172 184;
-  --accent-3: #c9ccd4;
 }
 :root[data-palette='violet'] {
   --accent-rgb: 165 147 255;
   --accent-mesh: #a593ff;
   --accent-2: #7d6bea;
   --accent-2-rgb: 125 107 234;
-  --accent-3: #e2a0ae;
 }
 :root[data-palette='rose'] {
   --accent-rgb: 228 154 174;
   --accent-mesh: #e49aae;
   --accent-2: #c46a86;
   --accent-2-rgb: 196 106 134;
-  --accent-3: #e2b46a;
 }
