@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
 import type { AppState, Client, CornerStyle, DockPosition, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
@@ -6,7 +6,7 @@ import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
 import { desktop, type AutostartStatus } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
 import { freeState, hasPro, isProPalette, openPro, themesUnlocked } from '../../app/pro';
-import { IconChat, IconLock } from '../icons';
+import { IconArrowUpRight, IconChart, IconChat, IconCompanion, IconHelp, IconLock, IconMusic, IconSettings, IconSparkle } from '../icons';
 import { companionHello } from '../../app/companion';
 import { avatarName } from '../../domain/companion';
 import { COPYRIGHT } from '../../domain/legal';
@@ -43,15 +43,16 @@ interface Props {
   onShowCompanion?: () => void;
 }
 
-const TABS: Array<{ id: SettingsTab; label: string }> = [
-  { id: 'general', label: 'Allgemein' },
-  { id: 'companion', label: 'Begleiter' },
-  { id: 'design', label: 'Design' },
-  { id: 'overlay', label: 'Overlay' },
-  { id: 'media', label: 'Audio' },
-  { id: 'data', label: 'Daten' },
-  { id: 'about', label: 'Über' },
+const TABS: Array<{ id: SettingsTab; label: string; lead: string; icon: ReactNode }> = [
+  { id: 'general', label: 'Allgemein', lead: 'Wie ToDoMe mit dir spricht und wie dein Tag tickt.', icon: <IconSettings size={17} /> },
+  { id: 'companion', label: 'Begleiter', lead: 'Wer dich begleitet, wie oft er vorbeischaut und woran er erinnert.', icon: <IconCompanion size={17} /> },
+  { id: 'design', label: 'Design', lead: 'Navigation, Licht, Ecken und die Atmosphäre, in der du arbeitest.', icon: <IconSparkle size={17} /> },
+  { id: 'overlay', label: 'Overlay', lead: 'Die kleine Glasbox, die bei dir bleibt, während du woanders arbeitest.', icon: <IconArrowUpRight size={17} /> },
+  { id: 'media', label: 'Audio', lead: 'Klänge, Töne und deine Musik.', icon: <IconMusic size={17} /> },
+  { id: 'data', label: 'Daten', lead: 'Kunden, Backups und alles, was auf diesem Gerät liegt.', icon: <IconChart size={17} /> },
+  { id: 'about', label: 'Über', lead: 'Version, Rechtliches und wer hinter ToDoMe steht.', icon: <IconHelp size={17} /> },
 ];
+const tabIndex = (id: SettingsTab) => TABS.findIndex((t) => t.id === id);
 
 const TONES: Array<{ id: Tone; label: string; example: string }> = [
   { id: 'gentle', label: 'Sanft', example: '„Du bist etwas über der Zeit – völlig okay.“' },
@@ -86,7 +87,15 @@ const DOCKS: Array<{ id: DockPosition; label: string; text: string }> = [
 const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minuten-Takt', fifteen: '15-Minuten-Takt' };
 
 export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCompanion }: Props) {
-  const [tab, setTab] = useState<SettingsTab>(initialTab);
+  const [tab, setTabNow] = useState<SettingsTab>(initialTab);
+  // The panel slides in the direction you travel through the list.
+  const [dir, setDir] = useState<'up' | 'down'>('down');
+  const current = useRef(tab);
+  const setTab = (next: SettingsTab) => {
+    setDir(tabIndex(next) < tabIndex(current.current) ? 'up' : 'down');
+    current.current = next;
+    setTabNow(next);
+  };
   /** A link to another tab: switch and keep the keyboard on that tab (the panel is rebuilt). */
   const goTo = (next: SettingsTab) => {
     setTab(next);
@@ -134,8 +143,9 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
 
   return (
     <Dialog open={open} title="Einstellungen" wide onClose={onClose} className="dialog--settings">
-      <div className="settings">
+      <div className="settings" style={{ '--tab': tabIndex(tab) } as CSSProperties}>
         <div className="settings__tabs" role="tablist" aria-label="Bereiche">
+          <span className="settings__lens" aria-hidden="true" />
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -147,11 +157,16 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
               className={tab === t.id ? 'is-on' : undefined}
               onClick={() => setTab(t.id)}
             >
+              {t.icon}
               {t.label}
             </button>
           ))}
         </div>
-        <div className="settings__panel" id="settings-panel" role="tabpanel" aria-labelledby={`settings-tab-${tab}`} key={tab}>
+        <div className="settings__panel" id="settings-panel" role="tabpanel" aria-labelledby={`settings-tab-${tab}`} key={tab} data-dir={dir}>
+          <header className="settings__intro">
+            <h2 className="settings__title">{TABS[tabIndex(tab)]?.label}</h2>
+            <p className="settings__lead">{TABS[tabIndex(tab)]?.lead}</p>
+          </header>
           {tab === 'general' && (
             <>
         <BrainSection />

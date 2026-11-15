@@ -1,0 +1,54 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { ServicesContext, type Services } from '../app/services';
+import { SettingsDialog } from '../components/dialogs/SettingsDialog';
+import { createMemoryStore } from '../lib/storage';
+import { emptyState } from '../state/defaults';
+import { createStore } from '../state/store';
+
+function open() {
+  const store = createStore({ storage: createMemoryStore(), key: 'k', initial: emptyState(), persistDelayMs: 0 });
+  const services = { store, announce: () => {} } as unknown as Services;
+  render(
+    <ServicesContext.Provider value={services}>
+      <SettingsDialog open onClose={() => {}} initialTab="design" />
+    </ServicesContext.Provider>,
+  );
+}
+
+const panel = () => document.getElementById('settings-panel')!;
+const tab = (name: string) => screen.getByRole('tab', { name, hidden: true });
+
+describe('the living settings', () => {
+  it('gives every tab an icon and the panel a large title with one line about it', () => {
+    open();
+    for (const t of screen.getAllByRole('tab', { hidden: true })) expect(t.querySelector('svg'), t.textContent ?? '').not.toBeNull();
+    expect(panel().querySelector('.settings__title')?.textContent).toBe('Design');
+    expect(panel().querySelector('.settings__lead')?.textContent).toBeTruthy();
+  });
+
+  it('lets the lens glide to the chosen tab', () => {
+    open();
+    const sheet = document.querySelector<HTMLElement>('.settings')!;
+    expect(sheet.style.getPropertyValue('--tab')).toBe('2');
+    fireEvent.click(tab('Daten'));
+    expect(sheet.style.getPropertyValue('--tab')).toBe('5');
+    expect(document.querySelector('.settings__lens')).not.toBeNull();
+  });
+
+  it('moves the panel in the direction you travel', () => {
+    open();
+    fireEvent.click(tab('Daten'));
+    expect(panel().dataset.dir).toBe('down');
+    fireEvent.click(tab('Allgemein'));
+    expect(panel().dataset.dir).toBe('up');
+  });
+
+  it('opens out of the dock, on whichever side it sits', () => {
+    const css = readFileSync(join(process.cwd(), 'src', 'styles', 'components', 'dialogs.css'), 'utf8');
+    for (const side of ['right', 'top', 'bottom']) expect(css, side).toMatch(new RegExp(`\[data-dock='${side}'\][^{]*\.dialog--settings`));
+    expect(css).toMatch(/\.dialog--settings\[open\][^}]*animation: settings-in/);
+  });
+});

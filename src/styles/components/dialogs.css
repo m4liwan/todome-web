@@ -89,13 +89,60 @@ html.is-desktop .select__list {
   border-top: 1px solid var(--line);
 }
 
-/* ---------- settings sheet: tabs left, panel right ---------- */
+/* ---------- settings sheet: opens out of the dock, tabs beside the panel ----------
+   The sheet stands next to the dock on whichever edge it sits and slides
+   out of it; the dock stays visible behind a lighter backdrop. */
+.dialog--settings {
+  --from-x: -28px;
+  --from-y: 0px;
+}
 .dialog--settings[open] {
+  position: fixed;
+  inset: var(--dock-inset) auto var(--dock-inset) calc(var(--dock-inset) + var(--dock-size) + var(--s3));
   display: flex;
   flex-direction: column;
-  height: min(820px, calc(100dvh - 32px));
+  width: min(1040px, calc(100vw - var(--dock-space) - var(--s3) - var(--dock-inset)));
+  max-width: none;
+  height: auto;
+  max-height: none;
+  margin: 0;
   padding: 0;
   overflow: hidden;
+  animation: settings-in var(--t-slow) var(--ease) both;
+}
+:root[data-dock='right'] .dialog--settings {
+  --from-x: 28px;
+}
+:root[data-dock='right'] .dialog--settings[open] {
+  inset: calc(var(--chrome-h) + var(--s2)) calc(var(--dock-inset) + var(--dock-size) + var(--s3)) var(--dock-inset) auto;
+}
+:root[data-dock='top'] .dialog--settings {
+  --from-x: 0px;
+  --from-y: -24px;
+}
+:root[data-dock='bottom'] .dialog--settings {
+  --from-x: 0px;
+  --from-y: 24px;
+}
+:root:is([data-dock='top'], [data-dock='bottom']) .dialog--settings[open] {
+  inset: calc(var(--dock-inset) + var(--dock-size) + var(--s3)) auto var(--dock-inset) 50%;
+  width: min(1040px, calc(100vw - 2 * var(--dock-inset)));
+  translate: -50% 0;
+}
+:root[data-dock='bottom'] .dialog--settings[open] {
+  inset: calc(var(--chrome-h) + var(--s2)) auto calc(var(--dock-inset) + var(--dock-size) + var(--s3)) 50%;
+}
+.dialog--settings::backdrop {
+  background: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(3px);
+}
+.dialog--settings .dialog__header h2 {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 .dialog--settings .dialog__inner {
   flex: 1 1 auto;

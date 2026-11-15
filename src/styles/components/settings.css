@@ -5,46 +5,107 @@
    ======================================================================== */
 
 .settings {
+  --row: 40px;
+  position: relative;
   flex: 1 1 auto;
   display: grid;
-  grid-template-columns: 188px minmax(0, 1fr);
+  grid-template-columns: 208px minmax(0, 1fr);
   min-height: 0;
+  overflow: hidden;
+}
+/* A living light in the sheet: it travels down with the chosen tab. */
+.settings::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  right: -160px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.09), rgb(var(--accent-rgb) / 0.03) 55%, rgb(var(--accent-rgb) / 0));
+  pointer-events: none;
+  transform: translateY(calc(var(--tab) * 72px));
+  transition: transform 900ms var(--ease);
 }
 .settings__tabs {
+  position: relative;
   display: grid;
+  grid-auto-rows: var(--row);
   align-content: start;
-  gap: 2px;
   padding: var(--s4) var(--s3);
   border-right: 1px solid var(--line);
   overflow-y: auto;
 }
 .settings__tabs button {
-  min-height: 34px;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
   padding: 0 var(--s3);
   border-radius: var(--radius);
   font-size: 14px;
-  color: var(--ink-2);
+  color: var(--ink-3);
   text-align: left;
   white-space: nowrap;
+  transition: color var(--t-base) var(--ease);
+}
+.settings__tabs button svg {
+  flex: none;
+  transition: transform var(--t-base) var(--ease);
 }
 .settings__tabs button:hover {
-  background: var(--hover);
   color: var(--ink);
+}
+.settings__tabs button:hover svg {
+  transform: translateX(2px);
 }
 .settings__tabs button[aria-selected='true'] {
-  background: var(--active);
   color: var(--ink);
 }
+/* The lens glides to the chosen tab, like the one in the dock. */
+.settings__lens {
+  position: absolute;
+  top: var(--s4);
+  left: var(--s3);
+  right: var(--s3);
+  height: var(--row);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--active);
+  pointer-events: none;
+  transform: translateY(calc(var(--tab) * var(--row)));
+  transition: transform var(--t-slow) var(--ease);
+}
 .settings__panel {
+  position: relative;
   display: grid;
   align-content: start;
   gap: 0;
   min-height: 0;
-  padding: 0 var(--s6) var(--s6);
+  padding: 0 var(--s7) var(--s6);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  animation: fade-in var(--t-base) var(--ease) both;
+  animation: panel-down var(--t-slow) var(--ease) both;
+}
+.settings__panel[data-dir='up'] {
+  animation-name: panel-up;
+}
+.settings__intro {
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s6) 0 var(--s2);
+}
+.settings__title {
+  font-size: var(--fs-h1);
+  line-height: 1.1;
+  letter-spacing: var(--track-tight);
+}
+.settings__lead {
+  max-width: 52ch;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
 }
 .settings section {
   display: grid;
@@ -89,8 +150,17 @@
     border-bottom: 1px solid var(--line);
     overflow-x: auto;
   }
+  .settings__lens {
+    display: none;
+  }
+  .settings__tabs button[aria-selected='true'] {
+    background: var(--active);
+  }
   .settings__panel {
     padding: 0 var(--s4) var(--s5);
+  }
+  .settings__title {
+    font-size: var(--fs-h2);
   }
 }
 

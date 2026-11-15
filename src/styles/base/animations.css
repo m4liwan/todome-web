@@ -298,3 +298,36 @@
     transform: none;
   }
 }
+
+/* The settings sheet slides out of the dock (direction set per dock side). */
+@keyframes settings-in {
+  from {
+    opacity: 0;
+    transform: translate(var(--from-x), var(--from-y)) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* A settings panel arrives from the direction you travel. */
+@keyframes panel-down {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes panel-up {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
