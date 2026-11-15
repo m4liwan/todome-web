@@ -49,6 +49,7 @@ describe('window drag regions', () => {
       ['Onboarding.tsx', 'className={`onboard'],
       ['Standby.tsx', 'className={`standby'],
       ['HomeExtras.tsx', 'className="pause-room"'],
+      ['Breathe.tsx', 'className="calm-breath"'],
     ] as const) {
       const src = readFileSync(join(components, file), 'utf8');
       const view = src.indexOf(mark);
@@ -56,5 +57,28 @@ describe('window drag regions', () => {
       // The strip is the view's first child.
       expect(src.slice(view, view + 600), file).toMatch(/>\s*<WindowDrag \/>/);
     }
+  });
+
+  // The app region is inherited, and Chromium lets later regions override
+  // earlier ones: inside a view, its full-size no-drag layers punched the
+  // strip out again (the window could not be moved at all).
+  it('renders the strip at the end of the page, after every view layer', () => {
+    const src = readFileSync(join(components, 'WindowDrag.tsx'), 'utf8');
+    expect(src).toMatch(/createPortal\([\s\S]*className="window-drag"[\s\S]*document\.body\)/);
+  });
+
+  // A pseudo-element inherits its element's region with its whole box, even
+  // where the element clips it: a glow with a negative inset on a header
+  // button made a wide area of the header stop moving the window.
+  it('never lets a pseudo-element of a control grow past it', () => {
+    const offenders = cssFiles.flatMap((file) => {
+      const found: string[] = [];
+      postcss.parse(readFileSync(file, 'utf8')).walkDecls('inset', (d: Declaration) => {
+        const sel = (d.parent as Rule).selector ?? '';
+        if (/::(before|after)/.test(sel) && /(cta|btn|button|tool-pill|segnav)/.test(sel) && /(^|\s)-/.test(d.value)) found.push(`${sel} { inset: ${d.value} }`);
+      });
+      return found;
+    });
+    expect(offenders).toEqual([]);
   });
 });

@@ -651,3 +651,8 @@ html.is-desktop .window-drag {
   pointer-events: none;
   -webkit-app-region: drag;
 }
+/* A dialog over a full-screen view: the strip (last in the page, so it wins
+   every overlap) steps back, so a close button up there stays clickable. */
+html.is-desktop.has-modal .window-drag {
+  display: none;
+}
