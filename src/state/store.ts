@@ -6,6 +6,7 @@ import { DEFAULT_APPEARANCE, DEFAULT_COMPANION, DEFAULT_MEDIA, DEFAULT_OVERLAY, 
 import type { Task } from '../domain/types';
 import { normalizeAvatar } from '../domain/companion';
 import { sanitizeProgression } from '../domain/companionProgression';
+import { sanitizeAnchors } from '../domain/anchors';
 import { reduceAll, type Action } from './reducer';
 
 export interface Store {
@@ -183,6 +184,8 @@ export function parseState(raw: string | null): AppState | null {
       })(),
       weather: isRecord(data.weather) ? (data.weather as unknown as AppState['weather']) : null,
       thoughts: Array.isArray(data.thoughts) ? (data.thoughts as AppState['thoughts']).filter((t) => isRecord(t) && typeof t.text === 'string') : [],
+      // Added in 1.17 (no schema bump: older data simply has none yet).
+      anchors: sanitizeAnchors(data.anchors),
       archive: Array.isArray(data.archive)
         ? (data.archive as AppState['archive']).filter((a) => isRecord(a) && typeof a.day === 'string' && Number.isFinite(a.netMs))
         : [],

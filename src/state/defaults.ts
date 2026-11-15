@@ -103,6 +103,7 @@ export function emptyState(): AppState {
     wellbeing: { ...DEFAULT_WELLBEING },
     weather: null,
     thoughts: [],
+    anchors: [],
     archive: [],
     progression: emptyProgression(),
   };

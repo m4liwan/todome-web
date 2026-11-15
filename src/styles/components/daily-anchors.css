@@ -1,0 +1,323 @@
+/* ========================================================================
+   Tages-Anker (components/DailyAnchors): floating glass pill + pop-up.
+   The pill floats (fixed), so no layout ever moves for it. Open anchors
+   glow softly and warmly (a gentle presence, never an alarm); set ones rest
+   calm and muted. No red, no strike-through, nothing overdue.
+   ======================================================================== */
+
+.anchors,
+.anchors-fab {
+  /* The palette's soft third tone, warmed up: fits every colour world. */
+  --anchor-warm: color-mix(in srgb, var(--accent-3) 60%, var(--warm-a, #f4a261));
+  --anchor-rest: rgb(var(--accent-rgb) / 0.2);
+}
+
+/* Trigger: bottom left, the quiet counterpart of "Bearbeiten" (bottom right). */
+.anchors-fab {
+  position: fixed;
+  left: max(24px, env(safe-area-inset-left, 0px));
+  bottom: max(22px, env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+}
+.anchors-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px 0 13px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  background: var(--surface-strong);
+  box-shadow: var(--glass-inset), var(--shadow);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 650;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.3s ease,
+    color 0.3s ease,
+    border-color 0.6s ease,
+    box-shadow 0.6s ease;
+}
+.anchors-pill:hover,
+.anchors-pill:focus-visible {
+  opacity: 1;
+  color: var(--ink);
+}
+/* Something for today is still open: a soft glow in the accent colour. */
+.anchors-pill.is-open {
+  opacity: 1;
+  color: var(--ink);
+  border-color: rgb(var(--accent-rgb) / 0.45);
+  box-shadow: var(--glass-inset), var(--shadow), 0 0 0 1px rgb(var(--accent-rgb) / 0.1), 0 0 22px -6px rgb(var(--accent-rgb) / 0.6);
+}
+.anchors-pill.is-open svg {
+  color: rgb(var(--accent-rgb));
+  filter: drop-shadow(0 0 5px rgb(var(--accent-rgb) / 0.6));
+}
+/* Allround (neither study nor work): the anchors carry a bit more of the day. */
+.anchors-pill.is-allround {
+  opacity: 1;
+  height: 42px;
+  padding-inline: 15px 16px;
+}
+.anchors-pill.is-nudging {
+  animation: anchor-nudge 2.8s ease-in-out 3;
+}
+.anchors-pill__count {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+}
+.anchors-pill.is-open .anchors-pill__count {
+  background: rgb(var(--accent-rgb) / 0.16);
+  color: var(--ink);
+}
+
+/* Pop-up (its width: .dialog--anchors in dialogs.css) */
+.anchors {
+  display: grid;
+  gap: 14px;
+}
+.anchors__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.anchors__list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.anchors__free h3 {
+  margin: 4px 0 8px;
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.anchor {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 4px;
+  border: 1px solid color-mix(in srgb, var(--anchor-warm) 30%, transparent);
+  border-radius: 16px;
+  background: linear-gradient(100deg, color-mix(in srgb, var(--anchor-warm) 9%, transparent), transparent 70%);
+  box-shadow: 0 0 22px -12px var(--anchor-warm);
+  transition: border-color 0.6s ease,
+    background-color 0.6s ease,
+    box-shadow 0.6s ease;
+}
+/* The top anchors of a fuller day: a little more presence. */
+.anchor.is-core {
+  border-color: color-mix(in srgb, var(--anchor-warm) 48%, transparent);
+  box-shadow: 0 0 26px -10px var(--anchor-warm);
+}
+.anchor.is-core .anchor__title {
+  font-weight: 700;
+}
+.anchor.is-done,
+.anchor.is-free {
+  border-color: var(--line);
+  background: var(--surface-sunk);
+  box-shadow: none;
+}
+.anchor.is-free {
+  opacity: 0.75;
+}
+.anchor__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 650;
+  text-align: left;
+}
+button.anchor__main {
+  cursor: pointer;
+}
+.anchor__dot {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--anchor-warm);
+  border-radius: 50%;
+  color: transparent;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--anchor-warm) 12%, transparent),
+    0 0 14px -2px var(--anchor-warm);
+  animation: anchor-glow 5.2s ease-in-out infinite;
+  transition: background-color 0.5s ease,
+    border-color 0.5s ease,
+    color 0.5s ease,
+    transform 0.35s var(--ease-spring);
+}
+button.anchor__main:hover .anchor__dot {
+  transform: scale(1.08);
+}
+.anchor.is-done .anchor__dot {
+  border-color: transparent;
+  background: var(--anchor-rest);
+  color: var(--ink-2);
+  box-shadow: none;
+  animation: none;
+}
+.anchor.is-free .anchor__dot {
+  border: 1.5px dashed var(--line-strong);
+  box-shadow: none;
+  animation: none;
+}
+.anchor__text {
+  display: grid;
+  min-width: 0;
+}
+.anchor__title {
+  overflow-wrap: anywhere;
+  transition: color 0.5s ease;
+}
+.anchor.is-done .anchor__title,
+.anchor.is-free .anchor__title {
+  color: var(--ink-2);
+  font-weight: 550;
+}
+.anchor__rhythm {
+  color: var(--ink-3);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+.anchor__impulse {
+  flex: none;
+}
+.anchor--edit {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border-color: var(--line);
+  background: var(--surface-sunk);
+  box-shadow: none;
+}
+.anchor__edit-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.anchor__edit {
+  flex: 1;
+  min-width: 0;
+}
+.anchor__icon-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: background-color 0.25s,
+    color 0.25s;
+}
+.anchor__icon-btn:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--ink);
+}
+.anchor__icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Rhythm: "Täglich" or the weekdays, as small glass toggles. */
+.day-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.day-picker__all,
+.day-picker__day {
+  min-width: 34px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background-color 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease;
+}
+.day-picker__all {
+  margin-right: 4px;
+}
+.day-picker__all.is-on,
+.day-picker__day.is-on {
+  border-color: rgb(var(--accent-rgb) / 0.5);
+  background: rgb(var(--accent-rgb) / 0.16);
+  color: var(--ink);
+}
+
+.anchors__ideas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.anchors__idea {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px dashed color-mix(in srgb, var(--anchor-warm) 55%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s,
+    color 0.3s;
+}
+.anchors__idea:hover {
+  background: color-mix(in srgb, var(--anchor-warm) 10%, transparent);
+  color: var(--ink);
+}
+.anchors__add {
+  display: grid;
+  gap: 8px;
+}
+.anchors__add-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.anchors__add-row input {
+  flex: 1;
+  min-width: 0;
+}
+.anchors__full {
+  margin: 0;
+}

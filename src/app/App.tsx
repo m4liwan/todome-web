@@ -12,6 +12,9 @@ import { PromptCenter } from '../components/PromptCenter';
 import { ReportPanel, TodayTimesCard } from '../components/ReportPanel';
 import { FlowSlider } from '../components/FlowSlider';
 import { CompanionHome, DailyImpulse, MicroRoutines, RoutineTimer, ThoughtParking, WeekTeaser, type Routine } from '../components/HomeExtras';
+import { AnchorsDialog, AnchorsPill } from '../components/DailyAnchors';
+import { ANCHOR_IMPULSE_SECONDS } from '../domain/anchors';
+import type { DailyAnchor } from '../domain/types';
 import { Onboarding } from '../components/Onboarding';
 import { StorageNotice } from '../components/StorageNotice';
 import { FirstTasks } from '../components/FirstTasks';
@@ -319,7 +322,11 @@ export function App() {
 
   const endRoutine = useCallback(
     (completed: boolean) => {
-      if (completed && routine) {
+      if (completed && routine?.anchorId) {
+        // Five minutes for an anchor: showing up is what counts, so it is set.
+        services.store.dispatch({ type: 'anchor/mark', id: routine.anchorId, day: dayKey(services.clock.now()), done: true });
+        services.announce(`Fünf Minuten für „${routine.label}“. Das zählt.`);
+      } else if (completed && routine) {
         const day = dayKey(services.clock.now());
         if (!(services.store.getState().wellbeing.routines[day] ?? []).includes(routine.id)) services.store.dispatch({ type: 'routine/toggle', day, id: routine.id });
         services.announce('Schön, dass du dir das gegönnt hast.');
@@ -328,6 +335,12 @@ export function App() {
     },
     [routine, services],
   );
+
+  // A Tages-Anker's focus impulse: the pop-up steps back, five calm minutes in the pause room.
+  const startImpulse = useCallback((anchor: DailyAnchor) => {
+    setModalRaw(null);
+    setRoutine({ id: `anchor:${anchor.id}`, label: anchor.title, hint: '', seconds: ANCHOR_IMPULSE_SECONDS, anchorId: anchor.id });
+  }, []);
 
   // Second shift: Feierabend was made, but there is a little more to do. The
   // day opens again; everything already done today stays counted.
@@ -473,6 +486,10 @@ export function App() {
           <InlineCompanion onOpen={setModal} />
         </>
       )}
+      {/* Tages-Anker: a floating glass pill (bottom left), never part of the layouts; steps back while you focus. */}
+      {state.settings.onboarded && !onboarding && !landing && !focusing && (
+        <AnchorsPill state={state} now={now} onOpen={() => setModal({ kind: 'anchors' })} />
+      )}
       <Toasts />
       <StorageNotice />
 
@@ -489,6 +506,7 @@ export function App() {
       <EnergyDialog open={m?.kind === 'energy'} onClose={close} />
       <FirstTasks open={m?.kind === 'first_tasks'} onDone={endBridge} />
       <WeatherDialog open={m?.kind === 'weather'} onClose={close} />
+      <AnchorsDialog open={m?.kind === 'anchors'} state={state} now={now} onClose={close} onImpulse={startImpulse} />
       <SettingsDialog
         // A fresh instance per opening (the right tab from the very first frame);
         // the key stays while closing, so the sheet can fade out softly.

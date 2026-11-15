@@ -393,6 +393,21 @@ export interface Thought {
   createdAt: Millis;
 }
 
+/**
+ * Tages-Anker: a small thing that belongs to every day ("X-Post absetzen").
+ * Whether it is done today is derived from `lastDoneDay`, so a new day starts
+ * fresh by itself; earlier days are never kept or weighed (no streaks).
+ */
+export interface DailyAnchor {
+  id: Id;
+  title: string;
+  createdAt: Millis;
+  /** Local day (YYYY-MM-DD) it was last set, or null. */
+  lastDoneDay: string | null;
+  /** Rhythm: the weekdays it belongs to (0 = Monday … 6 = Sunday); all seven = daily. */
+  days: number[];
+}
+
 export interface WeatherHour {
   at: Millis;
   temp: number;
@@ -455,6 +470,8 @@ export interface AppState {
   wellbeing: Wellbeing;
   weather: WeatherSnapshot | null;
   thoughts: Thought[];
+  /** Tages-Anker, at most ten, in the user's order (see domain/anchors). */
+  anchors: DailyAnchor[];
   /** Condensed old sessions (see DaySummary). */
   archive: DaySummary[];
   /** Companion XP, level, streak and unlocks (see domain/companionProgression). */

@@ -17,6 +17,10 @@
 .dialog--wide {
   width: min(820px, calc(100vw - 24px));
 }
+/* Tages-Anker pop-up (components/DailyAnchors). */
+.dialog--anchors {
+  width: min(560px, calc(100vw - 32px));
+}
 .dialog--focus .dialog__inner::before,
 .dialog--pause .dialog__inner::before {
   content: '';

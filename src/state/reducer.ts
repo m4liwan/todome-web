@@ -1,11 +1,13 @@
 import { dayKey } from '../lib/time';
 import { applyTaskTransition } from '../domain/companionProgression';
+import { anchorTitle, canAddAnchor, normalizeDays } from '../domain/anchors';
 import type {
   AppState,
   CheckIn,
   CheckInKind,
   Client,
   ContextSnapshot,
+  DailyAnchor,
   Id,
   Millis,
   Session,
@@ -41,6 +43,15 @@ export type Action =
   | { type: 'thought/add'; thought: Thought }
   | { type: 'thought/remove'; id: Id }
   | { type: 'routine/toggle'; day: string; id: string }
+  /** Ignored once there are MAX_ANCHORS or the title is empty. */
+  | { type: 'anchor/add'; anchor: DailyAnchor }
+  /** New title and/or rhythm; an empty title is ignored. */
+  | { type: 'anchor/update'; id: Id; title?: string; days?: number[] }
+  /** One place up (-1) or down (1) in the user's order. */
+  | { type: 'anchor/move'; id: Id; by: -1 | 1 }
+  | { type: 'anchor/remove'; id: Id }
+  /** Set (done) or loosen (not done) an anchor for the given day. */
+  | { type: 'anchor/mark'; id: Id; day: string; done: boolean }
   | { type: 'state/replace'; state: AppState };
 
 /** Pure reducer. The event log is append-only: events are never edited or removed. */
@@ -179,6 +190,46 @@ export function reducer(state: AppState, action: Action): AppState {
       routines[action.day] = next;
       return { ...state, wellbeing: { ...state.wellbeing, routines } };
     }
+
+    case 'anchor/add': {
+      const title = anchorTitle(action.anchor.title);
+      if (!title || !canAddAnchor(state.anchors) || state.anchors.some((a) => a.id === action.anchor.id)) return state;
+      return { ...state, anchors: [...state.anchors, { ...action.anchor, title, days: normalizeDays(action.anchor.days) }] };
+    }
+
+    case 'anchor/update': {
+      const title = action.title === undefined ? undefined : anchorTitle(action.title);
+      return {
+        ...state,
+        anchors: state.anchors.map((a) =>
+          a.id === action.id ? { ...a, ...(title ? { title } : {}), ...(action.days ? { days: normalizeDays(action.days) } : {}) } : a,
+        ),
+      };
+    }
+
+    case 'anchor/move': {
+      const from = state.anchors.findIndex((a) => a.id === action.id);
+      const to = from + action.by;
+      if (from < 0 || to < 0 || to >= state.anchors.length) return state;
+      const anchors = [...state.anchors];
+      const [moved] = anchors.splice(from, 1);
+      if (moved) anchors.splice(to, 0, moved);
+      return { ...state, anchors };
+    }
+
+    case 'anchor/remove':
+      return { ...state, anchors: state.anchors.filter((a) => a.id !== action.id) };
+
+    case 'anchor/mark':
+      return {
+        ...state,
+        anchors: state.anchors.map((a) => {
+          if (a.id !== action.id) return a;
+          if (action.done) return { ...a, lastDoneDay: action.day };
+          // Loosening only undoes today's tick; it never reaches into other days.
+          return a.lastDoneDay === action.day ? { ...a, lastDoneDay: null } : a;
+        }),
+      };
 
     case 'state/replace':
       return action.state;

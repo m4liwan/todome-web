@@ -779,3 +779,19 @@
     transform: scale(0.7);
   }
 }
+
+/* Tages-Anker: an open anchor breathes a soft, warm light. */
+@keyframes anchor-glow {
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--anchor-warm) 6%, transparent),
+      0 0 20px 0 var(--anchor-warm);
+  }
+}
+
+/* Tages-Anker pill: a soft call for attention, three breaths, once a day. */
+@keyframes anchor-nudge {
+  50% {
+    transform: translateY(-2px);
+    box-shadow: var(--glass-inset), var(--shadow), 0 0 0 6px rgb(var(--accent-rgb) / 0.1), 0 0 30px -4px rgb(var(--accent-rgb) / 0.7);
+  }
+}

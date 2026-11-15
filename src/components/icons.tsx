@@ -180,6 +180,19 @@ export const IconMusic = (p: IconProps) => (
   </Svg>
 );
 
+/** Tages-Anker: a small anchor (ring, shank, arms). */
+export const IconAnchor = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="5" r="2" />
+    <path d="M12 7v13M8 11h8" />
+    <path d="M5 13.5a7 7 0 0 0 14 0" />
+  </Svg>
+);
+export const IconArrowUp = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 19V5M6 11l6-6 6 6" />
+  </Svg>
+);
 export const IconLock = (p: IconProps) => (
   <Svg {...p}>
     <rect x="5" y="10.5" width="14" height="10" rx="3" />

@@ -276,6 +276,8 @@ export interface Routine {
   label: string;
   hint: string;
   seconds?: number;
+  /** Set when the timer is a Tages-Anker's five-minute focus impulse. */
+  anchorId?: string;
 }
 
 export const ROUTINES: Routine[] = [
@@ -434,7 +436,13 @@ export function RoutineTimer({ routine, onClose }: { routine: Routine; onClose: 
           {Math.floor(sec / 60)}:{String(sec % 60).padStart(2, '0')}
         </p>
         <h2>{left === 0 ? 'Schön gemacht.' : routine.label}</h2>
-        <p className="muted">{breathe ? 'Ein, und langsam aus. Der Kreis atmet mit dir.' : 'Schau in die Ferne. Lass die Schultern sinken. Hier gibt es gerade nichts zu tun.'}</p>
+        <p className="muted">
+          {routine.anchorId
+            ? 'Nur fünf Minuten, nur dieser eine Anker. Danach darfst du aufhören.'
+            : breathe
+              ? 'Ein, und langsam aus. Der Kreis atmet mit dir.'
+              : 'Schau in die Ferne. Lass die Schultern sinken. Hier gibt es gerade nichts zu tun.'}
+        </p>
         <button type="button" className="pill pill--ghost" onClick={() => onClose(false)}>
           {left === 0 ? 'Zurück' : 'Lieber später'}
         </button>
