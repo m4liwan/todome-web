@@ -11,7 +11,7 @@ import { contextLabels } from '../domain/userContext';
 
 export type View = 'today' | 'times' | 'companion' | 'closing';
 
-const VIEW_LABEL: Record<View, string> = { today: 'Heute', times: 'Rückblick', companion: 'Begleiter', closing: 'Feierabend' };
+const VIEW_LABEL: Record<Exclude<View, 'closing'>, string> = { today: 'Heute', times: 'Rückblick', companion: 'Begleiter' };
 
 interface Props {
   state: AppState;
@@ -43,7 +43,7 @@ export function Topbar({ state, view, onView, onResume }: Props) {
         </div>
 
         <p className="topbar__where">
-          <span className="label topbar__view">{VIEW_LABEL[view]}</span>
+          <span className="label topbar__view">{view === 'closing' ? labels.dayEnd : VIEW_LABEL[view]}</span>
           <span className="topbar__date">{formatDate(today)}</span>
         </p>
 

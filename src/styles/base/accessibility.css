@@ -50,6 +50,7 @@
   }
 }
 .shell.is-fx-calm .enter,
-.shell.is-fx-calm .veil {
+.shell.is-fx-calm .veil,
+.shell.is-focusing .veil {
   animation: none;
 }

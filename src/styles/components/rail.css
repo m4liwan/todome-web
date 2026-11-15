@@ -132,3 +132,28 @@
     height: 36px;
   }
 }
+/* Short or zoomed windows (up to 200 % on a 640 px window): tighter rows,
+   so the tools at the bottom always stay on screen. */
+@media (max-height: 760px) {
+  .rail {
+    padding-top: var(--s2);
+    padding-bottom: var(--s2);
+  }
+  .rail__stations {
+    grid-auto-rows: 40px;
+  }
+  .rail__tools {
+    grid-auto-rows: 36px;
+  }
+  .rail__item {
+    width: 34px;
+    height: 34px;
+  }
+  .rail__mark {
+    height: 40px;
+  }
+  .rail__mark::before {
+    top: 11px;
+    bottom: 11px;
+  }
+}
