@@ -7,9 +7,11 @@
   margin: 0 auto;
   color: var(--ink);
   -webkit-app-region: no-drag;
-  border: 0;
-  padding: 14px 16px;
-  background: var(--bg);
+  padding: var(--s5);
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
 }
 .hub-intro[open] {
   display: grid;

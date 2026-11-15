@@ -193,14 +193,14 @@ export function StandbySection() {
     <section>
       <h3>Ruhemodus</h3>
       <p className="muted small">Startet nach 15 Minuten ohne Eingabe oder per Klick auf „Ruhemodus“. Ein Mausklick holt dich zurück.</p>
-      <div className="layouts" role="radiogroup" aria-label="Aussehen des Ruhemodus">
+      <div className="options" role="radiogroup" aria-label="Aussehen des Ruhemodus">
         {STANDBY.map((l) => (
           <button
             key={l.id}
             type="button"
             role="radio"
             aria-checked={a.standby === l.id}
-            className={`layout-opt${a.standby === l.id ? ' is-on' : ''}`}
+            className={`option${a.standby === l.id ? ' is-on' : ''}`}
             onClick={() => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...a, standby: l.id } } })}
           >
             <strong>{l.label}</strong>
@@ -303,7 +303,7 @@ export function MoodSection() {
               role="radio"
               aria-checked={a.focusStyle === f.id}
               aria-disabled={locked || undefined}
-              className={`layout-opt focus-style-opt${a.focusStyle === f.id ? ' is-on' : ''}${locked ? ' is-locked' : ''}`}
+              className={`option focus-style-opt${a.focusStyle === f.id ? ' is-on' : ''}${locked ? ' is-locked' : ''}`}
               onClick={() => (locked ? services.announce(FOCUS_TIMER_LOCKED) : setA({ focusStyle: f.id }))}
             >
               <strong>{f.label}</strong>
@@ -469,7 +469,7 @@ export function TimelineStyleField() {
             type="button"
             role="radio"
             aria-checked={a.timeline === t.id}
-            className={`layout-opt timeline-opt${a.timeline === t.id ? ' is-on' : ''}`}
+            className={`option timeline-opt${a.timeline === t.id ? ' is-on' : ''}`}
             onClick={() => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...a, timeline: t.id } } })}
           >
             <span className="timeline-opt__preview" aria-hidden="true">
@@ -477,7 +477,7 @@ export function TimelineStyleField() {
             </span>
             <strong>{t.label}</strong>
             <span>{t.text}</span>
-            {t.id === 'wave' && <span className="layout-opt__badge">Standard</span>}
+            {t.id === 'wave' && <span className="option__badge">Standard</span>}
           </button>
         ))}
       </div>

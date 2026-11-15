@@ -1,47 +1,156 @@
+/* ========================================================================
+   Dialogs (components/Dialog.tsx): one floating sheet on --bg-raised with a
+   hairline frame, a quiet header and the actions bottom right. Opens with a
+   short rise, closes with sheet-out (Dialog waits for its animationend).
+   ======================================================================== */
+
 .dialog {
-  width: min(560px, calc(100vw - 24px));
+  width: min(560px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: var(--s6);
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
   color: var(--ink);
   overflow: auto;
-  margin: auto;
-  padding: 20px 24px;
-  border: 0;
-  background: var(--bg);
+}
+.dialog[open] {
+  overflow-x: hidden;
+  animation: rise var(--t-base) var(--ease) both;
+}
+.dialog[open]::backdrop {
+  animation: fade-in var(--t-base) var(--ease) both;
+}
+.dialog.is-closing[open] {
+  animation: sheet-out 0.18s cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+.dialog::backdrop {
+  background: rgb(0 0 0 / 0.72);
+  backdrop-filter: blur(6px);
+}
+.dialog:focus,
+.dialog:focus-visible {
+  outline: none;
 }
 .dialog--wide {
-  width: min(820px, calc(100vw - 24px));
+  width: min(840px, calc(100vw - 32px));
 }
-.dialog--anchors {
+.dialog--anchors,
+.dialog--pro {
   width: min(560px, calc(100vw - 32px));
 }
+.dialog--storage {
+  width: min(620px, calc(100vw - 32px));
+  max-width: min(620px, calc(100vw - 32px));
+}
+html.is-desktop .dialog,
+html.is-desktop .select__list {
+  -webkit-app-region: no-drag;
+}
+
 .dialog__inner {
   position: relative;
   display: grid;
-  gap: var(--gap);
+  gap: var(--s5);
+}
+.dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.dialog__header h2 {
+  font-size: var(--fs-h2);
+}
+.dialog__header .icon-btn {
+  align-self: center;
+  margin-right: calc(var(--s2) * -1);
+}
+.dialog__header .icon-btn svg {
+  display: block;
+}
+.dialog__body {
+  display: grid;
+  gap: var(--s4);
+}
+.dialog__body > p.muted {
+  color: var(--ink-2);
 }
 .dialog__footer {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--gap);
+  gap: var(--s2);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--line);
 }
+
+/* ---------- settings sheet: tabs left, panel right ---------- */
+.dialog--settings[open] {
+  display: flex;
+  flex-direction: column;
+  height: min(820px, calc(100dvh - 32px));
+  padding: 0;
+  overflow: hidden;
+}
+.dialog--settings .dialog__inner {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+}
+.dialog--settings .dialog__header {
+  padding: var(--s5) var(--s6);
+  border-bottom: 1px solid var(--line);
+}
+.dialog--settings .dialog__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ---------- energy check-in ---------- */
 .energy {
   display: grid;
-  gap: var(--gap);
+  gap: var(--s5);
 }
 .energy__scale {
   display: grid;
   grid-template-columns: repeat(10, minmax(0, 1fr));
-  gap: var(--gap);
+  gap: var(--s1);
 }
 .energy__step {
+  min-height: 40px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--ink-2);
+  text-align: center;
   cursor: pointer;
+}
+.energy__step:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.energy__step.is-filled {
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--ink);
+}
+.energy__step:is([aria-checked='true'], [aria-pressed='true'], .is-on) {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
 }
 .energy__readout {
   display: grid;
-  gap: var(--gap);
+  gap: var(--s2);
 }
 .energy__word {
   color: var(--ink-2);
@@ -56,95 +165,4 @@
   .energy__scale {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
-}
-.dialog[open] {
-  overflow-x: hidden;
-}
-.dialog.is-closing[open] {
-  animation: sheet-out 0.18s cubic-bezier(0.4, 0, 1, 1) both;
-  pointer-events: none;
-}
-html.is-desktop .dialog,
-html.is-desktop .select__list {
-  -webkit-app-region: no-drag;
-}
-.dialog--settings[open] {
-  display: flex;
-  flex-direction: column;
-  height: min(820px, calc(100dvh - 32px));
-  overflow: hidden;
-}
-.dialog--settings .dialog__inner {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.dialog--settings .dialog__body {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.dialog--settings .settings {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
-}
-.dialog:focus,
-.dialog:focus-visible {
-  outline: none;
-}
-.dialog__header {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--gap);
-  align-items: center;
-}
-.dialog__header .icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  align-self: center;
-}
-.dialog__header .icon-btn svg {
-  display: block;
-}
-.dialog--settings .settings__tabs button {
-  white-space: nowrap;
-}
-.dialog--settings .settings__tabs button:hover {
-  color: var(--ink);
-}
-.dialog--settings .settings__panel {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.dialog--pro {
-  width: min(560px, calc(100vw - 32px));
-}
-.dialog--settings .settings__tabs {
-  flex: none;
-  display: grid;
-  gap: var(--gap);
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-}
-@media (max-width: 760px) {
-  .dialog--settings .settings__tabs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-.dialog--storage {
-  width: min(620px, calc(100vw - 32px));
-  max-width: min(620px, calc(100vw - 32px));
-}
-.dialog::backdrop {
-  background: rgba(0, 0, 0, 0.75);
 }

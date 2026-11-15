@@ -75,8 +75,6 @@ const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
   { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
 ];
 
-/** Position of the sliding tab highlight (moves with transform only, no layout work). */
-
 const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minuten-Takt', fifteen: '15-Minuten-Takt' };
 
 export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCompanion }: Props) {

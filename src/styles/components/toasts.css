@@ -1,19 +1,28 @@
+/* ========================================================================
+   Toasts: one sentence at the bottom centre on a floating surface.
+   ======================================================================== */
+
 .toasts {
   position: fixed;
-  left: 50%;
-  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
+  left: calc(50% + var(--rail-w) / 2);
+  bottom: calc(var(--s5) + env(safe-area-inset-bottom, 0px));
   z-index: 60;
   display: grid;
-  gap: var(--gap);
-  width: min(480px, calc(100vw - 32px));
+  gap: var(--s2);
+  width: min(460px, calc(100vw - var(--rail-w) - 32px));
+  transform: translateX(-50%);
 }
 .toast {
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
+  font-size: 14px;
   color: var(--ink);
   text-align: center;
   cursor: pointer;
-  background: var(--bg);
-  padding: 10px 14px;
+  animation: rise var(--t-base) var(--ease) both;
 }
 .storage-note {
   display: grid;
@@ -32,6 +41,10 @@
 }
 .toast__action {
   flex: none;
-  color: inherit;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--ink-3);
+  text-underline-offset: 3px;
   cursor: pointer;
 }

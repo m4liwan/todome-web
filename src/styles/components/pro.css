@@ -1,18 +1,26 @@
 .pro-lock {
   display: inline-flex;
   align-items: center;
-  gap: var(--gap);
+  gap: 4px;
   height: 20px;
-  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
   white-space: nowrap;
 }
 .pro-veil__note {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s4);
   width: fit-content;
-  max-width: min(560px, 100%);
+  max-width: min(600px, 100%);
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: var(--fs-meta);
 }
 .pro-veil__note p {
   flex: 1 1 260px;
@@ -25,9 +33,16 @@
 .pro__badge {
   display: inline-flex;
   align-items: center;
-  gap: var(--gap);
+  gap: 6px;
   width: fit-content;
-  height: 28px;
+  height: 24px;
+  padding: 0 var(--s2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
   color: var(--ink);
 }
 .pro__focus {
@@ -45,6 +60,9 @@
 .pro-compare th,
 .pro-compare td {
   height: 40px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  font-weight: 400;
   text-align: center;
   vertical-align: middle;
 }
@@ -53,7 +71,11 @@
 }
 .pro-compare thead th {
   height: 34px;
-  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
 .pro-compare__pro {
   width: 116px;

@@ -23,9 +23,15 @@
   top: 0;
   left: 0;
   box-sizing: border-box;
+  border-radius: var(--radius);
   pointer-events: none;
-  outline: 2px solid var(--ink);
-  outline-offset: 4px;
+  outline: 1px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 6px;
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.55);
+  transition:
+    transform var(--t-slow) var(--ease),
+    width var(--t-slow) var(--ease),
+    height var(--t-slow) var(--ease);
 }
 .tour__buddy {
   position: absolute;
@@ -42,10 +48,14 @@
   left: 0;
   z-index: 1;
   display: grid;
-  gap: var(--gap);
+  gap: var(--s3);
+  padding: var(--s5);
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
   opacity: 0;
-  background: var(--bg);
-  padding: 14px 16px;
+  transition: opacity var(--t-base) var(--ease);
 }
 .tour__bubble.is-ready {
   opacity: 1;
@@ -53,29 +63,40 @@
 .tour__who {
   display: flex;
   justify-content: space-between;
-  gap: var(--gap);
-  color: var(--ink-2);
+  gap: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.tour__bubble h2 {
+  font-size: var(--fs-h2);
 }
 .tour__text {
+  font-size: 14px;
   color: var(--ink-2);
 }
 .tour__actions {
   display: flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s3);
+  margin-top: var(--s2);
 }
 .tour__dots {
   display: flex;
-  gap: var(--gap);
+  gap: 6px;
   margin-right: auto;
 }
 .tour__dots i {
-  width: 6px;
-  height: 6px;
-  background: var(--line);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--line-strong);
 }
 .tour__skip {
-  color: var(--ink-2);
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
 }
 
 .tour__badge {

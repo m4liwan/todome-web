@@ -25,14 +25,23 @@
 .breathe__circle {
   display: grid;
   place-items: center;
+  width: 140px;
+  height: 140px;
 }
 .breathe__circle span {
+  width: 120px;
+  height: 120px;
+  border: 1px solid rgb(var(--accent-rgb) / 0.6);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--accent-rgb) / 0.18), transparent 70%);
   animation: breathe-guide 8s ease-in-out infinite;
   animation-duration: inherit;
 }
 .breathe__text {
   display: grid;
   min-height: 1.6em;
+  font-size: 17px;
+  color: var(--ink-2);
 }
 .breathe__in,
 .breathe__out {
