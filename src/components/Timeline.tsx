@@ -100,7 +100,7 @@ export function Timeline({ state, projections, now }: Props) {
   const live = todays.some((p) => p.status === 'running');
 
   return (
-    <section className="card timeline rise" style={{ '--i': 1 } as React.CSSProperties} aria-label="Tagesverlauf">
+    <section className="card timeline" aria-label="Tagesverlauf">
       <header className="timeline__head">
         <div>
           <h2>Dein Tag</h2>

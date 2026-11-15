@@ -40,7 +40,7 @@ export function ActiveSession({ state, projections, foreground, now, onOpen, onS
   const stack = sessionStack(projections);
   useTimerAnnouncements(state, foreground);
   return (
-    <section className="rise" style={{ '--i': 2 } as React.CSSProperties} aria-label="Aktuelle Session">
+    <section aria-label="Aktuelle Session">
       {foreground ? (
         <FocusCard state={state} p={foreground} now={now} onOpen={onOpen} stackDepth={stack.length} onBreathe={onBreathe} />
       ) : (

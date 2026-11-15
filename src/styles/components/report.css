@@ -1,16 +1,37 @@
+.times-mini {
+  display: grid;
+  align-content: start;
+  gap: var(--s4);
+}
+.times-mini__amount {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
 .times-mini__amount small {
   display: block;
-  color: var(--ink-2);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--ink-3);
 }
 .bars {
   display: grid;
-  gap: var(--gap);
+  gap: var(--s3);
 }
 .bars li {
   display: grid;
   grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s3);
+  font-size: var(--fs-meta);
+}
+.bars__value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
 }
 .bars__name {
   overflow: hidden;
@@ -67,6 +88,17 @@
   user-select: none;
 }
 .bars__track {
-  height: 4px;
-  background: var(--line);
+  height: 2px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+.bars__track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ink-2);
+}
+.bars__track span.is-billable {
+  background: var(--ink);
 }

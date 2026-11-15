@@ -36,7 +36,7 @@ export function TodayTimesCard({ state, projections, now, onMore }: Props & { on
   const amount = totals.reduce((a, t) => a + t.amount, 0);
   const max = Math.max(1, ...totals.map((t) => t.netMs));
   return (
-    <section className="card times-mini rise" style={{ '--i': 6 } as React.CSSProperties} aria-label="Zeiten heute">
+    <section className="card times-mini" aria-label="Zeiten heute">
       <header className="card__head">
         <div>
           <h2>Zeiten heute</h2>
@@ -80,7 +80,7 @@ export function ReportPanel({ state, projections, now }: Props) {
   const pro = hasPro();
 
   return (
-    <section className="zone report rise" style={{ '--i': 2 } as React.CSSProperties} aria-label="Zeitbericht">
+    <section className="zone report" aria-label="Zeitbericht">
       <header className="card__head">
         <div>
           <h2>Zeitbericht</h2>

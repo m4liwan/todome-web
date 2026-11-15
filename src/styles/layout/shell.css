@@ -62,6 +62,18 @@
   justify-content: space-between;
   gap: var(--gap);
 }
+/* Module titles: clear and compact; the subline is quiet meta. */
+.card__head h2,
+.timeline__head h2 {
+  font-size: 17px;
+  letter-spacing: -0.02em;
+}
+.card__head p.muted,
+.timeline__head p.muted {
+  margin-top: 2px;
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
 .gaps li {
   display: flex;
   justify-content: space-between;

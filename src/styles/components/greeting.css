@@ -1,69 +1,120 @@
-.hello,
-.timeline {
-  grid-column: 1 / -1;
-}
+/* ========================================================================
+   Greeting (components/Greeting.tsx): the headline of the day, quiet
+   shortcuts (energy, login, rest, breathe) and the vitals as a mono row.
+   ======================================================================== */
+
 .hello {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--gap);
+  display: grid;
+  gap: var(--s6);
+}
+.hello__text {
+  display: grid;
+  gap: var(--s3);
+}
+.hello h1 {
+  font-size: 40px;
+  letter-spacing: -0.04em;
 }
 .hello p {
+  max-width: 60ch;
   color: var(--ink-2);
-}
-.vitals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap);
-}
-.vitals div {
-  display: flex;
-  flex-direction: column-reverse;
-}
-.vitals dt {
-  color: var(--ink-3);
-}
-.vitals dd small {
-  color: var(--ink-3);
-}
-@media (max-width: 600px) {
-  .vitals {
-    gap: var(--gap);
-  }
-}
-.shell.is-focusing .vitals,
-.shell.is-focusing .timeline {
-  opacity: 0.42;
-}
-.shell.is-focusing .vitals:hover,
-.shell.is-focusing .timeline:hover {
-  opacity: 1;
-}
-.energy-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap);
-  color: var(--ink-2);
-  cursor: pointer;
-}
-.energy-chip:hover {
-  color: var(--ink);
 }
 .hello__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--gap);
+  gap: var(--s2);
+  margin-top: var(--s2);
 }
-.shell.is-focusing .vitals {
-  opacity: 0.55;
+.energy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: var(--fs-meta);
+  font-weight: 500;
+  color: var(--ink-2);
+  cursor: pointer;
 }
-.shell.is-focusing .vitals:hover {
+.energy-chip:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: var(--hover);
+  color: var(--ink);
+}
+/* A set energy reads as a status: a small dot in front. */
+.energy-chip:is(.energy-chip--low, .energy-chip--mid, .energy-chip--high)::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-2);
+}
+.energy-chip--high::before {
+  background: var(--accent) !important;
+}
+
+/* Vitals: four numbers in one row, divided by hairlines. */
+.vitals {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.vitals div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  padding: 0 var(--s5);
+  border-left: 1px solid var(--line);
+}
+.vitals div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.vitals dt {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.vitals dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+.vitals dd small {
+  margin-left: 2px;
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+@media (max-width: 760px) {
+  .vitals {
+    row-gap: var(--s4);
+  }
+  .vitals div {
+    padding: 0 var(--s4);
+  }
+  .vitals div:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* While a block runs the vitals step back; they return on contact. */
+.hello__chips,
+.vitals {
+  transition: opacity var(--t-slow) var(--ease);
+}
+.shell.is-focusing .vitals,
+.shell.is-focusing .hello__chips {
+  opacity: 0.4;
+}
+.shell.is-focusing .vitals:hover,
+.shell.is-focusing .hello__chips:hover,
+.shell.is-focusing .hello__chips:focus-within {
   opacity: 1;
-}
-.shell.fs-breathe .hello__chips,
-.shell.fs-breathe .vitals,
-.shell.fs-micro .hello__chips,
-.shell.fs-micro .vitals {
-  opacity: 0.45;
 }

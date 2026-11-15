@@ -112,7 +112,7 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen }: Hu
   const spotOf = (part: IntroSpot) => (intro.spot === part ? ' is-spot' : '');
 
   return (
-    <section className={`companion-hub rise${intro.spot ? ' is-touring' : ''}`} aria-label={`Dein Begleiter ${name}`}>
+    <section className={`companion-hub${intro.spot ? ' is-touring' : ''}`} aria-label={`Dein Begleiter ${name}`}>
       <div ref={intro.refs.hero} className={`companion-hub__hero is-${tier}${spotOf('hero')}`}>
         <button
           ref={intro.help}

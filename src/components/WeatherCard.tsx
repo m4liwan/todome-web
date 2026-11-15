@@ -19,7 +19,7 @@ export function WeatherCard({ state, now, onOpen }: Props) {
 
   if (!hasLocation) {
     return (
-      <section className="card weather weather--empty rise" style={{ '--i': 4 } as React.CSSProperties} aria-label="Wetter">
+      <section className="card weather weather--empty" aria-label="Wetter">
         <header className="card__head">
           <h2>Wetter</h2>
         </header>
@@ -33,7 +33,7 @@ export function WeatherCard({ state, now, onOpen }: Props) {
 
   if (!w) {
     return (
-      <section className="card weather rise" style={{ '--i': 4 } as React.CSSProperties} aria-label="Wetter" aria-busy={status.loading}>
+      <section className="card weather" aria-label="Wetter" aria-busy={status.loading}>
         <header className="card__head">
           <h2>Wetter</h2>
         </header>
@@ -51,9 +51,9 @@ export function WeatherCard({ state, now, onOpen }: Props) {
 
   return (
     <section
-      className="card weather weather--interactive rise"
+      className="card weather weather--interactive"
       data-kind={d.kind}
-      style={{ '--i': 4 } as React.CSSProperties}
+     
       aria-label="Wetter"
       onClick={(e) => {
         if (!(e.target as Element).closest('button')) onOpen({ kind: 'weather' });

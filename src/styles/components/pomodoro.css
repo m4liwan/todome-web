@@ -1,17 +1,21 @@
 .pomo-rounds {
   display: flex;
-  gap: var(--gap);
+  gap: 6px;
   list-style: none;
 }
 .pomo-rounds li {
-  width: 8px;
-  height: 8px;
-  background: var(--line);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--line-strong);
 }
 .timer-lengths {
   display: grid;
   gap: var(--gap);
 }
-.pomo-rounds li.is-done, .pomo-rounds li.is-on {
-  background: var(--ink);
+.pomo-rounds li.is-done {
+  background: var(--ink-2);
+}
+.pomo-rounds li.is-on {
+  background: var(--accent);
 }

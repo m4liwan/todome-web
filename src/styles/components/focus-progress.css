@@ -1,7 +1,11 @@
-/* Focus progress: wave, bar and dots show how far the session has come (data marks). */
+/* ========================================================================
+   Focus progress (components/FocusProgress.tsx): how far the block has come.
+   A hairline track, the done part and the "now" mark in the light colour.
+   ======================================================================== */
+
 .tl-wave {
   position: relative;
-  max-width: 640px;
+  width: 100%;
   height: 44px;
 }
 .tl-wave svg {
@@ -18,30 +22,45 @@
 }
 .tl-wave__line {
   fill: none;
-  stroke: var(--ink);
+  stroke: var(--accent);
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }
-.tl-wave__fill-top,
+.tl-wave__fill-top {
+  stop-color: rgb(var(--accent-rgb));
+  stop-opacity: 0.12;
+}
 .tl-wave__fill-bottom {
+  stop-color: rgb(var(--accent-rgb));
   stop-opacity: 0;
+}
+.tl-wave.is-paused .tl-wave__line {
+  stroke: var(--ink-3);
 }
 .tl-wave__now {
   position: absolute;
-  top: 8px;
-  bottom: 8px;
+  top: 6px;
+  bottom: 6px;
   width: 1px;
-  background: var(--ink);
+  background: var(--accent);
+  transition: left var(--t-slow) var(--ease);
 }
+.tl-wave.is-paused .tl-wave__now {
+  background: var(--ink-3);
+}
+
 .tl-bar {
   position: relative;
-  max-width: 640px;
-  height: 4px;
+  width: 100%;
+  height: 2px;
   overflow: hidden;
-  background: var(--line);
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 .tl-bar__fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: var(--ink);
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width var(--t-slow) var(--ease);
 }

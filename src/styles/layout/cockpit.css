@@ -57,7 +57,8 @@
 .panel--tl > * {
   flex: none;
 }
-.panel--focus {
+.panel--focus,
+.panel--hub {
   container-type: inline-size;
 }
 .panel--focus > section {

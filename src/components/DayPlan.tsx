@@ -49,7 +49,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
   const total = open.length + done.length;
 
   return (
-    <section id="plan" className={`card plan rise${expanded ? ' is-expanded' : ''}`} style={{ '--i': 3 } as React.CSSProperties} aria-label="Tagesplan">
+    <section id="plan" className={`card plan${expanded ? ' is-expanded' : ''}`} aria-label="Tagesplan">
       <header className="card__head">
         <div>
           <h2>{expanded ? 'Dein Tag' : 'Danach'}</h2>
@@ -57,7 +57,7 @@ export function DayPlan({ state, projections, foreground, now, onOpen, expanded,
             {total === 0 ? 'Noch nichts geplant' : done.length > 0 ? `${done.length} ${done.length === 1 ? 'Sache' : 'Sachen'} schon geschafft` : 'Eins nach dem anderen'}
           </p>
         </div>
-        <button type="button" className="round-btn round-btn--primary" aria-label="Aufgabe anlegen" title="Aufgabe anlegen" onClick={() => onOpen({ kind: 'task', taskId: null })}>
+        <button type="button" className="round-btn" aria-label="Aufgabe anlegen" title="Aufgabe anlegen" onClick={() => onOpen({ kind: 'task', taskId: null })}>
           <IconPlus size={18} />
         </button>
       </header>

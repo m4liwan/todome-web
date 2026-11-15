@@ -1,51 +1,128 @@
-.weather__icon {
+/* ========================================================================
+   Weather (components/WeatherCard.tsx, dialogs/WeatherDialog): the
+   temperature in mono, the next hours as quiet bars, one line of advice.
+   ======================================================================== */
+
+.weather {
   display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-}
-.weather__now {
-  display: flex;
-  align-items: center;
-  gap: var(--gap);
-}
-.weather__temp sup {
-  vertical-align: 0.95em;
+  align-content: start;
+  gap: var(--s4);
 }
 .weather--interactive {
   cursor: pointer;
 }
+.weather__icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  color: var(--ink-2);
+}
+.weather__icon:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.weather__now {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+}
+.weather__temp {
+  font-family: var(--font-mono);
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.weather__temp sup {
+  margin-left: 2px;
+  font-size: var(--fs-meta);
+  letter-spacing: 0;
+  vertical-align: 1.6em;
+  color: var(--ink-3);
+}
+.weather__desc {
+  display: grid;
+  gap: 2px;
+  font-size: var(--fs-meta);
+}
+.weather__advice {
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+}
+
+/* The next hours: a row of thin bars with temperature and hour. */
+.hours {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: var(--s1);
+}
+.hours li {
+  display: grid;
+  justify-items: center;
+  align-content: end;
+  gap: 6px;
+}
+.hours__bar {
+  width: 2px;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+.hours__t {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.hours__h {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-3);
+}
+
+/* Weather dialog */
 .wx {
   display: grid;
-  gap: var(--gap);
+  gap: var(--s5);
 }
 .wx__now {
   display: flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s4);
+}
+.wx__temp {
+  font-family: var(--font-mono);
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: -0.05em;
 }
 .wx__temp sup {
+  font-size: var(--fs-meta);
   vertical-align: top;
+  color: var(--ink-3);
 }
 .wx__hours {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
-  gap: var(--gap);
+  gap: var(--s2);
 }
 .wx__hours li {
   display: grid;
   justify-items: center;
-  gap: var(--gap);
+  gap: var(--s1);
+  padding: var(--s2) 0;
+  border-top: 1px solid var(--line);
 }
 .wx__h,
 .wx__p {
-  color: var(--ink-2);
   min-height: 1em;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
 }
 .wx__settings {
   display: grid;
-  gap: var(--gap);
-}
-.shell--today .weather__advice {
-  color: var(--ink-2);
+  gap: var(--s3);
 }

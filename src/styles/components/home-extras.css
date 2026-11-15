@@ -1,137 +1,165 @@
-.pause-room {
-  position: fixed;
-  inset: 0;
-  z-index: 160;
-  display: grid;
-  place-items: center;
-  background: var(--bg);
-}
-.pause-room__center {
+/* ========================================================================
+   Home extras (components/HomeExtras.tsx): the companion in the side column,
+   thought of the day, thought parking, week teaser, micro routines and the
+   full-screen pause room of a routine.
+   ======================================================================== */
+
+/* ---------- companion (side column) ---------- */
+.home-hub {
   position: relative;
   display: grid;
-  justify-items: center;
-  gap: var(--gap);
-  text-align: center;
-  max-width: 460px;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s5);
 }
-.pause-room__ring {
-  overflow: visible;
+.home-hub__house {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 112px;
 }
-.pause-room__track {
-  fill: none;
-  stroke: var(--line-strong);
-  stroke-width: 2;
+.home-hub__house .scene {
+  max-width: 100%;
 }
-.pause-room__fill {
-  fill: none;
-  stroke-linecap: round;
-  stroke: var(--ink);
-  stroke-width: 2;
+.home-hub__info {
+  display: grid;
+  align-content: start;
+  gap: var(--s2);
+  min-width: 0;
+}
+.home-hub__name {
+  font-size: var(--fs-h2);
+}
+.home-hub__doing {
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+}
+.home-hub__info .muted.small,
+.home-hub__since {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.home-hub__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s1);
+}
+.home-hub__customize {
+  justify-self: start;
+}
+.home-hub__feedback {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  transition:
+    color var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease);
+}
+.home-hub__feedback:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+@container (max-width: 280px) {
+  .home-hub {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- thought of the day ---------- */
+.impulse {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-content: stretch;
+  gap: var(--s4);
 }
 .impulse__label {
-  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.impulse__text {
+  align-self: center;
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  quotes: none;
+  animation: rise var(--t-slow) var(--ease) both;
+}
+.impulse__q {
+  color: var(--ink-3);
 }
 .impulse__next {
   justify-self: start;
+}
+
+/* ---------- thought parking ---------- */
+.parking__add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
 }
 .parking__add input {
   flex: 1;
   min-width: 0;
 }
+.parking__btns {
+  display: flex;
+  gap: var(--s2);
+}
 .parking__list {
   display: grid;
-  gap: var(--gap);
+}
+.parking__list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'text actions'
+    'time actions';
+  align-items: center;
+  column-gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+  transition: opacity var(--t-slow) var(--ease);
+}
+.parking__list li.is-releasing {
+  opacity: 0;
 }
 .parking__list p {
   grid-area: text;
+  font-weight: 500;
   overflow-wrap: anywhere;
 }
 .parking__time {
   grid-area: time;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
   color: var(--ink-3);
 }
 .parking__actions {
   grid-area: actions;
   display: flex;
+  opacity: 0.6;
+  transition: opacity var(--t-fast) var(--ease);
 }
-.teaser {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--gap);
+.parking__list li:hover .parking__actions,
+.parking__list li:focus-within .parking__actions {
+  opacity: 1;
 }
-.teaser__text {
-  flex: 1 1 260px;
-  display: grid;
-  gap: var(--gap);
-}
-.teaser__bars {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--gap);
-  height: 56px;
-}
-.teaser__bars li {
-  width: 14px;
-  height: max(5px, calc(var(--h) * 100%));
-  background: var(--ink-3);
-}
-.routines__list {
-  display: grid;
-  gap: var(--gap);
-}
-.routines__list li {
-  display: flex;
-  align-items: center;
-  gap: var(--gap);
-}
-.routines__tick {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  outline: 1px solid var(--line-strong);
-  outline-offset: -4px;
-}
-.routines__text {
-  flex: 1;
-  min-width: 0;
-}
-.routines__text span {
+.parking__empty {
+  font-size: var(--fs-meta);
   color: var(--ink-3);
-}
-.routines__list li.is-done .routines__text p {
-  color: var(--ink-2);
-}
-.impulse {
-  display: grid;
-  gap: var(--gap);
-  grid-template-rows: auto 1fr auto;
-  align-content: stretch;
-}
-.impulse__text {
-  align-self: center;
-  quotes: none;
-}
-.parking__add {
-  display: flex;
-  gap: var(--gap);
-  align-items: center;
-  flex-wrap: wrap;
-}
-.parking__btns {
-  display: flex;
-  gap: var(--gap);
-}
-.parking__list li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: 'text actions'
-    'time actions';
-  align-items: center;
-  gap: var(--gap);
 }
 .ticker-field {
   position: relative;
@@ -141,20 +169,135 @@
 .ticker-field input {
   width: 100%;
 }
+.ticker-field__text {
+  display: none;
+}
+
+/* ---------- week teaser ---------- */
+.teaser {
+  display: grid;
+  align-content: start;
+  gap: var(--s4);
+}
+.teaser__text {
+  display: grid;
+  gap: var(--s2);
+}
+.teaser__bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 56px;
+}
+.teaser__bars li {
+  flex: 1;
+  max-width: 18px;
+  height: max(2px, calc(var(--h) * 100%));
+  border-radius: 2px 2px 0 0;
+  background: var(--line-strong);
+  transform-origin: bottom;
+  animation: rise var(--t-slow) var(--ease) both;
+}
+.teaser__bars li.is-today {
+  background: var(--accent);
+}
+.teaser .btn {
+  justify-self: start;
+}
+
+/* ---------- micro routines ---------- */
+.routines__list {
+  display: grid;
+}
+.routines__list li {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.routines__tick {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: calc(var(--radius) / 2);
+  color: var(--bg);
+  cursor: pointer;
+  transition:
+    background-color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease);
+}
+.routines__tick[aria-checked='true'] {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+.routines__tick[aria-checked='false'] svg {
+  visibility: hidden;
+}
+.routines__text {
+  flex: 1;
+  min-width: 0;
+}
+.routines__text p {
+  font-weight: 500;
+}
+.routines__text span {
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+.routines__list li.is-done .routines__text p {
+  color: var(--ink-3);
+}
 .routines__swap {
   flex: none;
+  font-size: 12px;
   color: var(--ink-3);
   cursor: pointer;
 }
 .routines__swap:hover {
   color: var(--ink);
 }
-.teaser__bars li.is-today {
-  background: var(--ink);
+
+/* ---------- pause room (full screen) ---------- */
+.pause-room {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  animation: fade-in var(--t-slow) var(--ease) both;
 }
-.routines__tick[aria-checked='false'] svg {
-  visibility: hidden;
+.pause-room__center {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--s4);
+  max-width: 460px;
+  text-align: center;
 }
-.ticker-field__text {
-  display: none;
+.pause-room__ring {
+  overflow: visible;
+}
+.pause-room__track {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+.pause-room__fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+.pause-room__time {
+  font-family: var(--font-mono);
+  font-size: 56px;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
 }

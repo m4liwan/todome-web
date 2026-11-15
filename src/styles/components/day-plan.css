@@ -1,38 +1,128 @@
+/* ========================================================================
+   Day plan (components/DayPlan.tsx): "Danach" in the side column, the full
+   plan when expanded. Rows divided by hairlines, durations in mono.
+   ======================================================================== */
+
+.plan {
+  container-type: inline-size;
+  display: grid;
+  gap: var(--s4);
+}
+.plan .card__head .round-btn {
+  width: 32px;
+  height: 32px;
+}
+
+/* ---------- "Danach": what comes next ---------- */
+.later {
+  display: grid;
+  gap: var(--s4);
+}
+.later__list {
+  display: grid;
+}
+.later__list li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.later__list li:first-child {
+  border-top: 1px solid var(--line);
+}
+.later__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.later__note {
+  flex: none;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.later__list .later__more {
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+.later__empty {
+  color: var(--ink-3);
+}
+.later__actions {
+  display: flex;
+  justify-content: flex-start;
+}
+@container (max-width: 300px) {
+  .later__note {
+    display: none;
+  }
+}
+
+/* ---------- capacity of the day ---------- */
 .capacity {
   display: grid;
-  gap: var(--gap);
-  color: var(--ink-2);
+  gap: var(--s2);
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
 }
 .capacity__bar {
+  height: 2px;
   overflow: hidden;
-  background: var(--line);
-  height: 4px;
+  border-radius: 999px;
+  background: var(--line-strong);
 }
 .capacity__bar span {
   display: block;
   height: 100%;
+  border-radius: inherit;
   background: var(--ink);
+  transition: width var(--t-slow) var(--ease);
 }
 .capacity.is-over p {
   color: var(--ink);
 }
+
+/* ---------- the full list ---------- */
+.plan__group {
+  display: grid;
+  gap: var(--s2);
+}
 .plan__label,
 .plan__fold summary {
-  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
   cursor: pointer;
 }
 .tasks {
   display: grid;
-  gap: var(--gap);
 }
 .task {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--gap);
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.task.is-running .task__title::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: var(--s2);
+  border-radius: 50%;
+  background: var(--accent);
+  vertical-align: 2px;
+  animation: pulse-dot 2.4s var(--ease) infinite;
 }
 .task--muted {
-  opacity: 0.75;
+  opacity: 0.7;
 }
 .task--done .task__title {
   color: var(--ink-3);
@@ -41,70 +131,29 @@
 .task__main {
   display: flex;
   align-items: baseline;
-  gap: var(--gap);
+  gap: var(--s3);
   min-width: 0;
 }
 .task__text {
   min-width: 0;
 }
 .task__title {
+  font-weight: 500;
   overflow-wrap: anywhere;
 }
 .task__meta {
-  color: var(--ink-2);
+  font-size: 12px;
+  color: var(--ink-3);
 }
 .task__actions {
   display: flex;
-  align-items: center;
-  gap: var(--gap);
   flex: none;
-}
-/* order-pinned: belongs to components/controls, kept here so the cascade stays as before */
-/* order-pinned: belongs to components/report, kept here so the cascade stays as before */
-.bars__track span {
-  display: block;
-  height: 100%;
-  background: var(--ink-2);
-}
-.later {
-  display: grid;
-  gap: var(--gap);
-}
-.later__list {
-  display: grid;
-  gap: var(--gap);
-}
-.later__title {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.later__note {
-  flex: none;
-  color: var(--ink-3);
-}
-.later__list .later__more {
-  color: var(--ink-2);
-}
-.later__empty {
-  color: var(--ink-2);
-}
-.later__actions {
-  display: flex;
-  justify-content: flex-start;
-}
-.plan {
-  container-type: inline-size;
-}
-.later__list li {
-  display: flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s1);
+  opacity: 0.55;
+  transition: opacity var(--t-fast) var(--ease);
 }
-@container (max-width: 360px) {
-  .later__note {
-    display: none;
-  }
+.task:hover .task__actions,
+.task:focus-within .task__actions {
+  opacity: 1;
 }

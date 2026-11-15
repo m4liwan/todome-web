@@ -46,7 +46,7 @@ export function WeekView({ state, projections, now }: Props) {
   const proud = w.days.map((d) => ({ day: d.day, note: state.wellbeing.proud[d.day] })).filter((p): p is { day: string; note: string } => Boolean(p.note));
 
   return (
-    <section className="weekview rise" aria-label="Deine Woche">
+    <section className="weekview" aria-label="Deine Woche">
       <div className="weekview__hero">
         <p className="zone__label">Dein Rückblick · die letzten sieben Tage</p>
         <h1 className="weekview__title">{r.title}</h1>

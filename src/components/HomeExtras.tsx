@@ -53,7 +53,7 @@ export function DailyImpulse({ state, now }: { state: AppState; now: Millis }) {
   const mode = energyMode(energyToday(state, now));
   const text = thoughtFor(dayKey(now), mode, offset);
   return (
-    <section className="card impulse rise" aria-label="Tagesgedanke">
+    <section className="card impulse" aria-label="Tagesgedanke">
       <p className="impulse__label">Dein Gedanke für heute</p>
       <blockquote className="impulse__text" key={text}>
         <span className="impulse__q impulse__q--open" aria-hidden="true">
@@ -119,7 +119,7 @@ export function ThoughtParking({ state, now }: { state: AppState; now: Millis })
   };
 
   return (
-    <section className="card parking rise" aria-label="Gedanken-Parkplatz">
+    <section className="card parking" aria-label="Gedanken-Parkplatz">
       <header className="card__head">
         <div>
           <h2>Gedanken-Parkplatz</h2>
@@ -246,7 +246,7 @@ export function WeekTeaser({ state, projections, now, onOpen }: { state: AppStat
   const w = useMemo(() => weekSummary(state, projections, now), [state, projections, now]);
   const max = Math.max(HOUR, ...w.days.map((d) => d.netMs));
   return (
-    <section className="card teaser rise" aria-label="Wochen-Teaser">
+    <section className="card teaser" aria-label="Wochen-Teaser">
       <div className="teaser__text">
         <h2>Deine Woche</h2>
         <p className="muted">
@@ -350,7 +350,7 @@ export function MicroRoutines({ state, now, onStart }: { state: AppState; now: M
     ...slots.map((id, i) => ({ r: MOMENT_POOL.find((m) => m.id === id) ?? MOMENT_POOL[0]!, slot: i })),
   ];
   return (
-    <section className="card routines rise" aria-label="Micro-Routinen">
+    <section className="card routines" aria-label="Micro-Routinen">
       <header className="card__head">
         <div>
           <h2>Kleine Wohlfühl-Momente</h2>
@@ -458,13 +458,13 @@ export function CompanionHome({ state, now, fgTaskId, onCustomize }: { state: Ap
   const activity = running ? avatarActivity(state, now, running) : profile?.mode === 'low' ? 'tea' : 'writing';
   const energy = energyToday(state, now);
   return (
-    <section className="card home-hub rise" aria-label="Dein Begleiter">
+    <section className="card home-hub" aria-label="Dein Begleiter">
       <a className="home-hub__feedback" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer" aria-label="Feedback zu ToDoMe. geben" title="Feedback geben">
         <IconChat size={16} />
       </a>
       <div className="home-hub__house">
         <AvatarFx level={state.progression.stats.level} enabled={state.settings.appearance.companionFx}>
-          <AvatarScene avatar={avatar} activity={activity} size={190} holo={holoFor(state.progression.stats.level, state.settings.appearance.companionFx)} />
+          <AvatarScene avatar={avatar} activity={activity} size={112} holo={holoFor(state.progression.stats.level, state.settings.appearance.companionFx)} />
         </AvatarFx>
       </div>
       <div className="home-hub__info">

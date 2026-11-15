@@ -1,192 +1,331 @@
+/* ========================================================================
+   Focus: the stage of the cockpit (components/ActiveSession.tsx).
+   Idle ("Dein nächster Schritt") and running block share one rhythm:
+   mono label, monumental title, the clock, a hairline of progress, actions.
+   ======================================================================== */
+
+.focus {
+  position: relative;
+  flex: 1;
+  min-height: 100%;
+}
 .focus__inner {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  gap: var(--s5);
   height: 100%;
 }
+
+/* ---------- idle: the one next step ---------- */
+.one {
+  display: grid;
+  align-content: center;
+  height: 100%;
+}
+.one__text {
+  display: grid;
+  align-content: center;
+  gap: var(--s4);
+  min-width: 0;
+}
+.one__label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.one__title,
+.focus__title {
+  max-width: 20ch;
+  font-size: clamp(36px, 7.4cqi, var(--fs-display));
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
+}
+.one__lead {
+  max-width: 48ch;
+  font-size: 17px;
+  color: var(--ink-2);
+}
+.one__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+/* The companion lives in the side column; the stage stays with the task. */
+.one__buddy {
+  display: none;
+}
+
+/* ---------- running block ---------- */
 .focus__top {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
-  gap: var(--gap);
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.focus__top .status-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 2.4s var(--ease) infinite;
+}
+.focus[data-state='paused'] .focus__top .status-pill::before {
+  background: var(--ink-3);
+  animation: none;
+}
+.focus__sub {
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+.focus__row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s5);
 }
 .focus__clock {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--gap);
+  display: grid;
+  flex: 1 1 auto;
+  gap: var(--s2);
+  min-width: 0;
 }
+.focus__time {
+  font-family: var(--font-mono);
+  font-size: var(--fs-timer);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+.focus[data-state='paused'] .focus__time {
+  color: var(--ink-2);
+}
+.focus__clock-label {
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+.focus__dot {
+  display: none;
+}
+/* The companion's small scene appears on the stage only when the side
+   column has stepped away (tunnel). */
+.focus__buddy {
+  display: none;
+  flex: none;
+  width: 160px;
+  justify-items: center;
+  gap: var(--s2);
+  text-align: center;
+}
+.focus__buddy figcaption {
+  max-width: 18ch;
+  font-size: var(--fs-meta);
+  color: var(--ink-3);
+}
+.focus__buddy .scene {
+  margin-inline: auto;
+}
+.shell.fs-tunnel .focus__buddy {
+  display: grid;
+}
+
+/* Facts and steps: two quiet columns under the hairline of progress. */
 .focus__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
-  gap: var(--gap);
+  gap: var(--s7);
   align-items: start;
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
 }
 .facts {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--gap);
+  gap: var(--s4) var(--s5);
+  margin: 0;
+}
+.facts dt {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.facts dd {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
 }
 .facts__goal {
   grid-column: 1 / -1;
 }
+.facts__goal dd {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  color: var(--ink-2);
+}
+.steps {
+  display: grid;
+  gap: var(--s2);
+}
+.steps__title {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
 .step {
   position: relative;
   display: flex;
-  gap: var(--gap);
   align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--line);
   cursor: pointer;
 }
+.step input {
+  margin-top: 4px;
+}
 .step.is-done .step__label {
-  opacity: 0.55;
+  color: var(--ink-3);
   text-decoration: line-through;
+  text-decoration-color: var(--ink-3);
 }
 .steps__add {
   display: flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s2);
 }
-.focus .steps__add input:not([type='checkbox']) {
+.focus .steps__add input:not([type='checkbox']):not([type='radio']):not([type='range']) {
   flex: 1;
   min-width: 0;
 }
+
+/* The stack of interrupted work (return to it later). */
 .stack li {
   display: flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--line);
 }
 .stack__text {
   display: grid;
   flex: 1;
   min-width: 0;
 }
-@media (max-width: 860px) {
-  .focus__grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-.one {
+
+/* Micro bites: one small step at a time. */
+.bites {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--gap);
-  height: 100%;
+  align-content: start;
+  gap: var(--s3);
 }
-.one__text {
+.bites__now {
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.bites__done {
+  justify-self: start;
+}
+.bites__more {
   display: grid;
-  align-content: center;
-  gap: var(--gap);
-  min-width: 0;
+  gap: var(--s2);
+  color: var(--ink-3);
 }
-.one__title {
-  overflow-wrap: anywhere;
+
+/* Beads (focus progress "beads"): done in the light colour, the next one grey. */
+.focus .dots span.is-on {
+  background: var(--accent);
 }
-.one__lead {
-  max-width: 44ch;
+.focus .dots span.is-next {
+  background: var(--ink-3);
 }
-.one__meta {
+
+.focus__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s2);
+  margin-top: auto;
+  padding-top: var(--s3);
 }
-.one__buddy,
-.focus__buddy {
+
+/* Focus style menu (components/FocusStyle.tsx). */
+.fstyle {
+  position: relative;
+}
+.fstyle__menu {
+  position: fixed;
+  z-index: 120;
   display: grid;
-  justify-items: center;
-  gap: var(--gap);
+  gap: 2px;
+  width: min(340px, 80vw);
+  padding: var(--s1);
+  border: 1px solid var(--line-float);
+  border-radius: calc(var(--radius) + 2px);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  animation: rise-sm var(--t-base) var(--ease) both;
 }
-.one__buddy figcaption,
-.focus__buddy figcaption {
-  max-width: 18ch;
-  text-align: center;
+.fstyle__menu button {
+  display: grid;
+  gap: 2px;
+  padding: var(--s2) var(--s3);
+  border-radius: var(--radius);
+  text-align: left;
 }
-.focus__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--gap);
+.fstyle__menu button:hover {
+  background: var(--hover);
 }
-.focus__row .focus__clock {
-  flex: 1 1 auto;
-  min-width: 0;
+.fstyle__menu button:is([aria-checked='true'], .is-on) {
+  background: var(--active);
 }
-@media (max-width: 560px) {
+.fstyle__menu.is-closing {
+  pointer-events: none;
+  animation: fade-out var(--t-fast) var(--ease) both;
+}
+.fstyle__menu button.is-locked {
+  opacity: 0.6;
+}
+.fstyle__menu button .pro-lock {
+  vertical-align: middle;
+}
+
+@container (max-width: 620px) {
+  .focus__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .focus__row {
     flex-wrap: wrap;
+  }
+}
+@media (max-width: 1180px) {
+  .focus__time {
+    font-size: 72px;
   }
 }
 @media (max-width: 760px) {
-  .one__buddy {
-    justify-self: start;
+  .focus__time {
+    font-size: 56px;
   }
 }
-@container (max-width: 620px) {
-  .focus__grid {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-  .one {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-  .one__buddy {
-    justify-self: center;
-  }
-  .focus__row {
-    flex-wrap: wrap;
-  }
-  .focus__buddy {
-    margin-inline: auto;
-  }
-}
-.one__buddy {
-  justify-self: center;
-  align-self: center;
-  width: 100%;
-  max-width: 220px;
-}
-.one__buddy .scene {
-  margin-inline: auto;
-}
-.one__buddy,
-.focus__buddy {
-  display: grid;
-  justify-items: center;
-  align-content: center;
-  gap: var(--gap);
-}
-.one__buddy {
-  width: min(100%, 230px);
-  justify-self: center;
-}
-.focus .steps__add {
-  gap: var(--gap);
-}
-.focus .steps__add input:not([type='checkbox']):not([type='radio']):not([type='range']) {
-  flex: 1;
-}
-.one__buddy,
-.focus__buddy {
-  justify-items: center;
-  text-align: center;
-}
-.one__buddy .scene,
-.focus__buddy .scene {
-  margin-inline: auto;
-}
-.focus__buddy {
-  flex: none;
-  width: 184px;
-}
-.focus {
-  position: relative;
-  min-height: 100%;
-  flex: 1;
-}
-.focus__dot {
-  display: none;
-}
+
+/* ---------- cocoon: only the task, the clock and a companion dot ---------- */
 .shell.fs-cocoon .focus__top .chips,
 .shell.fs-cocoon .focus__sub,
 .shell.fs-cocoon .focus__grid,
@@ -197,25 +336,23 @@
   display: none;
 }
 .shell.fs-cocoon .focus__inner {
+  align-items: center;
   text-align: center;
 }
 .shell.fs-cocoon .focus__title {
-  justify-self: center;
-  max-width: 28ch;
+  max-width: 24ch;
 }
-.shell.fs-cocoon .focus__top {
-  justify-content: center;
-}
+.shell.fs-cocoon .focus__top,
 .shell.fs-cocoon .focus__row {
   justify-content: center;
 }
 .shell.fs-cocoon .focus__clock {
   justify-items: center;
-  text-align: center;
 }
 .shell.fs-cocoon .focus__actions {
   justify-content: center;
   opacity: 0.4;
+  transition: opacity var(--t-base) var(--ease);
 }
 .shell.fs-cocoon .focus:hover .focus__actions,
 .shell.fs-cocoon .focus__actions:focus-within {
@@ -223,54 +360,13 @@
 }
 .shell.fs-cocoon .focus__dot {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 0;
+  right: 0;
   z-index: 2;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   overflow: hidden;
-}
-.fstyle {
-  position: relative;
-}
-.fstyle__menu {
-  position: fixed;
-  z-index: 120;
-  display: grid;
-  gap: var(--gap);
-  width: min(340px, 80vw);
-  color: var(--ink);
-  background: var(--bg);
-  padding: 12px;
-}
-.fstyle__menu.is-closing {
-  pointer-events: none;
-}
-.fstyle__menu button.is-locked {
-  opacity: 0.62;
-}
-.fstyle__menu button .pro-lock {
-  vertical-align: middle;
-}
-.bites {
-  display: grid;
-  align-content: start;
-  gap: var(--gap);
-}
-.bites__done {
-  justify-self: start;
-  gap: var(--gap);
-}
-.bites__more {
-  display: grid;
-  gap: var(--gap);
-}
-.focus__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap);
-  margin-top: auto;
-  align-items: center;
+  border-radius: 50%;
 }

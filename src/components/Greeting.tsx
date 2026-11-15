@@ -64,7 +64,7 @@ export function Greeting({ state, projections, now, onOpen, onLogin, onStandby, 
   const profile = energyProfile(state, now);
 
   return (
-    <section className="hello rise" style={{ '--i': 0 } as React.CSSProperties} aria-label="Überblick">
+    <section className="hello" aria-label="Überblick">
       <div className="hello__text">
         <h1>
           {greetingFor(now)}

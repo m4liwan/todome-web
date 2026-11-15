@@ -46,7 +46,7 @@ export function CompanionCard({ state, projections, now, onOpen }: Props) {
   const level = 112 - fill * 88;
 
   return (
-    <section className="card hydro rise" style={{ '--i': 5 } as React.CSSProperties} aria-label="Wasser">
+    <section className="card hydro" aria-label="Wasser">
       <div className="hydro__main">
         <svg className="hydro__glass" viewBox="0 0 100 124" width="96" height="120" aria-hidden="true">
           <defs>

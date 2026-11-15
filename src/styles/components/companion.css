@@ -251,51 +251,64 @@ html.is-companion body {
   transform-box: fill-box;
 }
 .hydro__main {
-  display: flex;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s4);
 }
 .hydro__glass {
   flex: none;
+  width: 56px;
+  height: 70px;
   overflow: visible;
 }
 .hydro__text {
   display: grid;
-  gap: var(--gap);
+  gap: var(--s1);
   min-width: 0;
 }
+.hydro__amount {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
 .hydro__amount small {
-  color: var(--ink-2);
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.hydro__title {
+  font-size: var(--fs-body);
 }
 .hydro__line {
+  font-size: var(--fs-meta);
   color: var(--ink-2);
 }
 .hydro__actions {
   display: flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s2);
 }
 .hydro__buddy {
   display: flex;
   align-items: center;
-  gap: var(--gap);
+  gap: var(--s3);
   margin-top: auto;
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line);
 }
 .hydro__buddy p {
   flex: 1;
   min-width: 0;
-}
-@media (max-width: 760px) {
-  .hydro__main {
-    align-items: flex-start;
-  }
+  font-size: 12px;
+  color: var(--ink-3);
 }
 .hydro__avatar {
   flex: none;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   cursor: pointer;
 }
 .hydro__avatar .avatar {
@@ -311,7 +324,7 @@ html.is-companion body {
 .hydro {
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  gap: var(--s4);
 }
 .scene {
   position: relative;
