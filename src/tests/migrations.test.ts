@@ -64,7 +64,8 @@ describe('settings from 1.17 (OLED redesign)', () => {
       rose: 'rose',
       ocean: 'cyan',
       midnight: 'mono',
-      lavender: 'violet',
+      // The old 'lavender' world is a palette of its own again (Lavendel-Traum, 2.x).
+      lavender: 'lavender',
       neon: 'cyan',
       pulse: 'rose',
       matrix: 'cyan',

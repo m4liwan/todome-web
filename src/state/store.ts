@@ -40,10 +40,10 @@ const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = {
   ocean: 'cyan',
   neon: 'cyan',
   matrix: 'cyan',
-  lavender: 'violet',
+  // 'lavender' is a palette again (2.x, Lavendel-Traum); old saves keep it.
   pulse: 'rose',
 };
-const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose']);
+const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose', 'blush', 'lavender', 'peach', 'sakura', 'lilac']);
 const CORNERS = new Set(['sharp', 'precise', 'soft']);
 const DOCKS = new Set(['top', 'bottom']);
 const LAYOUTS = new Set(['classic', 'sanctuary', 'hub', 'flow', 'duo']);

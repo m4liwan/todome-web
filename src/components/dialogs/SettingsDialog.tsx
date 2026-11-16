@@ -62,14 +62,19 @@ const TONES: Array<{ id: Tone; label: string; example: string }> = [
   { id: 'sporty', label: 'Sportlich', example: '„Nachspielzeit! Noch mal ran oder abpfeifen?“' },
 ];
 
-/** Ambient light colours: a soft light behind the modules, muted in the accents. */
-const LIGHTS: Array<{ id: PaletteId; label: string; color: string }> = [
-  { id: 'lime', label: 'Fokus-Lime', color: '#a3e635' },
-  { id: 'cyan', label: 'Tiefsee-Cyan', color: '#62d4dc' },
-  { id: 'amber', label: 'Warmes Bernstein', color: '#e9b46a' },
-  { id: 'mono', label: 'Reines Weiß', color: '#e6e8ee' },
-  { id: 'violet', label: 'Tiefes Violett', color: '#a593ff' },
-  { id: 'rose', label: 'Gedämpftes Rosé', color: '#e49aae' },
+/** Ambient light colours: a soft light behind the modules, muted in the accents. Two tones each (the swatch shows the gradient). */
+const LIGHTS: Array<{ id: PaletteId; label: string; color: string; color2: string }> = [
+  { id: 'lime', label: 'Fokus-Lime', color: '#a3e635', color2: '#84cc16' },
+  { id: 'cyan', label: 'Tiefsee-Cyan', color: '#62d4dc', color2: '#3fa3c0' },
+  { id: 'amber', label: 'Warmes Bernstein', color: '#e9b46a', color2: '#cf8a4c' },
+  { id: 'mono', label: 'Reines Weiß', color: '#e6e8ee', color2: '#a7acb8' },
+  { id: 'violet', label: 'Tiefes Violett', color: '#a593ff', color2: '#7d6bea' },
+  { id: 'rose', label: 'Gedämpftes Rosé', color: '#e49aae', color2: '#c46a86' },
+  { id: 'blush', label: 'Soft Rose', color: '#f4aebc', color2: '#e284a0' },
+  { id: 'lavender', label: 'Lavendel-Traum', color: '#beaafa', color2: '#9680e8' },
+  { id: 'peach', label: 'Pfirsich-Seide', color: '#ffbe96', color2: '#f29678' },
+  { id: 'sakura', label: 'Sakura-Verlauf', color: '#ffb7d5', color2: '#d6b0ff' },
+  { id: 'lilac', label: 'Flieder-Aura', color: '#cda0f0', color2: '#8ca0ff' },
 ];
 
 const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
@@ -471,7 +476,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
                 }}
               >
                 <span className="palette__frame" aria-hidden="true">
-                  <span className="palette__swatch" style={{ '--swatch': p.color } as React.CSSProperties} />
+                  <span className="palette__swatch" style={{ '--swatch': p.color, '--swatch-2': p.color2 } as React.CSSProperties} />
                   {isProPalette(p.id, themes) && (
                     <span className="pro-blur__lock">
                       <IconLock size={13} />

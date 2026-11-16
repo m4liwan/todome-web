@@ -411,6 +411,7 @@
 .palettes {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
+  row-gap: var(--s3);
   gap: var(--s2);
 }
 .palette {
@@ -445,7 +446,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--swatch);
+  background: linear-gradient(135deg, var(--swatch), var(--swatch-2, var(--swatch)));
   box-shadow: 0 0 18px var(--swatch);
 }
 .palette.is-on .palette__swatch {

@@ -14,7 +14,7 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  opacity: calc(var(--ambient) * 0.36);
+  opacity: calc(var(--ambient) * 0.56);
   mix-blend-mode: var(--light-blend);
   transition: opacity var(--t-slow) var(--ease);
 }
@@ -59,6 +59,36 @@
   opacity: 0.7;
   animation: light-drift-c 54s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
+/* The wash: the whole background, softly, in both tones; it breathes. */
+.light__wash {
+  position: absolute;
+  inset: -12%;
+  background:
+    radial-gradient(ellipse 80% 62% at 18% 14%, rgb(var(--accent-2-rgb) / 0.2), rgb(var(--accent-2-rgb) / 0) 70%),
+    radial-gradient(ellipse 72% 66% at 86% 88%, rgb(var(--accent-rgb) / 0.18), rgb(var(--accent-rgb) / 0) 70%);
+  transition: opacity 1600ms var(--ease);
+  animation: light-breath-wide 18s ease-in-out infinite alternate;
+}
+/* The aurora: a long, soft band from one tone to the other that turns and
+   wanders very slowly; its edges dissolve (a mask, no blur filter). */
+.light__aurora {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150vmax;
+  height: 48vmax;
+  margin: -24vmax 0 0 -75vmax;
+  background: linear-gradient(100deg, rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb) / 0.3) 30%, rgb(var(--accent-2-rgb) / 0.28) 64%, rgb(var(--accent-2-rgb) / 0));
+  mask-image: radial-gradient(closest-side, #000 20%, rgb(0 0 0 / 0) 100%);
+  transition: opacity 1600ms var(--ease);
+  will-change: transform;
+  animation: light-aurora 72s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+/* While a block runs the wide layers step back; the focus style's halo leads. */
+.shell.is-focusing :is(.light__wash, .light__aurora) {
+  opacity: 0.5;
+}
+
 /* The grain only dithers the light: grey noise at a few percent, so the
    black between the lights stays black. */
 .light__grain {

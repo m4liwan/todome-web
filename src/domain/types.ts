@@ -190,7 +190,7 @@ export type AvatarId = 'spike' | 'mark' | 'bit' | 'spark' | 'kiki' | 'pixie' | '
  * Ambient light colour: a soft light behind the floating modules, which also
  * tints the accents, muted. violet and rose are exclusive (Pro or companion level 15).
  */
-export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose';
+export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose' | 'blush' | 'lavender' | 'peach' | 'sakura' | 'lilac';
 
 /** Global corner rounding: architectural, precise, or soft (the original look). */
 export type CornerStyle = 'sharp' | 'precise' | 'soft';

@@ -172,6 +172,38 @@
   --accent-2-rgb: 196 106 134;
 }
 
+/* The soft palettes: two tones each, a gentle gradient in the light. */
+:root[data-palette='blush'] {
+  --accent-rgb: 244 174 188;
+  --accent-mesh: #f4aebc;
+  --accent-2: #e284a0;
+  --accent-2-rgb: 226 132 160;
+}
+:root[data-palette='lavender'] {
+  --accent-rgb: 190 170 250;
+  --accent-mesh: #beaafa;
+  --accent-2: #9680e8;
+  --accent-2-rgb: 150 128 232;
+}
+:root[data-palette='peach'] {
+  --accent-rgb: 255 190 150;
+  --accent-mesh: #ffbe96;
+  --accent-2: #f29678;
+  --accent-2-rgb: 242 150 120;
+}
+:root[data-palette='sakura'] {
+  --accent-rgb: 255 183 213;
+  --accent-mesh: #ffb7d5;
+  --accent-2: #d6b0ff;
+  --accent-2-rgb: 214 176 255;
+}
+:root[data-palette='lilac'] {
+  --accent-rgb: 205 160 240;
+  --accent-mesh: #cda0f0;
+  --accent-2: #8ca0ff;
+  --accent-2-rgb: 140 160 255;
+}
+
 /* ---------- Tageslicht: the light theme (Settings → Design) ----------
    Warm alabaster paper instead of white, deep anthracite type, dark
    hairlines. The same silence and structure as the OLED black: only the
@@ -239,4 +271,34 @@
   --accent-mesh: #c45678;
   --accent-2: #a03c5f;
   --accent-2-rgb: 160 60 95;
+}
+:root[data-theme='light'][data-palette='blush'] {
+  --accent-rgb: 200 90 120;
+  --accent-mesh: #c85a78;
+  --accent-2: #a84062;
+  --accent-2-rgb: 168 64 98;
+}
+:root[data-theme='light'][data-palette='lavender'] {
+  --accent-rgb: 116 92 214;
+  --accent-mesh: #745cd6;
+  --accent-2: #5c46bc;
+  --accent-2-rgb: 92 70 188;
+}
+:root[data-theme='light'][data-palette='peach'] {
+  --accent-rgb: 210 112 70;
+  --accent-mesh: #d27046;
+  --accent-2: #b05634;
+  --accent-2-rgb: 176 86 52;
+}
+:root[data-theme='light'][data-palette='sakura'] {
+  --accent-rgb: 210 90 150;
+  --accent-mesh: #d25a96;
+  --accent-2: #8e5cd2;
+  --accent-2-rgb: 142 92 210;
+}
+:root[data-theme='light'][data-palette='lilac'] {
+  --accent-rgb: 150 90 200;
+  --accent-mesh: #965ac8;
+  --accent-2: #5a68d2;
+  --accent-2-rgb: 90 104 210;
 }

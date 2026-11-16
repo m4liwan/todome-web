@@ -97,3 +97,26 @@ describe('the focus styles feel different', () => {
     expect(app).toMatch(/key=\{focusStyle\}/);
   });
 });
+
+describe('the fuller ambient light', () => {
+  it('fills the background in layers: a wash, an aurora in both tones, the wandering sources', () => {
+    render(<AmbientLight />);
+    const light = document.querySelector('.light')!;
+    expect(light.querySelector('.light__wash')).not.toBeNull();
+    expect(light.querySelector('.light__aurora')).not.toBeNull();
+    const css = read('styles', 'components', 'ambient-light.css');
+    // Present, but still led by the strength setting (the dim switch turns it all off).
+    const l = rules('components', 'ambient-light.css').find((r) => r.selector === '.light')!;
+    expect(decl(l, 'opacity')).toMatch(/var\(--ambient\) \* 0\.(5|6)/);
+    expect(css).toMatch(/\.light__aurora\s*\{[^}]*--accent-2-rgb/);
+    expect(css).toMatch(/\.light__aurora\s*\{[^}]*animation:\s*light-aurora \d+s/);
+    expect(css).toMatch(/\.light__wash\s*\{[^}]*animation:\s*light-breath-wide \d+s/);
+  });
+
+  it('holds its new layers still in calm motion, too', () => {
+    const still = rules('base', 'accessibility.css')
+      .filter((r) => decl(r, 'animation-play-state') === 'paused')
+      .flatMap((r) => r.selectors);
+    expect(still).toEqual(expect.arrayContaining(['.shell.is-fx-calm .light__aurora', '.shell.is-fx-calm .light__wash']));
+  });
+});

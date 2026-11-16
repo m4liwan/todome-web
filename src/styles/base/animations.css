@@ -442,6 +442,28 @@
   }
 }
 
+/* The ambient light's wide layers (ambient-light.css): the wash breathes,
+   the aurora turns and wanders, both far slower than a breath. */
+@keyframes light-breath-wide {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+@keyframes light-aurora {
+  0% {
+    transform: translate3d(-6vw, -4vh, 0) rotate(-10deg) scale(1);
+  }
+  50% {
+    transform: translate3d(5vw, 6vh, 0) rotate(5deg) scale(1.12);
+  }
+  100% {
+    transform: translate3d(9vw, -3vh, 0) rotate(14deg) scale(0.96);
+  }
+}
+
 /* A settings panel arrives from the direction you travel along the bar. */
 @keyframes panel-forward {
   from {
