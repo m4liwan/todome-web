@@ -22,7 +22,7 @@
   --pn-strong: var(--ink);
   --pn-pill: rgb(var(--accent-rgb) / 0.14);
   --pn-pill-ink: rgb(var(--accent-rgb));
-  --pn-dot: rgb(var(--accent-rgb));
+  --pn-dot: rgb(255 255 255 / 0.55);
   --pn-ring: rgb(var(--accent-rgb) / 0.7);
   --pn-row-hover: var(--hover);
   --pn-roll: calc(var(--pn-inner) / 2 + 0.7em);
@@ -240,17 +240,16 @@
   white-space: nowrap;
 }
 
-/* The dot: a point of light under the current view, stretching as it travels. */
+/* The mark of the current view: a fine hairline under its name, tone in
+   tone, fading at both ends. It glides (and stretches a little) as it travels. */
 .pill-nav__dot {
   position: absolute;
-  bottom: calc((var(--pn-inner) - var(--pn-font)) / 4 - 3px);
+  bottom: calc((var(--pn-inner) - var(--pn-font)) / 4 - 2px);
   left: 0;
-  width: 4px;
-  height: 4px;
-  margin-left: -2px;
-  border-radius: 50%;
-  background: var(--pn-dot);
-  box-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.7);
+  width: 16px;
+  height: 1px;
+  margin-left: -8px;
+  background: linear-gradient(90deg, rgb(255 255 255 / 0), var(--pn-dot), rgb(255 255 255 / 0));
   opacity: 0;
   pointer-events: none;
   transition: background-color 0.3s ease;

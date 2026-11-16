@@ -426,6 +426,22 @@
   }
 }
 
+/* Duo: a pulse of light crosses the bridge from the work to the companion. */
+@keyframes duo-pulse {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(44px);
+  }
+}
+
 /* A settings panel arrives from the direction you travel along the bar. */
 @keyframes panel-forward {
   from {

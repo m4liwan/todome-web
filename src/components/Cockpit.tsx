@@ -187,6 +187,7 @@ export const ROOMS: ReadonlyArray<{ id: LayoutId; label: string; mood: string; t
   { id: 'sanctuary', label: 'Sanctuary', mood: 'Zen', text: 'Nur der eine Schritt. Alles andere wartet, bis du es rufst.' },
   { id: 'hub', label: 'Hub', mood: 'Command', text: 'Der ganze Tag im Blick, der Begleiter im Kommandoraum.' },
   { id: 'flow', label: 'Flow', mood: 'Stream', text: 'Eine Bahn nach vorn: Schritt, Danach, Begleiter.' },
+  { id: 'duo', label: 'Duo', mood: 'Zu zweit', text: 'Ihr zwei, Seite an Seite: die Hauptkarte und dein Begleiter, durch Licht verbunden.' },
 ];
 
 /** A tiny floor plan of each room (for the settings). */
@@ -213,6 +214,14 @@ export function RoomGlyph({ id }: { id: LayoutId }) {
           {r(0, 4, 11, 10, true)}
           {r(12.5, 4, 7.5, 4.5)}
           {r(12.5, 9.5, 7.5, 4.5)}
+        </>
+      )}
+      {id === 'duo' && (
+        <>
+          {r(0, 0, 10.5, 10, true)}
+          {r(10.5, 4.6, 2, 0.8, true)}
+          {r(12.5, 0, 7.5, 10, true)}
+          {r(0, 11.5, 20, 2.5)}
         </>
       )}
       {id === 'flow' && (
@@ -309,6 +318,14 @@ export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps)
     </div>
   );
 
+  // Duo: his own half of the first screen, a bridge of light to the main card.
+  const partner = (
+    <section key="partner" className="cockpit__partner" aria-label="Ihr zwei: dein Begleiter">
+      <span className="cockpit__bridge" aria-hidden="true" />
+      {panel('hub')}
+    </section>
+  );
+
   const rooms: Record<LayoutId, ReactNode[]> = {
     // Monolith: the main card thrones, the companion keeps watch at the right edge, the day closes the room.
     classic: [fold([head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side', 'Begleiter, Wasser und Danach', COCKPIT.side, 'aside')]), day, anchors, more],
@@ -334,6 +351,15 @@ export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps)
         region('cockpit__next cockpit__side', 'Danach und Wasser', ['plan', 'water'], 'aside'),
         region('cockpit__stream cockpit__side', 'Dein Begleiter', ['hub'], 'aside'),
       ]),
+      day,
+      anchors,
+      more,
+    ],
+    // Duo: the main card and the companion side by side as equals, joined by a bridge of light;
+    // water and what comes next follow below the first screen.
+    duo: [
+      fold([head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), partner]),
+      region('cockpit__side cockpit__beside', 'Wasser und Danach', ['water', 'plan'], 'aside'),
       day,
       anchors,
       more,

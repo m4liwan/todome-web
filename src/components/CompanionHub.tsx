@@ -14,12 +14,13 @@ import {
   type PathStep,
   type Reward,
 } from '../domain/companionProgression';
-import type { AppState, Millis } from '../domain/types';
+import type { AppState, HavenId, Millis } from '../domain/types';
 import { useEffectsMode } from '../lib/effects';
 import { dayKey } from '../lib/time';
 import { Avatar } from './Avatar';
 import { AvatarFx, holoFor } from './AvatarFx';
 import { CompanionIntro, type IntroSpot } from './CompanionIntro';
+import { Haven, HavenPicker } from './Haven';
 import { IconCheck, IconFlame, IconLock, IconSnowflake } from './icons';
 
 /**
@@ -88,9 +89,11 @@ interface HubProps {
   introReady?: boolean;
   /** The intro was finished or skipped for the first time. */
   onIntroSeen?: () => void;
+  /** Changes his home (the ambience); shows the choice in his room when given. */
+  onHome?: (id: HavenId) => void;
 }
 
-export function CompanionHub({ state, now, introReady = false, onIntroSeen }: HubProps) {
+export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHome }: HubProps) {
   const { stats, daily } = state.progression;
   const avatar = state.settings.companion.avatar;
   const name = avatarName(avatar);
@@ -125,12 +128,28 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen }: Hu
         >
           ?
         </button>
-        <div className="companion-hub__stage" aria-hidden="true">
-          <AvatarFx level={progress.level} enabled={fx}>
-            <Avatar id={avatar} mood="happy" size={184} holo={holoFor(progress.level, fx)} />
-          </AvatarFx>
+        {/* His home: a room of his own. A horizon, a floor that holds a little
+            light, his alcove and his ambience; a soft lantern follows your pointer. */}
+        <div
+          className="companion-hub__home"
+          onMouseMove={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            if (!r.width || !r.height) return;
+            e.currentTarget.style.setProperty('--mx', `${Math.round(((e.clientX - r.left) / r.width) * 100)}%`);
+            e.currentTarget.style.setProperty('--my', `${Math.round(((e.clientY - r.top) / r.height) * 100)}%`);
+          }}
+        >
+          <span className="companion-hub__lantern" aria-hidden="true" />
+          <span className="companion-hub__horizon" aria-hidden="true" />
+          <div className="companion-hub__stage" aria-hidden="true">
+            <Haven id={state.settings.companion.home} still={!live} />
+            <AvatarFx level={progress.level} enabled={fx}>
+              <Avatar id={avatar} mood="happy" size={184} holo={holoFor(progress.level, fx)} />
+            </AvatarFx>
+          </div>
         </div>
         <div className="companion-hub__intro">
+          <p className="companion-hub__welcome">Willkommen zu Hause.</p>
           <h1 className="companion-hub__title">
             <span className="companion-hub__name">{name}</span>{' '}
             <span className="companion-hub__level">
@@ -138,6 +157,12 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen }: Hu
             </span>
           </h1>
           <p className="companion-hub__line">{TIER_LINE[tier](name)}</p>
+          {onHome && (
+            <div className="companion-hub__ambience">
+              <span className="companion-hub__ambience-label">Sein Zuhause</span>
+              <HavenPicker value={state.settings.companion.home} name={name} onChange={onHome} />
+            </div>
+          )}
           <XpBar key={progress.level} level={progress.level} into={progress.xpIntoLevel} span={progress.xpForNext} ratio={progress.ratio} />
           <p className="companion-hub__next muted">
             {next ? (

@@ -380,7 +380,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             <>
         <section>
           <h3>Heute</h3>
-          <p className="muted small">Vier Räume für denselben Tag. Jeder gibt dir ein anderes Gefühl; dein nächster Schritt steht in allen in der Mitte.</p>
+          <p className="muted small">Fünf Räume für denselben Tag. Jeder gibt dir ein anderes Gefühl; dein nächster Schritt steht in allen in der Mitte.</p>
           <div className="room-picker" role="radiogroup" aria-label="Aufbau von Heute">
             {ROOMS.map((r) => (
               <button

@@ -60,11 +60,11 @@ describe('the living settings', () => {
     expect(css).toMatch(/\.dialog--settings\[open\][^}]*animation: settings-in/);
   });
 
-  it('offers the four rooms of Heute with a preview each, all of them free', () => {
+  it('offers the five rooms of Heute with a preview each, all of them free', () => {
     const store = open();
     const group = screen.getByRole('radiogroup', { name: 'Aufbau von Heute', hidden: true });
     const rooms = [...group.querySelectorAll<HTMLElement>('[role="radio"]')];
-    expect(rooms.map((r) => r.querySelector('strong')?.textContent)).toEqual(['Classic', 'Sanctuary', 'Hub', 'Flow']);
+    expect(rooms.map((r) => r.querySelector('strong')?.textContent)).toEqual(['Classic', 'Sanctuary', 'Hub', 'Flow', 'Duo']);
     for (const r of rooms) expect(r.querySelector('.room-opt__preview')).not.toBeNull();
     expect(rooms.some((r) => r.hasAttribute('aria-disabled'))).toBe(false);
     fireEvent.click(rooms[1]!);

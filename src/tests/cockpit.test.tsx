@@ -111,7 +111,7 @@ describe('the areas (sub-navigation)', () => {
 
 describe('the four rooms', () => {
   beforeEach(() => window.localStorage.clear());
-  const ROOMS = ['classic', 'sanctuary', 'hub', 'flow'] as const;
+  const ROOMS = ['classic', 'sanctuary', 'hub', 'flow', 'duo'] as const;
 
   it('places all thirteen modules exactly once in every room, the main card always on the stage', () => {
     for (const layout of ROOMS) {
@@ -136,6 +136,8 @@ describe('the four rooms', () => {
     expect(place('sanctuary')).toContain('cockpit__stage');
     expect(place('hub')).toContain('cockpit__command');
     expect(place('flow')).toContain('cockpit__stream');
+    // Duo: his own half of the first screen, beside the main card.
+    expect(place('duo')).toContain('cockpit__partner');
   });
 
   it('Sanctuary: everything but the main card and the companion waits behind "Wenn du magst"', () => {
@@ -200,6 +202,7 @@ describe('the four rooms', () => {
       sanctuary: ['focus', 'hub'],
       hub: ['tl', 'focus', 'hub', 'water', 'times'],
       flow: ['focus', 'plan', 'water', 'hub'],
+      duo: ['focus', 'hub'],
     };
     for (const layout of ROOMS) {
       const { unmount } = render(<Cockpit panels={stubs} layout={layout} />);
@@ -216,5 +219,17 @@ describe('the four rooms', () => {
     const css = read('styles', 'layout', 'cockpit.css');
     expect(css).toMatch(/\.cockpit__fold\s*\{[^}]*--fold-h:\s*calc\(100svh - var\(--frame-t\) - var\(--frame-b\)/);
     expect(css).toMatch(/\.cockpit__fold\s*\{[^}]*min-height:\s*var\(--fold-h\)/);
+  });
+
+  it('Duo: the main card and the companion side by side as equals, joined by a bridge of light', () => {
+    render(<Cockpit panels={stubs} layout="duo" />);
+    const fold = document.querySelector('.cockpit__fold')!;
+    const regions = [...fold.children].map((r) => r.className.match(/cockpit__(\w+)/)?.[1]);
+    expect(regions).toEqual(['head', 'stage', 'partner']);
+    const partner = screen.getByRole('region', { name: 'Ihr zwei: dein Begleiter' });
+    expect(partner.querySelector('.panel--hub')).not.toBeNull();
+    expect(partner.querySelector('.cockpit__bridge')).not.toBeNull();
+    // Water and what comes next follow below the first screen.
+    expect(fold.querySelector('.panel--water, .panel--plan')).toBeNull();
   });
 });

@@ -46,11 +46,25 @@
   align-items: center;
   gap: var(--s3);
   margin-bottom: var(--s5);
-  padding: var(--s3) var(--s4);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
+  padding: var(--s2) 0 var(--s2) var(--s4);
+  border-left: 1px solid rgb(var(--accent-rgb) / 0.55);
   font-size: var(--fs-meta);
   color: var(--ink-2);
+}
+/* The companion at the day end stands on his little pool of light, too. */
+.closing__head > .scene {
+  position: relative;
+}
+.closing__head > .scene::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 130%;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.2), rgb(var(--accent-rgb) / 0));
+  translate: -50% 0;
 }
 .closing__block {
   display: grid;

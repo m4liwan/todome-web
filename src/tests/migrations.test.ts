@@ -198,7 +198,7 @@ describe('the room of Heute', () => {
     const base = emptyState();
     const load = (layout: unknown) =>
       parseState(JSON.stringify({ ...base, settings: { ...base.settings, appearance: { ...base.settings.appearance, layout } } }))?.settings.appearance.layout;
-    for (const room of ['classic', 'sanctuary', 'hub', 'flow']) expect(load(room)).toBe(room);
+    for (const room of ['classic', 'sanctuary', 'hub', 'flow', 'duo']) expect(load(room)).toBe(room);
     expect(load('diagonal')).toBe('classic');
     expect(load(undefined)).toBe('classic');
   });

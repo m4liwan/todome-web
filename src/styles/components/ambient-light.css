@@ -106,6 +106,13 @@
   opacity: 0.3;
 }
 
+/* Duo: a warm glow gathers behind the companion's half. */
+.shell.is-room-duo .light__halo {
+  --size: 64vmax;
+  opacity: 0.34;
+  transform: translate(22vw, 6vh);
+}
+
 /* ---------- focus profiles ---------- */
 
 /* Atmender Fokus: open and warm. The wandering lights stay, softer; a wide

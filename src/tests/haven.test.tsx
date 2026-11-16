@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ServicesContext, type Services } from '../app/services';
+import { CompanionHub } from '../components/CompanionHub';
 import { SettingsDialog } from '../components/dialogs/SettingsDialog';
 import { HAVENS } from '../components/Haven';
 import { CompanionHome } from '../components/HomeExtras';
@@ -77,5 +78,39 @@ describe('the companion at home', () => {
     const group = screen.getByRole('radiogroup', { name: /Zuhause/, hidden: true });
     fireEvent.click(within(group).getByRole('radio', { name: /Sternenstaub/, hidden: true }));
     expect(store.getState().settings.companion.home).toBe('stardust');
+  });
+});
+
+describe('the Begleiter tab: his true home', () => {
+  const home = (h: string, onHome?: (id: string) => void) => {
+    const s = withHome(h);
+    return render(<CompanionHub state={s} now={NOW} onHome={onHome as never} />);
+  };
+
+  it('welcomes you home, with him standing in his ambience inside a room of his own', () => {
+    home('fireflies');
+    const room = document.querySelector('.companion-hub__home')!;
+    expect(room.querySelector('.haven.haven--fireflies')).not.toBeNull();
+    expect(room.querySelector('.companion-hub__stage')).not.toBeNull();
+    expect(room.querySelector('.companion-hub__horizon')).not.toBeNull();
+    expect(screen.getByText(/Willkommen zu Hause/)).not.toBeNull();
+    // The level is still there, just no longer the only thing.
+    expect(document.querySelector('.companion-hub__level-num')).not.toBeNull();
+  });
+
+  it('lets a soft lantern follow the mouse through his room', () => {
+    home('moon');
+    const room = document.querySelector<HTMLElement>('.companion-hub__home')!;
+    room.getBoundingClientRect = () => ({ left: 0, top: 0, width: 400, height: 200, right: 400, bottom: 200, x: 0, y: 0, toJSON: () => ({}) });
+    fireEvent.mouseMove(room, { clientX: 100, clientY: 50 });
+    expect(room.style.getPropertyValue('--mx')).toBe('25%');
+    expect(room.style.getPropertyValue('--my')).toBe('25%');
+  });
+
+  it('changes his home right there', () => {
+    const onHome = vi.fn();
+    home('moon', onHome);
+    fireEvent.click(within(screen.getByRole('radiogroup', { name: /Zuhause/ })).getByRole('radio', { name: 'Morgentau' }));
+    expect(onHome).toHaveBeenCalledWith('dew');
   });
 });

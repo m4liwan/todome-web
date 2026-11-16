@@ -143,7 +143,7 @@ describe('the bar in the OLED look', () => {
     }
   });
 
-  it('colours the dot, the hover fill, the lit label and the focus ring with the light colour', () => {
+  it('colours the hover fill, the lit label and the focus ring with the light colour, the current mark stays tone in tone', () => {
     const vars: Record<string, string> = {};
     nav.walkRules((r: Rule) => {
       if (r.selector !== '.pill-nav') return;
@@ -151,7 +151,9 @@ describe('the bar in the OLED look', () => {
         vars[d.prop] = d.value;
       });
     });
-    for (const v of ['--pn-dot', '--pn-pill', '--pn-pill-ink', '--pn-ring']) expect(vars[v], v).toMatch(/var\(--accent-rgb\)/);
+    for (const v of ['--pn-pill', '--pn-pill-ink', '--pn-ring']) expect(vars[v], v).toMatch(/var\(--accent-rgb\)/);
+    // The current view is marked tone in tone: a fine hairline in the ink, no coloured dot.
+    expect(vars['--pn-dot']).not.toMatch(/accent/);
     // Hairlines instead of grey surfaces: the edge is the app's hairline, the surface the page's black.
     expect(vars['--pn-edge']).toBe('var(--line)');
     expect(vars['--pn-surface']).toMatch(/^rgb\(5 5 5 \//);
@@ -161,6 +163,26 @@ describe('the bar in the OLED look', () => {
       if (/#[0-9a-f]{3,8}\b/i.test(d.value)) fixed.push(`${(d.parent as Rule).selector}: ${d.value}`);
     });
     expect(fixed).toEqual([]);
+  });
+});
+
+describe('the mark of the current view', () => {
+  it('is a fine hairline under the name, not a dot', () => {
+    let rule: Rule | undefined;
+    css('components/pill-nav.css').walkRules((r: Rule) => {
+      if (r.selector === '.pill-nav__dot') rule = r;
+    });
+    const decl = (prop: string) => {
+      let v = '';
+      rule?.walkDecls(prop, (d) => {
+        v = d.value;
+      });
+      return v;
+    };
+    expect(parseFloat(decl('height'))).toBe(1);
+    expect(parseFloat(decl('width'))).toBeGreaterThanOrEqual(12);
+    expect(decl('box-shadow')).toBe('');
+    expect(decl('border-radius')).toBe('');
   });
 });
 

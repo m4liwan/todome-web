@@ -130,7 +130,12 @@
 
 .weekview > .weekview__row {
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  gap: 0;
+  gap: 0 var(--s7);
+}
+/* What you did and for whom: two columns, a hairline between them. */
+.weekview > .weekview__row > .people {
+  padding-left: var(--s7);
+  border-left: 1px solid var(--line);
 }
 .wins__list {
   display: flex;
@@ -147,9 +152,17 @@
   border-radius: var(--radius);
   font-size: var(--fs-meta);
 }
+/* What you did, then (after a hairline) what you were proud of. */
+.wins {
+  display: grid;
+  align-content: start;
+  gap: var(--s5);
+}
 .wins__proud {
   display: grid;
   gap: var(--gap);
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
 }
 .wins__proud h3 {
   font-family: var(--font-mono);
@@ -183,6 +196,10 @@
 @media (max-width: 1180px) {
   .weekview__row {
     grid-template-columns: 1fr;
+  }
+  .weekview > .weekview__row > .people {
+    padding-left: 0;
+    border-left: 0;
   }
 }
 .care {

@@ -46,8 +46,26 @@ const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = {
 const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose']);
 const CORNERS = new Set(['sharp', 'precise', 'soft']);
 const DOCKS = new Set(['top', 'bottom']);
-const LAYOUTS = new Set(['classic', 'sanctuary', 'hub', 'flow']);
+const LAYOUTS = new Set(['classic', 'sanctuary', 'hub', 'flow', 'duo']);
 const HAVENS = new Set(['moon', 'fireflies', 'stardust', 'dew', 'none']);
+
+/**
+ * The three bites the old Mikro-Schritt mode wrote into a task by itself
+ * (its first bite per task type, "the smallest piece: …", "note where to go
+ * on"). Only these exact texts; whatever the user wrote stays.
+ */
+const GENERATED_BITES = new Set([
+  'Datei öffnen und zwei Minuten nur reinschauen',
+  'Die Nachricht öffnen und den ersten Satz schreiben',
+  'Alle Unterlagen dafür auf den Tisch legen',
+  'Kontakt und Anlass in einem Satz notieren',
+  'Material öffnen und die Überschriften überfliegen',
+  'Drei Fragen notieren, die du klären willst',
+  'Alles dafür öffnen und zwei Minuten sichten',
+  'Alles dafür öffnen und kurz sichten',
+  'Kurz notieren, wo es als Nächstes weitergeht',
+]);
+const isGeneratedBite = (label: unknown): boolean => typeof label === 'string' && (GENERATED_BITES.has(label) || label.startsWith('Das kleinste sinnvolle Stück: '));
 
 function migrateAppearance(raw: unknown): AppearanceSettings {
   const a = { ...DEFAULT_APPEARANCE, ...(isRecord(raw) ? (raw as Partial<AppearanceSettings>) : {}) };
@@ -63,7 +81,7 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   // 1.18: the navigation could sit on any edge; since the bar it is top or
   // bottom centre (a side choice from before lands at the top).
   if (!DOCKS.has(String(a.dock))) a.dock = DEFAULT_APPEARANCE.dock;
-  // 2.x: the four rooms of "Heute" are back (1.18 had dropped the old layouts);
+  // 2.x: the rooms of "Heute" are back (1.18 had dropped the old layouts);
   // a known room is kept, anything else starts in Classic.
   if (!LAYOUTS.has(String(a.layout))) a.layout = DEFAULT_APPEARANCE.layout;
   // 2.x: level effects arrive switched on; only a real choice survives.
@@ -164,7 +182,12 @@ export function parseState(raw: string | null): AppState | null {
     const companion = isRecord(settings.companion) ? settings.companion : {};
     const tasks = records<Partial<Task>>(data.tasks);
     const migratedTasks: AppState['tasks'] = {};
-    for (const [id, t] of Object.entries(tasks)) migratedTasks[id] = { priority: 'normal', ...t } as Task;
+    for (const [id, t] of Object.entries(tasks)) {
+      const task = { priority: 'normal', ...t } as Task;
+      // 2.x: the generic "Mikro-Schritt" bites of earlier versions leave saved tasks for good.
+      if (Array.isArray(task.checklist)) task.checklist = task.checklist.filter((i) => !isGeneratedBite(i?.label));
+      migratedTasks[id] = task;
+    }
     return {
       ...base,
       ...(data as Partial<AppState>),

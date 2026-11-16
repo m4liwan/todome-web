@@ -65,3 +65,37 @@ describe('the next handhold (Mikro-Schritt)', () => {
     expect(store.getState().tasks[taskId]!.checklist[0]!.doneAt).not.toBeNull();
   });
 });
+
+describe('the generic bites of earlier versions', () => {
+  it('are removed from saved tasks for good; your own steps stay', async () => {
+    const { parseState } = await import('../state/store');
+    const { emptyState } = await import('../state/defaults');
+    const base = emptyState();
+    const item = (label: string, i: number) => ({ id: `c${i}`, label, doneAt: null });
+    const task = {
+      id: 't1',
+      title: 'Angebot',
+      type: 'deep_work',
+      clientId: null,
+      estimateMin: 45,
+      intention: 'Entwurf steht',
+      status: 'planned',
+      priority: 'normal',
+      billable: false,
+      notes: '',
+      plannedStart: null,
+      plannedDay: null,
+      createdAt: 1,
+      updatedAt: 1,
+      checklist: [
+        'Datei öffnen und zwei Minuten nur reinschauen',
+        'Das kleinste sinnvolle Stück: Entwurf steht',
+        'Kurz notieren, wo es als Nächstes weitergeht',
+        'Mail an Lena schreiben',
+        'Alles dafür öffnen und zwei Minuten sichten',
+      ].map(item),
+    };
+    const loaded = parseState(JSON.stringify({ ...base, tasks: { t1: task }, taskOrder: ['t1'] }))!;
+    expect(loaded.tasks.t1!.checklist.map((i) => i.label)).toEqual(['Mail an Lena schreiben']);
+  });
+});

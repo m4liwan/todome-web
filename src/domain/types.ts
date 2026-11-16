@@ -195,10 +195,10 @@ export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose';
 export type CornerStyle = 'sharp' | 'precise' | 'soft';
 
 /**
- * The room of "Heute": four arrangements of the same modules, each with its
- * own feeling (Monolith, Zen, Command, Stream). The main card leads in all.
+ * The room of "Heute": five arrangements of the same modules, each with its
+ * own feeling (Monolith, Zen, Command, Stream, Duo). The main card leads in all.
  */
-export type LayoutId = 'classic' | 'sanctuary' | 'hub' | 'flow';
+export type LayoutId = 'classic' | 'sanctuary' | 'hub' | 'flow' | 'duo';
 
 /** Where the main navigation (the dock) sits. */
 export type DockPosition = 'top' | 'bottom';

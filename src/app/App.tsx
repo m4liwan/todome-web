@@ -409,7 +409,13 @@ export function App() {
           )}
           {view === 'companion' && (
             <div className="view-fade" key="companion">
-              <CompanionHub state={state} now={now} introReady={!tour && !modal && !breathe && !routine && !splash && !onboarding && !landing} onIntroSeen={markIntroSeen} />
+              <CompanionHub
+                state={state}
+                now={now}
+                introReady={!tour && !modal && !breathe && !routine && !splash && !onboarding && !landing}
+                onIntroSeen={markIntroSeen}
+                onHome={(home) => services.store.dispatch({ type: 'settings/update', patch: { companion: { ...state.settings.companion, home } } })}
+              />
             </div>
           )}
           {view === 'closing' && (
