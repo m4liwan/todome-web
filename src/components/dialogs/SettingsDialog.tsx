@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
 import type { AppState, Client, CornerStyle, DockPosition, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
@@ -88,14 +88,28 @@ const ROUNDING: Record<Rounding, string> = { none: 'Minutengenau', six: '6-Minut
 
 export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCompanion }: Props) {
   const [tab, setTabNow] = useState<SettingsTab>(initialTab);
-  // The panel slides in the direction you travel through the list.
-  const [dir, setDir] = useState<'up' | 'down'>('down');
+  // The panel slides in the direction you travel along the bar.
+  const [dir, setDir] = useState<'forward' | 'back'>('forward');
   const current = useRef(tab);
   const setTab = (next: SettingsTab) => {
-    setDir(tabIndex(next) < tabIndex(current.current) ? 'up' : 'down');
+    setDir(tabIndex(next) < tabIndex(current.current) ? 'back' : 'forward');
     current.current = next;
     setTabNow(next);
   };
+  // The lens under the chosen tab (tabs differ in width, so it is measured).
+  const bar = useRef<HTMLDivElement>(null);
+  const [lens, setLens] = useState<{ x: number; w: number } | null>(null);
+  useLayoutEffect(() => {
+    const place = () => {
+      const el = bar.current?.querySelector<HTMLElement>(`#settings-tab-${tab}`);
+      if (el) setLens({ x: el.offsetLeft, w: el.offsetWidth });
+    };
+    place();
+    bar.current?.querySelector<HTMLElement>(`#settings-tab-${tab}`)?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(place);
+    if (bar.current) ro?.observe(bar.current);
+    return () => ro?.disconnect();
+  }, [tab]);
   /** A link to another tab: switch and keep the keyboard on that tab (the panel is rebuilt). */
   const goTo = (next: SettingsTab) => {
     setTab(next);
@@ -144,23 +158,26 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
   return (
     <Dialog open={open} title="Einstellungen" wide onClose={onClose} className="dialog--settings">
       <div className="settings" style={{ '--tab': tabIndex(tab) } as CSSProperties}>
-        <div className="settings__tabs" role="tablist" aria-label="Bereiche">
-          <span className="settings__lens" aria-hidden="true" />
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              role="tab"
-              id={`settings-tab-${t.id}`}
-              aria-selected={tab === t.id}
-              aria-controls="settings-panel"
-              className={tab === t.id ? 'is-on' : undefined}
-              onClick={() => setTab(t.id)}
-            >
-              {t.icon}
-              {t.label}
-            </button>
-          ))}
+        {/* The floating bar: it stays put while the content runs beneath it. */}
+        <div className="settings__bar">
+          <div className="settings__tabs" role="tablist" aria-label="Bereiche" ref={bar}>
+            {lens && <span className="settings__lens" aria-hidden="true" style={{ '--x': `${lens.x}px`, '--w': `${lens.w}px` } as CSSProperties} />}
+            {TABS.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="tab"
+                id={`settings-tab-${t.id}`}
+                aria-selected={tab === t.id}
+                aria-controls="settings-panel"
+                className={tab === t.id ? 'is-on' : undefined}
+                onClick={() => setTab(t.id)}
+              >
+                {t.icon}
+                <span>{t.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
         <div className="settings__panel" id="settings-panel" role="tabpanel" aria-labelledby={`settings-tab-${tab}`} key={tab} data-dir={dir}>
           <header className="settings__intro">

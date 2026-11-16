@@ -29,21 +29,25 @@ describe('the living settings', () => {
     expect(panel().querySelector('.settings__lead')?.textContent).toBeTruthy();
   });
 
-  it('lets the lens glide to the chosen tab', () => {
+  it('floats its navigation above the content, the lens gliding to the chosen tab', () => {
     open();
+    const bar = document.querySelector<HTMLElement>('.settings__bar')!;
+    expect(bar.querySelector('[role="tablist"]')).not.toBeNull();
+    // The bar is not part of the scrolling panel: the content runs beneath it.
+    expect(panel().contains(bar)).toBe(false);
     const sheet = document.querySelector<HTMLElement>('.settings')!;
     expect(sheet.style.getPropertyValue('--tab')).toBe('2');
     fireEvent.click(tab('Daten'));
     expect(sheet.style.getPropertyValue('--tab')).toBe('5');
-    expect(document.querySelector('.settings__lens')).not.toBeNull();
+    expect(bar.querySelector('.settings__lens')).not.toBeNull();
   });
 
-  it('moves the panel in the direction you travel', () => {
+  it('moves the panel in the direction you travel along the bar', () => {
     open();
     fireEvent.click(tab('Daten'));
-    expect(panel().dataset.dir).toBe('down');
+    expect(panel().dataset.dir).toBe('forward');
     fireEvent.click(tab('Allgemein'));
-    expect(panel().dataset.dir).toBe('up');
+    expect(panel().dataset.dir).toBe('back');
   });
 
   it('opens out of the dock, on whichever side it sits', () => {

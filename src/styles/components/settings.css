@@ -1,52 +1,72 @@
 /* ========================================================================
-   Settings (dialogs/SettingsDialog.tsx, SettingsSections.tsx): tabs as a
-   quiet list on the left, the panel on the right. Sections are divided by
+   Settings (dialogs/SettingsDialog.tsx, SettingsSections.tsx): a floating
+   bar of tabs above the content, which runs beneath it. Sections are divided by
    hairlines; choices are hairline options, the chosen one brighter.
    ======================================================================== */
 
 .settings {
-  --row: 40px;
   position: relative;
   flex: 1 1 auto;
-  display: grid;
-  grid-template-columns: 208px minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow: hidden;
 }
-/* A living light in the sheet: it travels down with the chosen tab. */
+/* A living light in the sheet: it travels along with the chosen tab. */
 .settings::before {
   content: '';
   position: absolute;
-  top: -200px;
-  right: -160px;
-  width: 520px;
+  top: -260px;
+  left: 6%;
+  width: 560px;
   height: 520px;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.09), rgb(var(--accent-rgb) / 0.03) 55%, rgb(var(--accent-rgb) / 0));
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.1), rgb(var(--accent-rgb) / 0.035) 55%, rgb(var(--accent-rgb) / 0));
   pointer-events: none;
-  transform: translateY(calc(var(--tab) * 72px));
+  transform: translateX(calc(var(--tab) * 88px));
   transition: transform 900ms var(--ease);
+}
+/* The floating bar: centred above the content, which runs beneath it. */
+.settings__bar {
+  position: absolute;
+  top: var(--s4);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  padding: 0 calc(var(--s7) + 40px);
+  pointer-events: none;
 }
 .settings__tabs {
   position: relative;
-  display: grid;
-  grid-auto-rows: var(--row);
-  align-content: start;
-  padding: var(--s4) var(--s3);
-  border-right: 1px solid var(--line);
-  overflow-y: auto;
+  display: flex;
+  gap: 2px;
+  max-width: 100%;
+  padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: rgb(16 16 18 / 0.72);
+  backdrop-filter: blur(18px) saturate(1.3);
+  box-shadow: var(--shadow-float);
+  pointer-events: auto;
+  animation: fade-up var(--t-slow) var(--ease) 80ms both;
 }
 .settings__tabs button {
   position: relative;
   z-index: 1;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--s3);
+  gap: var(--s2);
+  flex: none;
+  height: 36px;
   padding: 0 var(--s3);
   border-radius: var(--radius);
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--ink-3);
-  text-align: left;
   white-space: nowrap;
   transition: color var(--t-base) var(--ease);
 }
@@ -58,39 +78,44 @@
   color: var(--ink);
 }
 .settings__tabs button:hover svg {
-  transform: translateX(2px);
+  transform: translateY(-1px);
 }
 .settings__tabs button[aria-selected='true'] {
   color: var(--ink);
 }
-/* The lens glides to the chosen tab, like the one in the dock. */
+/* The lens glides to the chosen tab, like the one in the navigation. */
 .settings__lens {
   position: absolute;
-  top: var(--s4);
-  left: var(--s3);
-  right: var(--s3);
-  height: var(--row);
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: var(--w);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   background: var(--active);
   pointer-events: none;
-  transform: translateY(calc(var(--tab) * var(--row)));
-  transition: transform var(--t-slow) var(--ease);
+  transform: translateX(var(--x));
+  transition:
+    transform var(--t-slow) var(--ease),
+    width var(--t-slow) var(--ease);
 }
 .settings__panel {
   position: relative;
+  flex: 1 1 auto;
   display: grid;
   align-content: start;
   gap: 0;
   min-height: 0;
-  padding: 0 var(--s7) var(--s6);
+  padding: calc(var(--s4) + 46px + var(--s4)) max(var(--s7), calc((100% - 820px) / 2)) var(--s7);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  animation: panel-down var(--t-slow) var(--ease) both;
+  /* Content that scrolls up fades out beneath the bar. */
+  mask-image: linear-gradient(transparent calc(var(--s4) + 46px), #000 calc(var(--s4) + 46px + var(--s6)));
+  animation: panel-forward var(--t-slow) var(--ease) both;
 }
-.settings__panel[data-dir='up'] {
-  animation-name: panel-up;
+.settings__panel[data-dir='back'] {
+  animation-name: panel-back;
 }
 .settings__intro {
   display: grid;
@@ -138,26 +163,18 @@
   text-align: center;
 }
 @media (max-width: 760px) {
-  .settings {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-  .settings__tabs {
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    padding: var(--s2) var(--s4);
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-    overflow-x: auto;
-  }
-  .settings__lens {
-    display: none;
-  }
-  .settings__tabs button[aria-selected='true'] {
-    background: var(--active);
+  .settings__bar {
+    justify-content: flex-start;
+    padding: 0 56px 0 var(--s4);
   }
   .settings__panel {
-    padding: 0 var(--s4) var(--s5);
+    padding-inline: var(--s4);
+  }
+  .settings__tabs button span {
+    display: none;
+  }
+  .settings__tabs button[aria-selected='true'] span {
+    display: inline;
   }
   .settings__title {
     font-size: var(--fs-h2);

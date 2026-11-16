@@ -317,21 +317,21 @@
     transform: none;
   }
 }
-/* A settings panel arrives from the direction you travel. */
-@keyframes panel-down {
+/* A settings panel arrives from the direction you travel along the bar. */
+@keyframes panel-forward {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateX(24px);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-@keyframes panel-up {
+@keyframes panel-back {
   from {
     opacity: 0;
-    transform: translateY(-18px);
+    transform: translateX(-24px);
   }
   to {
     opacity: 1;
