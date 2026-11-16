@@ -89,19 +89,21 @@ html.is-desktop .select__list {
   border-top: 1px solid var(--line);
 }
 
-/* ---------- settings sheet: opens out of the dock, tabs beside the panel ----------
-   The sheet stands next to the dock on whichever edge it sits and slides
-   out of it; the dock stays visible behind a lighter backdrop. */
+/* ---------- settings sheet: opens out of the navigation bar ----------
+   The sheet stands below the bar (or above it, when the bar sits at the
+   bottom) and slides out of it; the bar stays visible behind a lighter
+   backdrop. */
 .dialog--settings {
-  --from-x: -28px;
-  --from-y: 0px;
+  --from-x: 0px;
+  --from-y: -24px;
 }
 .dialog--settings[open] {
   position: fixed;
-  inset: var(--dock-inset) auto var(--dock-inset) calc(var(--dock-inset) + var(--dock-size) + var(--s3));
+  inset: calc(var(--dock-inset) + var(--dock-size) + var(--s3)) auto var(--dock-inset) 50%;
   display: flex;
   flex-direction: column;
-  width: min(1040px, calc(100vw - var(--dock-space) - var(--s3) - var(--dock-inset)));
+  width: min(1040px, calc(100vw - 2 * var(--dock-inset)));
+  translate: -50% 0;
   max-width: none;
   height: auto;
   max-height: none;
@@ -110,24 +112,8 @@ html.is-desktop .select__list {
   overflow: hidden;
   animation: settings-in var(--t-slow) var(--ease) both;
 }
-:root[data-dock='right'] .dialog--settings {
-  --from-x: 28px;
-}
-:root[data-dock='right'] .dialog--settings[open] {
-  inset: calc(var(--chrome-h) + var(--s2)) calc(var(--dock-inset) + var(--dock-size) + var(--s3)) var(--dock-inset) auto;
-}
-:root[data-dock='top'] .dialog--settings {
-  --from-x: 0px;
-  --from-y: -24px;
-}
 :root[data-dock='bottom'] .dialog--settings {
-  --from-x: 0px;
   --from-y: 24px;
-}
-:root:is([data-dock='top'], [data-dock='bottom']) .dialog--settings[open] {
-  inset: calc(var(--dock-inset) + var(--dock-size) + var(--s3)) auto var(--dock-inset) 50%;
-  width: min(1040px, calc(100vw - 2 * var(--dock-inset)));
-  translate: -50% 0;
 }
 :root[data-dock='bottom'] .dialog--settings[open] {
   inset: calc(var(--chrome-h) + var(--s2)) auto calc(var(--dock-inset) + var(--dock-size) + var(--s3)) 50%;

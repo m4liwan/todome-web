@@ -275,32 +275,6 @@
   max-width: 60ch;
 }
 
-.level-badge {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  height: 20px;
-  white-space: nowrap;
-}
-.level-badge__shine {
-  display: none;
-}
-.shell.is-legendary .level-badge__shine {
-  display: block;
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.level-badge__float {
-  position: absolute;
-  left: 50%;
-  bottom: 100%;
-  white-space: nowrap;
-  pointer-events: none;
-  color: var(--ink);
-}
-
 @media (max-width: 720px) {
   .companion-hub__hero {
     grid-template-columns: minmax(0, 1fr);

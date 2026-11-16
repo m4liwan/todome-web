@@ -60,7 +60,7 @@ export function buildSteps(name: string, user: string, labels: ContextLabels, br
     },
     {
       id: 'closing',
-      targets: ['.dock__item--closing'],
+      targets: ['.pill-nav__item--anchor'],
       title: labels.dayEnd,
       text: labels.tourText,
       place: 'corner',

@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ServicesContext, type Services } from '../app/services';
 import { Avatar } from '../components/Avatar';
 import { AvatarFx, holoFor, useLegendaryShell } from '../components/AvatarFx';
-import { LevelBadge } from '../components/LevelBadge';
 import { CompanionHub } from '../components/CompanionHub';
 import { CompanionFxSection } from '../components/dialogs/SettingsSections';
 import { totalXpForLevel } from '../domain/companionProgression';
@@ -137,11 +136,5 @@ describe('the app-wide touch at level 50', () => {
     system(true);
     render(<Shell level={50} fx />);
     expect(classes()).toBe('shell is-legendary is-fx-calm');
-  });
-
-  it('gives the level badge its own clipped shine, outside of the floats', () => {
-    const { container } = render(<LevelBadge level={50} />);
-    const shine = container.querySelector('.level-badge > .level-badge__shine');
-    expect(shine?.getAttribute('aria-hidden')).toBe('true');
   });
 });

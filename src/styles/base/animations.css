@@ -295,17 +295,6 @@
 }
 
 /* The dock settles into place on launch. */
-@keyframes dock-in {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 /* The settings sheet slides out of the dock (direction set per dock side). */
 @keyframes settings-in {
   from {

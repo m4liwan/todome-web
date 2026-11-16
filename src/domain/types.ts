@@ -195,7 +195,7 @@ export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose';
 export type CornerStyle = 'sharp' | 'precise' | 'soft';
 
 /** Where the main navigation (the dock) sits. */
-export type DockPosition = 'left' | 'right' | 'top' | 'bottom';
+export type DockPosition = 'top' | 'bottom';
 
 /** How the rest screen looks. */
 export type StandbyLayout = 'calm' | 'bigclock' | 'drift' | 'breath';

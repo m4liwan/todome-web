@@ -38,15 +38,16 @@
   --s10: 96px;
   --gap: var(--s3);
 
-  /* Frame: the window strip along the top and the floating dock. --frame-*
-     is what the dock takes from each edge (data-dock below picks the side). */
+  /* Frame: the window strip along the top and the navigation bar. --frame-*
+     is what the bar takes from each edge: top centre by default, bottom
+     centre with data-dock='bottom'. */
   --chrome-h: 36px;
-  --dock-size: 56px;
+  --dock-size: 44px;
   --dock-inset: 16px;
   --dock-space: calc(var(--dock-size) + var(--dock-inset) * 2);
-  --frame-l: var(--dock-space);
+  --frame-l: 0px;
   --frame-r: 0px;
-  --frame-t: var(--chrome-h);
+  --frame-t: var(--dock-space);
   --frame-b: 0px;
 
   /* Type */
@@ -101,21 +102,15 @@
 
 @media (max-width: 760px) {
   :root {
-    --dock-size: 52px;
     --dock-inset: 10px;
   }
 }
 
-:root[data-dock='right'] {
-  --frame-l: 0px;
-  --frame-r: var(--dock-space);
-}
 :root[data-dock='top'] {
-  --frame-l: 0px;
   --frame-t: var(--dock-space);
 }
 :root[data-dock='bottom'] {
-  --frame-l: 0px;
+  --frame-t: var(--chrome-h);
   --frame-b: var(--dock-space);
 }
 

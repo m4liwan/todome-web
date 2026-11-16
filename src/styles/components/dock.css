@@ -1,66 +1,42 @@
 /* ========================================================================
-   Dock: the main navigation (components/Dock.tsx), on the edge the user
-   chose (data-dock on <html>). Top centre by default: no bar there, the
-   row stands in the room and a hairline grows out of it towards the edges.
-   On the other edges a quiet floating bar. Icons only; each name slides out
-   on hover or keyboard focus. A soft lens glides to the current view; the
-   day end is the softly lit anchor of the row.
+   Dock: the main navigation (components/Dock.tsx). A band across the top
+   of the room (or the bottom, data-dock='bottom') that centres the bar
+   (PillNav, see pill-nav.css): the "Me." mark in the slot on its left, the
+   views, the day end as the anchor, the tools in their own small slot.
+   The band itself takes no pointer and never moves the window: only the
+   bar and the tools are controls, the rest stays the window's drag strip.
    ======================================================================== */
 
 .dock {
-  --cell: 48px;
-  --item: 40px;
   position: fixed;
   top: var(--dock-inset);
-  bottom: var(--dock-inset);
-  left: var(--dock-inset);
+  left: 0;
+  right: 0;
   z-index: 31;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--s2);
-  width: var(--dock-size);
-  padding: var(--s3) 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: rgb(10 10 11 / 0.72);
-  backdrop-filter: blur(20px) saturate(1.2);
-  box-shadow: 0 18px 60px rgb(0 0 0 / 0.45);
-  -webkit-app-region: no-drag;
-  animation: dock-in var(--t-slow) var(--ease) both;
+  justify-content: center;
+  padding: 0 var(--s4);
+  pointer-events: none;
   transition: opacity var(--t-slow) var(--ease);
-}
-:root[data-dock='right'] .dock {
-  left: auto;
-  right: var(--dock-inset);
-  top: calc(var(--chrome-h) + var(--s2));
-}
-/* Top and bottom: a compact bar, centred over the content. */
-:root:is([data-dock='top'], [data-dock='bottom']) .dock {
-  top: var(--dock-inset);
-  bottom: auto;
-  left: 50%;
-  flex-direction: row;
-  width: auto;
-  height: var(--dock-size);
-  padding: 0 var(--s3);
-  translate: -50% 0;
 }
 :root[data-dock='bottom'] .dock {
   top: auto;
   bottom: var(--dock-inset);
 }
-/* Top centre: the row is part of the room, not a bar on top of it. */
-:root[data-dock='top'] .dock {
-  top: var(--s3);
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
+/* Desktop: keep clear of the window buttons on both sides, so the bar stays centred. */
+html.is-desktop .dock {
+  --wco: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+  padding: 0 max(var(--s4), calc(var(--wco) + var(--s3)));
 }
-/* The horizon: a hairline that grows out of the navigation and fades out
-   towards the edges of the window. */
-:root[data-dock='top'] .dock::after {
+.dock__nav,
+.dock__tools {
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+}
+
+/* The horizon: a hairline that grows out of the bar and fades out towards
+   the edges of the window. */
+.dock::after {
   content: '';
   position: absolute;
   top: calc(100% + var(--s2));
@@ -68,98 +44,83 @@
   width: min(1680px, 100vw);
   height: 1px;
   translate: -50% 0;
-  background: linear-gradient(90deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.05) 20%, rgb(255 255 255 / 0.12) 50%, rgb(255 255 255 / 0.05) 80%, rgb(255 255 255 / 0));
+  background: linear-gradient(90deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.04) 20%, rgb(255 255 255 / 0.1) 50%, rgb(255 255 255 / 0.04) 80%, rgb(255 255 255 / 0));
   pointer-events: none;
 }
-
-.dock__brand {
-  display: grid;
-  place-items: center;
-  height: var(--item);
-  padding-bottom: var(--s2);
-  border-bottom: 1px solid var(--line);
-}
-:root:is([data-dock='top'], [data-dock='bottom']) .dock__brand {
-  height: auto;
-  padding: 0 var(--s3) 0 var(--s1);
-  border-bottom: 0;
-  border-right: 1px solid var(--line);
+:root[data-dock='bottom'] .dock::after {
+  top: auto;
+  bottom: calc(100% + var(--s2));
 }
 
-.dock__stations,
+/* ---------- the mark: "Me." with its dot in the light colour ---------- */
+.dock__mark {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1.5px;
+}
+.dock__mark img {
+  display: block;
+  width: auto;
+  height: 13px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.dock__mark-dot {
+  width: 3.5px;
+  height: 3.5px;
+  margin-bottom: 0.5px;
+  border-radius: 50%;
+  background: rgb(var(--accent-rgb));
+  box-shadow: 0 0 6px rgb(var(--accent-rgb) / 0.6);
+}
+
+/* ---------- the tools: a small slot after the bar ---------- */
 .dock__tools {
   position: relative;
-  display: grid;
-  grid-auto-rows: var(--cell);
-  justify-items: center;
+  display: flex;
   align-items: center;
+  gap: 2px;
+  height: var(--pn-h);
+  padding: var(--pn-pad);
+  border-radius: var(--radius);
+  background: var(--pn-surface);
+  box-shadow: inset 0 0 0 1px var(--pn-edge);
+  -webkit-backdrop-filter: var(--pn-blur);
+  backdrop-filter: var(--pn-blur);
 }
-:root:is([data-dock='top'], [data-dock='bottom']) :is(.dock__stations, .dock__tools) {
-  grid-auto-flow: column;
-  grid-auto-columns: var(--cell);
-  grid-auto-rows: auto;
-}
-.dock__sep {
-  flex: none;
-  width: 20px;
-  height: 1px;
-  margin-top: auto;
-  background: var(--line-strong);
-}
-:root:is([data-dock='top'], [data-dock='bottom']) .dock__sep {
-  width: 1px;
-  height: 20px;
-  margin: 0 var(--s1);
-}
-
-.dock__item {
+.dock__tool {
   position: relative;
   display: grid;
   place-items: center;
-  width: var(--item);
-  height: var(--item);
+  width: var(--pn-inner);
+  height: 100%;
   border-radius: var(--radius);
   color: var(--ink-3);
-  transition: color var(--t-fast) var(--ease);
+  transition:
+    color var(--t-fast) var(--ease),
+    background-color var(--t-base) var(--ease),
+    transform var(--t-fast) var(--ease);
 }
-.dock__item:hover,
-.dock__item:focus-visible,
-.dock__item[aria-current='page'],
-.dock__item[aria-pressed='true'] {
+.dock__tool:hover {
+  background-color: rgb(var(--accent-rgb) / 0.1);
+  color: rgb(var(--accent-rgb));
+}
+.dock__tool:active {
+  transform: scale(0.94);
+}
+.dock__tool[aria-pressed='true'] {
   color: var(--ink);
 }
-.dock__item > svg {
-  position: relative;
-  z-index: 1;
+.dock__tool:focus-visible {
+  outline: 2px solid var(--pn-ring);
+  outline-offset: -2px;
 }
 
-/* The lens: a soft glass square that glides to the current view. */
-.dock__lens {
-  position: absolute;
-  top: calc((var(--cell) - var(--item)) / 2);
-  left: calc(50% - var(--item) / 2);
-  width: var(--item);
-  height: var(--item);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  background: var(--active);
-  pointer-events: none;
-  transform: translateY(calc(var(--at) * var(--cell)));
-  transition: transform var(--t-slow) var(--ease);
-}
-:root:is([data-dock='top'], [data-dock='bottom']) .dock__lens {
-  top: calc(50% - var(--item) / 2);
-  left: calc((var(--cell) - var(--item)) / 2);
-  transform: translateX(calc(var(--at) * var(--cell)));
-}
-
-/* The name: slides out of the icon towards the content and unveils from its
-   edge (clip), a beat after the pointer arrives. */
+/* The name: unveils below the tool (above it when the bar sits at the bottom). */
 .dock__label {
-  --from: inset(0 100% 0 0 round var(--radius));
   position: absolute;
-  top: 50%;
-  left: calc(100% + 14px);
+  top: calc(100% + 14px);
+  left: 50%;
   z-index: 2;
   padding: 7px 11px;
   border: 1px solid var(--line-float);
@@ -173,139 +134,39 @@
   color: var(--ink);
   white-space: nowrap;
   pointer-events: none;
+  /* Hidden, not just transparent: a waiting name must not claim the window's
+     drag strip below the bar (Electron). */
+  visibility: hidden;
   opacity: 0;
-  clip-path: var(--from);
-  transform: translate(-10px, -50%);
+  clip-path: inset(0 0 100% 0 round var(--radius));
+  transform: translate(-50%, -8px);
   transition:
     opacity var(--t-fast) var(--ease),
     transform var(--t-base) var(--ease),
-    clip-path var(--t-base) var(--ease);
-}
-:root[data-dock='right'] .dock__label {
-  --from: inset(0 0 0 100% round var(--radius));
-  left: auto;
-  right: calc(100% + 14px);
-  transform: translate(10px, -50%);
-}
-:root[data-dock='top'] .dock__label {
-  --from: inset(0 0 100% 0 round var(--radius));
-  top: calc(100% + 14px);
-  left: 50%;
-  transform: translate(-50%, -8px);
+    clip-path var(--t-base) var(--ease),
+    visibility var(--t-base);
 }
 :root[data-dock='bottom'] .dock__label {
-  --from: inset(100% 0 0 0 round var(--radius));
   top: auto;
   bottom: calc(100% + 14px);
-  left: 50%;
+  clip-path: inset(100% 0 0 0 round var(--radius));
   transform: translate(-50%, 8px);
 }
-.dock__item:is(:hover, :focus-visible) .dock__label {
+.dock__tool:is(:hover, :focus-visible) .dock__label {
+  visibility: visible;
   opacity: 1;
   clip-path: inset(0 0 0 0 round var(--radius));
-  transform: translate(0, -50%);
+  transform: translate(-50%, 0);
   transition-delay: 60ms;
 }
-:root:is([data-dock='top'], [data-dock='bottom']) .dock__item:is(:hover, :focus-visible) .dock__label {
-  transform: translate(-50%, 0);
-}
-.dock__item:focus-visible .dock__label {
-  transition-delay: 0ms;
-}
 
-/* ---------- the day end: the anchor of the day ----------
-   Set apart from the views and softly lit in the light colour: the one
-   step that closes the day, always within reach, never loud. */
-.dock__item--closing {
-  flex: none;
-  border: 1px solid rgb(var(--accent-rgb) / 0.3);
-  color: var(--ink);
-  box-shadow:
-    0 0 0 3px rgb(var(--accent-rgb) / 0.04),
-    0 0 22px rgb(var(--accent-rgb) / 0.14);
-  transition:
-    color var(--t-fast) var(--ease),
-    border-color var(--t-base) var(--ease),
-    background-color var(--t-base) var(--ease),
-    box-shadow var(--t-base) var(--ease);
-}
-.dock__item--closing:is(:hover, :focus-visible) {
-  border-color: rgb(var(--accent-rgb) / 0.6);
-  box-shadow:
-    0 0 0 4px rgb(var(--accent-rgb) / 0.07),
-    0 0 30px rgb(var(--accent-rgb) / 0.24);
-}
-.dock__item--closing[aria-current='page'] {
-  border-color: rgb(var(--accent-rgb) / 0.7);
-  background: rgb(var(--accent-rgb) / 0.1);
-}
-/* In a row (top, bottom) it is named: icon and word in one small pill. */
-:root:is([data-dock='top'], [data-dock='bottom']) .dock__item--closing {
-  display: inline-flex;
-  gap: var(--s2);
-  width: auto;
-  margin: 0 var(--s2);
-  padding: 0 var(--s4) 0 var(--s3);
-}
-:root:is([data-dock='top'], [data-dock='bottom']) .dock__item--closing .dock__label,
-:root:is([data-dock='top'], [data-dock='bottom']) .dock__item--closing:is(:hover, :focus-visible) .dock__label {
-  position: static;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  font-size: var(--fs-meta);
-  opacity: 1;
-  clip-path: none;
-  transform: none;
-}
-
-/* The companion's level: a tiny mono number tucked under its icon. */
-.dock__item .level-badge {
-  position: absolute;
-  left: 50%;
-  bottom: -7px;
-  z-index: 1;
-  height: auto;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.04em;
-  color: var(--ink-3);
-}
-
-/* Focus: the dock steps back and returns on contact. */
+/* Focus: the navigation steps back and returns on contact. */
 .shell.is-focusing .dock {
   opacity: 0.35;
 }
-.shell.is-focusing .dock:is(:hover, :focus-within) {
+.shell.is-focusing .dock:is(:hover, :focus-within, :has(.pill-nav[data-open])) {
   opacity: 1;
 }
 .shell.is-covered .dock {
   visibility: hidden;
-}
-
-/* Short or zoomed windows (up to 200 % on a 640 px window): no wordmark,
-   tighter cells, so every item of a side dock stays on screen. */
-@media (max-height: 760px) {
-  :root {
-    --dock-inset: 10px;
-  }
-  .dock {
-    --cell: 36px;
-    --item: 32px;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    row-gap: 2px;
-  }
-  .dock__brand {
-    display: none;
-  }
-  .dock__item--closing {
-    width: var(--item);
-    height: var(--item);
-  }
-  :root[data-dock='right'] .dock {
-    top: var(--chrome-h);
-  }
 }

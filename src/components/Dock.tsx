@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import markSrc from '../assets/logo-mark.png';
 import { useServices } from '../app/services';
 import type { OpenModal } from '../app/modal';
 import { toggledAmbient } from '../app/theme';
@@ -8,8 +9,7 @@ import type { AppState } from '../domain/types';
 import { contextLabels } from '../domain/userContext';
 import { dayKey } from '../lib/time';
 import { IconBell, IconBellOff, IconChart, IconCompanion, IconHome, IconMoon, IconPlay, IconSettings, IconSun, IconSunset } from './icons';
-import { LevelBadge } from './LevelBadge';
-import { Logo } from './Logo';
+import { PillNav, type PillNavItem } from './PillNav';
 import type { View } from './Topbar';
 
 interface Props {
@@ -22,17 +22,26 @@ interface Props {
 }
 
 const STATIONS: Array<{ id: Exclude<View, 'closing'>; label: string; icon: ReactNode }> = [
-  { id: 'today', label: 'Heute', icon: <IconHome size={20} /> },
-  { id: 'times', label: 'Rückblick', icon: <IconChart size={20} /> },
-  { id: 'companion', label: 'Begleiter', icon: <IconCompanion size={20} /> },
+  { id: 'today', label: 'Heute', icon: <IconHome size={18} /> },
+  { id: 'times', label: 'Rückblick', icon: <IconChart size={18} /> },
+  { id: 'companion', label: 'Begleiter', icon: <IconCompanion size={18} /> },
 ];
 
+/** "Me." in the logo slot: the wordmark's last syllable, its dot in the light colour. */
+function Mark() {
+  return (
+    <span className="dock__mark">
+      <img src={markSrc} alt="" draggable={false} />
+      <span className="dock__mark-dot" />
+    </span>
+  );
+}
+
 /**
- * The main navigation, on the edge the user chose (top centre by default,
- * where it merges with the room below). Icons only; each name slides out on
- * hover or keyboard focus, a soft lens glides to the current view. The day
- * end stands apart as the anchor of the day: named and softly lit. Tools
- * (do-not-disturb, light, settings) close the row.
+ * The main navigation: one bar, top centre by default (or bottom centre),
+ * the ToDoMe mark in the slot on its left. The views carry their names; the
+ * day end closes the row as the softly lit anchor of the day. The tools
+ * (do-not-disturb, light, settings) sit in their own small slot after it.
  */
 export function Dock({ state, view, onView, onOpen, onResume }: Props) {
   const { store, clock } = useServices();
@@ -42,72 +51,56 @@ export function Dock({ state, view, onView, onOpen, onResume }: Props) {
   const lit = appearance.ambient > 0;
   const closedToday = state.coach.closedDay === dayKey(clock.now());
   const set = (patch: Partial<AppState['settings']>) => store.dispatch({ type: 'settings/update', patch });
-  const at = STATIONS.findIndex((s) => s.id === view);
 
-  const item = (key: string, label: string, icon: ReactNode, props: { onClick: () => void; current?: boolean; pressed?: boolean; name?: string; className?: string }, extra?: ReactNode) => (
-    <button
-      key={key}
-      type="button"
-      className={`dock__item${props.className ? ` ${props.className}` : ''}`}
-      aria-current={props.current ? 'page' : undefined}
-      aria-pressed={props.pressed}
-      aria-label={props.name}
-      onClick={props.onClick}
-    >
+  const items: PillNavItem[] = [
+    ...STATIONS.map((s) => ({ id: s.id, label: s.label, icon: s.icon })),
+    closedToday ? { id: 'resume', label: 'Fokus wieder aufnehmen', icon: <IconPlay size={16} />, anchor: true } : { id: 'closing', label: labels.dayEnd, icon: <IconSunset size={18} />, anchor: true },
+  ];
+
+  const select = (item: PillNavItem) => {
+    if (item.id === 'resume') {
+      uiSound(state, 'bloom');
+      onResume();
+      return;
+    }
+    if (item.id === 'closing' && view !== 'closing') uiSound(state, 'bloom');
+    onView(item.id as View);
+  };
+
+  const tool = (key: string, label: string, icon: ReactNode, props: { onClick: () => void; pressed?: boolean; name: string }) => (
+    <button key={key} type="button" className="dock__tool" aria-pressed={props.pressed} aria-label={props.name} onClick={props.onClick}>
       {icon}
-      <span className="dock__label" aria-hidden={props.name ? true : undefined}>
+      <span className="dock__label" aria-hidden="true">
         {label}
       </span>
-      {extra}
     </button>
   );
 
   return (
-    <nav className="dock" aria-label="Navigation">
-      <div className="dock__brand" aria-hidden="true">
-        <Logo className="logo" height={9} />
-      </div>
-
-      <div className="dock__stations" style={{ '--at': at } as CSSProperties}>
-        {at >= 0 && <span className="dock__lens" aria-hidden="true" />}
-        {STATIONS.map((s) =>
-          item(s.id, s.label, s.icon, { onClick: () => onView(s.id), current: view === s.id }, s.id === 'companion' && <LevelBadge level={state.progression.stats.level} />),
-        )}
-      </div>
-
-      {/* The day end: the one anchor that ends the day, set apart from the views. */}
-      {closedToday
-        ? item('resume', 'Fokus wieder aufnehmen', <IconPlay size={18} />, {
-            className: 'dock__item--closing',
-            onClick: () => {
-              uiSound(state, 'bloom');
-              onResume();
-            },
-          })
-        : item('closing', labels.dayEnd, <IconSunset size={20} />, {
-            className: 'dock__item--closing',
-            current: view === 'closing',
-            onClick: () => {
-              if (view !== 'closing') uiSound(state, 'bloom');
-              onView('closing');
-            },
-          })}
-
-      <span className="dock__sep" aria-hidden="true" />
-
-      <div className="dock__tools" role="group" aria-label="Schnellzugriff">
-        {item('dnd', dnd ? 'Stumm: keine Nachfragen, kein Besuch' : 'Stumm schalten', dnd ? <IconBellOff size={19} /> : <IconBell size={19} />, {
-          name: dnd ? 'Stumm ist an' : 'Stumm schalten',
-          pressed: dnd,
-          onClick: () => set({ doNotDisturb: !dnd }),
-        })}
-        {item('light', lit ? 'Licht dimmen' : 'Licht an', lit ? <IconMoon size={19} /> : <IconSun size={19} />, {
-          name: lit ? 'Licht dimmen' : 'Licht an',
-          pressed: !lit,
-          onClick: () => set({ appearance: { ...appearance, ambient: toggledAmbient(appearance.ambient, DEFAULT_APPEARANCE.ambient) } }),
-        })}
-        {item('settings', 'Einstellungen', <IconSettings size={19} />, { name: 'Einstellungen', onClick: () => onOpen({ kind: 'settings' }) })}
-      </div>
-    </nav>
+    <div className="dock">
+      <PillNav
+        className="dock__nav"
+        logo={<Mark />}
+        items={items}
+        activeId={view}
+        onSelect={select}
+        placement={appearance.dock === 'bottom' ? 'above' : 'below'}
+        end={
+          <div className="dock__tools" role="group" aria-label="Schnellzugriff">
+            {tool('dnd', dnd ? 'Stumm: keine Nachfragen, kein Besuch' : 'Stumm schalten', dnd ? <IconBellOff size={17} /> : <IconBell size={17} />, {
+              name: dnd ? 'Stumm ist an' : 'Stumm schalten',
+              pressed: dnd,
+              onClick: () => set({ doNotDisturb: !dnd }),
+            })}
+            {tool('light', lit ? 'Licht dimmen' : 'Licht an', lit ? <IconMoon size={17} /> : <IconSun size={17} />, {
+              name: lit ? 'Licht dimmen' : 'Licht an',
+              pressed: !lit,
+              onClick: () => set({ appearance: { ...appearance, ambient: toggledAmbient(appearance.ambient, DEFAULT_APPEARANCE.ambient) } }),
+            })}
+            {tool('settings', 'Einstellungen', <IconSettings size={17} />, { name: 'Einstellungen', onClick: () => onOpen({ kind: 'settings' }) })}
+          </div>
+        }
+      />
+    </div>
   );
 }

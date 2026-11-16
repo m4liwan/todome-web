@@ -1,15 +1,11 @@
-import { act, render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { CalmStats } from '../components/CalmStats';
 import { CompanionHub, progressionTrail } from '../components/CompanionHub';
-import { LevelBadge } from '../components/LevelBadge';
-import { connectProgression } from '../app/progression';
 import { freeState, isProPalette, themesUnlocked } from '../app/pro';
 import { rewardPath, totalXpForLevel } from '../domain/companionProgression';
 import type { AppState } from '../domain/types';
-import { createMemoryStore } from '../lib/storage';
 import { emptyState } from '../state/defaults';
-import { createStore } from '../state/store';
 import { T0 } from '../test/helpers';
 
 function atLevel(level: number, patch: Partial<AppState['progression']['stats']> = {}): AppState {
@@ -63,21 +59,6 @@ describe('the next milestone in the hero', () => {
   it('says all is earned only beyond the last milestone', () => {
     render(<CompanionHub state={atLevel(50)} now={T0} />);
     expect(screen.getByText(/Alle Belohnungen gehören euch/)).toBeTruthy();
-  });
-});
-
-describe('level badge', () => {
-  it('lets a "+15" rise from the badge for a gain while it is visible', () => {
-    const state = emptyState();
-    state.tasks.t = { id: 't', status: 'planned', checklist: [] } as unknown as AppState['tasks'][string];
-    const store = createStore({ storage: createMemoryStore(), key: 'k', initial: state, persistDelayMs: 0 });
-    const disconnect = connectProgression(store);
-    const { container } = render(<LevelBadge level={1} />);
-    expect(container.querySelector('.level-badge__float')).toBeNull();
-    act(() => store.dispatch({ type: 'task/update', id: 't', patch: { status: 'done' }, at: T0 }));
-    expect(container.querySelector('.level-badge__float')?.textContent).toBe('+15');
-    expect(container.querySelector('.level-badge__float')?.getAttribute('aria-hidden')).toBe('true');
-    disconnect();
   });
 });
 

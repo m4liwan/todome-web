@@ -1,0 +1,431 @@
+/* ========================================================================
+   PillNav (components/PillNav.tsx): the navigation bar, after React Bits.
+   OLED: near-black glass with a 1px hairline instead of grey surfaces, no
+   drop shadow. Every colour of the motion (hover fill, the lit label, the
+   dot, the focus ring) comes from the light colour (--accent-rgb), every
+   corner from the corner setting (--radius): Kantig, Präzise, Weich.
+   ======================================================================== */
+
+.pill-nav {
+  --pn-h: 44px;
+  --pn-pad: 4px;
+  --pn-inner: 36px;
+  --pn-x: 14px;
+  --pn-font: 13.5px;
+  --pn-gap: 8px;
+  --pn-mark: 30px;
+  --pn-surface: rgb(5 5 5 / 0.62);
+  --pn-blur: blur(20px) saturate(1.3);
+  --pn-edge: var(--line);
+  --pn-rim: rgb(255 255 255 / 0.025);
+  --pn-text: var(--ink-2);
+  --pn-strong: var(--ink);
+  --pn-pill: rgb(var(--accent-rgb) / 0.14);
+  --pn-pill-ink: rgb(var(--accent-rgb));
+  --pn-dot: rgb(var(--accent-rgb));
+  --pn-ring: rgb(var(--accent-rgb) / 0.7);
+  --pn-row-hover: var(--hover);
+  --pn-roll: calc(var(--pn-inner) / 2 + 0.7em);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pn-gap);
+  max-width: 100%;
+  font-size: var(--pn-font);
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pill-nav__surface {
+  background: var(--pn-surface);
+  -webkit-backdrop-filter: var(--pn-blur);
+  backdrop-filter: var(--pn-blur);
+}
+
+/* The hairline: drawn inside the surface, so it never shifts the layout. */
+.pill-nav__rim {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 1px var(--pn-edge),
+    inset 0 1px 0 var(--pn-rim);
+  pointer-events: none;
+}
+
+/* ---------- the logo slot ---------- */
+.pill-nav__logo {
+  position: relative;
+  z-index: 2;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--pn-h);
+  height: var(--pn-h);
+  border-radius: var(--radius);
+}
+.pill-nav__mark {
+  display: grid;
+  place-items: center;
+  width: var(--pn-mark);
+  height: var(--pn-mark);
+}
+
+/* ---------- the bar ---------- */
+.pill-nav__bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: var(--pn-h);
+  padding: var(--pn-pad);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}
+.pill-nav__track {
+  position: relative;
+  height: 100%;
+}
+.pill-nav__list {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pill-nav__slot {
+  display: flex;
+}
+
+.pill-nav__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--pn-x);
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--pn-text);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.25s ease;
+}
+.pill-nav__slot[data-lit] .pill-nav__item,
+.pill-nav__item[aria-current] {
+  color: var(--pn-strong);
+}
+.pill-nav__item:focus-visible,
+.pill-nav__row:focus-visible {
+  outline: 2px solid var(--pn-ring);
+  outline-offset: -2px;
+}
+
+/* The face and its lit twin: on hover the label rolls up and the twin, in
+   the light colour, rolls in from below. While the twin and the fill wait
+   outside the item they are hidden, not just clipped: a clipped box would
+   still claim the window's drag strip below the bar (Electron). Visibility
+   rides along with the roll, so they show for the whole movement. */
+.pill-nav__face,
+.pill-nav__face-alt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  transition:
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.36s;
+}
+.pill-nav__face-alt {
+  position: absolute;
+  inset: 0;
+  justify-content: center;
+  color: var(--pn-pill-ink);
+  visibility: hidden;
+  transform: translateY(var(--pn-roll));
+}
+.pill-nav__face svg,
+.pill-nav__face-alt svg,
+.pill-nav__ink-item svg,
+.pill-nav__row svg {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+}
+.pill-nav__slot:is([data-on], [data-hover]) .pill-nav__face {
+  transform: translateY(calc(var(--pn-roll) * -1));
+  transition-duration: 0.5s;
+}
+.pill-nav__slot:is([data-on], [data-hover]) .pill-nav__face-alt {
+  visibility: visible;
+  transform: translateY(0);
+  transition-duration: 0.5s;
+}
+
+/* The fill: a circle of tinted light that rises from below the item. */
+.pill-nav__fill {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: -1;
+  width: var(--pn-fill, 200%);
+  height: var(--pn-fill, 200%);
+  margin: calc(var(--pn-fill, 200%) / -2) 0 0 calc(var(--pn-fill, 200%) / -2);
+  border-radius: 50%;
+  background: var(--pn-pill);
+  visibility: hidden;
+  transform: scale(0);
+  transition:
+    transform 0.36s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.36s;
+  pointer-events: none;
+}
+.pill-nav__slot:is([data-on], [data-hover]) .pill-nav__fill {
+  visibility: visible;
+  transform: scale(1);
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.55s;
+}
+
+/* Glide mode (not used by the dock, kept with the engine). */
+.pill-nav__glide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  border: 1px solid rgb(var(--accent-rgb) / 0.3);
+  border-radius: var(--radius);
+  background: var(--pn-pill);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  will-change: transform, width, opacity;
+}
+.pill-nav[data-focus] .pill-nav__glide {
+  box-shadow: 0 0 0 2px var(--pn-ring);
+}
+.pill-nav__ink {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  color: var(--pn-pill-ink);
+  pointer-events: none;
+  clip-path: inset(0 100% 0 0);
+}
+.pill-nav__ink-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  height: 100%;
+  padding: 0 var(--pn-x);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+
+/* The dot: a point of light under the current view, stretching as it travels. */
+.pill-nav__dot {
+  position: absolute;
+  bottom: calc((var(--pn-inner) - var(--pn-font)) / 4 - 3px);
+  left: 0;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: var(--pn-dot);
+  box-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transition: background-color 0.3s ease;
+  will-change: transform, opacity;
+}
+
+/* ---------- the anchor: the day end, set apart and softly lit ---------- */
+.pill-nav__slot[data-anchor] {
+  position: relative;
+  margin-left: calc(var(--pn-gap) + 1px);
+}
+.pill-nav__slot[data-anchor]::before {
+  content: '';
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: calc(var(--pn-gap) / -2 - 1px);
+  width: 1px;
+  background: var(--line-strong);
+}
+.pill-nav__item--anchor {
+  --pn-pill: rgb(var(--accent-rgb) / 0.2);
+  color: var(--pn-strong);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--accent-rgb) / 0.32),
+    0 0 18px rgb(var(--accent-rgb) / 0.12);
+  transition:
+    color 0.25s ease,
+    box-shadow var(--t-base) var(--ease);
+}
+.pill-nav__item--anchor .pill-nav__face svg {
+  color: rgb(var(--accent-rgb));
+}
+.pill-nav__slot[data-anchor]:is([data-hover], [data-lit]) .pill-nav__item--anchor,
+.pill-nav__item--anchor[aria-current] {
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--accent-rgb) / 0.6),
+    0 0 26px rgb(var(--accent-rgb) / 0.22);
+}
+.pill-nav__ink-item--anchor {
+  margin-left: calc(var(--pn-gap) + 1px);
+}
+
+/* ---------- after the bar (the dock's tools) ---------- */
+.pill-nav__end {
+  display: flex;
+  flex: none;
+}
+
+/* ---------- collapsed: a toggle and a menu that unfolds from the bar ---------- */
+.pill-nav__toggle {
+  position: relative;
+  z-index: 3;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: var(--pn-h);
+  height: var(--pn-h);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  color: var(--pn-strong);
+  cursor: pointer;
+  outline: none;
+}
+.pill-nav__toggle:focus-visible {
+  outline: 2px solid var(--pn-ring);
+  outline-offset: 2px;
+}
+.pill-nav__burger {
+  position: relative;
+  width: 16px;
+  height: 10px;
+}
+.pill-nav__line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pill-nav__line--top {
+  top: 1.5px;
+}
+.pill-nav__line--bottom {
+  top: 7px;
+}
+.pill-nav[data-open] .pill-nav__line--top {
+  top: 4.25px;
+  transform: rotate(45deg);
+}
+.pill-nav[data-open] .pill-nav__line--bottom {
+  top: 4.25px;
+  transform: rotate(-45deg);
+}
+
+.pill-nav__panel {
+  position: absolute;
+  top: calc(100% + var(--pn-gap));
+  left: 50%;
+  z-index: 5;
+  width: max-content;
+  min-width: 240px;
+  padding: 6px;
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  background: rgb(8 8 9 / 0.94);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.6);
+  translate: -50% 0;
+}
+.pill-nav[data-placement='above'] .pill-nav__panel {
+  top: auto;
+  bottom: calc(100% + var(--pn-gap));
+}
+.pill-nav__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pill-nav__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: calc(var(--pn-h) - 4px);
+  padding: 0 var(--s4);
+  border: 0;
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  background: none;
+  color: var(--pn-strong);
+  font-family: inherit;
+  font-size: calc(var(--pn-font) + 0.5px);
+  line-height: 1;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease;
+}
+.pill-nav__row:hover {
+  background: var(--pn-row-hover);
+}
+.pill-nav__row[aria-current] {
+  background: var(--pn-pill);
+  color: var(--pn-pill-ink);
+}
+.pill-nav__row--anchor {
+  margin-top: 4px;
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.32);
+}
+
+.pill-nav__measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill-nav__face,
+  .pill-nav__face-alt,
+  .pill-nav__fill,
+  .pill-nav__line,
+  .pill-nav__item,
+  .pill-nav__row {
+    transition: none;
+  }
+}

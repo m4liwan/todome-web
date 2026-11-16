@@ -50,9 +50,12 @@ describe('the living settings', () => {
     expect(panel().dataset.dir).toBe('back');
   });
 
-  it('opens out of the dock, on whichever side it sits', () => {
+  it('opens out of the navigation bar, below it or above it', () => {
     const css = readFileSync(join(process.cwd(), 'src', 'styles', 'components', 'dialogs.css'), 'utf8');
-    for (const side of ['right', 'top', 'bottom']) expect(css, side).toMatch(new RegExp(String.raw`\[data-dock='${side}'\][^{]*\.dialog--settings`));
+    // Below the bar by default; above it when the bar sits at the bottom.
+    expect(css).toMatch(/\.dialog--settings\[open\]\s*\{[^}]*inset: calc\(var\(--dock-inset\) \+ var\(--dock-size\)/);
+    expect(css).toMatch(/\[data-dock='bottom'\][^{]*\.dialog--settings\[open\]/);
+    expect(css).not.toMatch(/data-dock='(left|right)'/);
     expect(css).toMatch(/\.dialog--settings\[open\][^}]*animation: settings-in/);
   });
 });

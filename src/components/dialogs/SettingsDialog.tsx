@@ -76,11 +76,9 @@ const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
   { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
 ];
 
-/** Where the main navigation sits; top centre merges it with the room. */
+/** Where the navigation bar sits; top centre merges it with the room. */
 const DOCKS: Array<{ id: DockPosition; label: string; text: string }> = [
   { id: 'top', label: 'Oben', text: 'Mittig im Kopf, eins mit dem Raum' },
-  { id: 'left', label: 'Links', text: 'Ruhig am Rand, wie ein Buchrücken' },
-  { id: 'right', label: 'Rechts', text: 'Der Blick startet beim Inhalt' },
   { id: 'bottom', label: 'Unten', text: 'Wie ein Dock, griffbereit' },
 ];
 
@@ -375,7 +373,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             <>
         <section>
           <h3>Navigation</h3>
-          <p className="muted small">Die schwebende Leiste mit allen Bereichen. Sie zeigt nur Symbole; die Namen erscheinen, wenn du darüber fährst.</p>
+          <p className="muted small">Die Leiste mit allen Bereichen und deinem Feierabend. Sie färbt sich mit deinem Licht und folgt deinem Eckenstil.</p>
           <div className="docks" role="radiogroup" aria-label="Position der Navigation">
             {DOCKS.map((d) => (
               <button
