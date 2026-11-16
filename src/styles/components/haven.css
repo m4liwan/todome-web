@@ -1,0 +1,186 @@
+/* ========================================================================
+   Haven (components/Haven.tsx): the companion's home. A quiet ambience in
+   the black around him: each mood has its own tone, a few points of light
+   at most, slow and soft. Decorative only; still when effects are off.
+   ======================================================================== */
+
+.haven {
+  --tone: var(--accent-rgb);
+  position: absolute;
+  inset: -22% -34% -4%;
+  z-index: 0;
+  pointer-events: none;
+}
+.haven--moon {
+  --tone: 205 222 255;
+}
+.haven--fireflies {
+  --tone: 255 198 96;
+}
+.haven--stardust {
+  --tone: var(--accent-rgb);
+}
+.haven--dew {
+  --tone: 150 230 196;
+}
+
+/* Moonlight: a cool, still glow behind him, a fine crescent at its rim. */
+.haven__orb {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--tone) / 0.24), rgb(var(--tone) / 0.08) 58%, rgb(var(--tone) / 0));
+  translate: -50% 0;
+  animation: haven-breathe 9s ease-in-out infinite alternate;
+}
+.haven__orb::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 12%;
+  width: 26%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: inset -2px 2px 0 rgb(var(--tone) / 0.45);
+}
+
+/* Fireflies, stardust and dew: a few points of light. */
+.haven__mote {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgb(var(--tone));
+  box-shadow: 0 0 7px 1px rgb(var(--tone) / 0.7);
+  opacity: 0;
+  animation: haven-float var(--dur) ease-in-out var(--delay) infinite;
+}
+.haven--stardust .haven__mote {
+  width: 2px;
+  height: 2px;
+  box-shadow: 0 0 5px rgb(var(--tone) / 0.8);
+  animation-name: haven-twinkle;
+}
+.haven--dew .haven__mote {
+  animation-name: haven-rise;
+}
+/* Dew: a fresh mist lying on the ground. */
+.haven--dew::before {
+  content: '';
+  position: absolute;
+  right: 8%;
+  bottom: 2%;
+  left: 8%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--tone) / 0.16), rgb(var(--tone) / 0));
+}
+.haven.is-still :is(.haven__orb, .haven__mote) {
+  animation: none;
+}
+.haven.is-still .haven__mote {
+  opacity: 0.6;
+}
+
+/* ---------- choosing his home ---------- */
+/* At the companion: five small swatches, they appear when you come closer. */
+.haven-picker {
+  display: flex;
+  gap: 6px;
+}
+.haven-picker__opt {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transition:
+    background-color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+.haven-picker__opt:hover {
+  background: var(--hover);
+}
+.haven-picker__opt:active {
+  transform: scale(0.92);
+}
+.haven-picker__opt:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.7);
+  outline-offset: 1px;
+}
+.haven-picker__swatch {
+  --tone: var(--accent-rgb);
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgb(var(--tone)), rgb(var(--tone) / 0.35));
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+}
+.haven-picker__opt--moon .haven-picker__swatch {
+  --tone: 205 222 255;
+}
+.haven-picker__opt--fireflies .haven-picker__swatch {
+  --tone: 255 198 96;
+}
+.haven-picker__opt--dew .haven-picker__swatch {
+  --tone: 150 230 196;
+}
+.haven-picker__opt--none .haven-picker__swatch {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.haven-picker__opt.is-on .haven-picker__swatch {
+  box-shadow:
+    0 0 0 2px var(--bg),
+    0 0 0 3px rgb(var(--tone) / 0.8),
+    0 0 10px rgb(var(--tone) / 0.5);
+}
+.haven-picker__opt--none.is-on .haven-picker__swatch {
+  box-shadow:
+    inset 0 0 0 1px var(--ink-2),
+    0 0 0 2px var(--bg),
+    0 0 0 3px var(--ink-3);
+}
+
+/* In the settings: cards with a small preview of each home. */
+.haven-picker--cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--s2);
+}
+.haven-picker--cards .haven-picker__opt {
+  display: grid;
+  place-items: start;
+  align-content: start;
+  gap: var(--s1);
+  width: auto;
+  height: auto;
+  border-radius: var(--radius);
+  text-align: left;
+}
+.haven-picker--cards .haven-picker__swatch {
+  width: 100%;
+  height: 64px;
+  margin-bottom: var(--s2);
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.haven-picker--cards .haven-picker__opt.is-on .haven-picker__swatch {
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.6);
+}
+.haven-picker--cards .haven {
+  inset: 0;
+}
+@media (max-width: 860px) {
+  .haven-picker--cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

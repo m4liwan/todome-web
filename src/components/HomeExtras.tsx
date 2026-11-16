@@ -14,6 +14,7 @@ import { dissolveText } from '../lib/dissolve';
 import { AvatarScene } from './AvatarScene';
 import { AvatarFx, holoFor } from './AvatarFx';
 import { IconArrowUpRight, IconCheck, IconClose, IconPlus, IconChat } from './icons';
+import { Haven, HavenPicker } from './Haven';
 import { WindowDrag } from './WindowDrag';
 
 /* ------------------------------------------------------------------------
@@ -462,7 +463,9 @@ export function CompanionHome({ state, now, fgTaskId, onCustomize }: { state: Ap
       <a className="home-hub__feedback" href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer" aria-label="Feedback zu ToDoMe. geben" title="Feedback geben">
         <IconChat size={16} />
       </a>
+      {/* His home: an alcove of hairline, a pool of light, and the ambience he lives in. */}
       <div className="home-hub__house">
+        <Haven id={state.settings.companion.home} still={!state.settings.appearance.companionFx} />
         <AvatarFx level={state.progression.stats.level} enabled={state.settings.appearance.companionFx}>
           <AvatarScene avatar={avatar} activity={activity} size={112} holo={holoFor(state.progression.stats.level, state.settings.appearance.companionFx)} />
         </AvatarFx>
@@ -483,6 +486,11 @@ export function CompanionHome({ state, now, fgTaskId, onCustomize }: { state: Ap
           Avatar anpassen
         </button>
         <p className="home-hub__since muted small">{running ? `Ihr arbeitet zusammen an „${running.title}“.` : 'Immer hier, wenn du mich brauchst.'}</p>
+        <HavenPicker
+          value={state.settings.companion.home}
+          name={avatarName(avatar)}
+          onChange={(home) => services.store.dispatch({ type: 'settings/update', patch: { companion: { ...services.store.getState().settings.companion, home } } })}
+        />
       </div>
     </section>
   );

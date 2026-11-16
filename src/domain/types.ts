@@ -287,6 +287,9 @@ export interface MediaSettings {
   rev?: number;
 }
 
+/** The companion's home: a quiet ambience around him (or none). */
+export type HavenId = 'moon' | 'fireflies' | 'stardust' | 'dew' | 'none';
+
 export interface CompanionSettings {
   enabled: boolean;
   avatar: AvatarId;
@@ -301,6 +304,8 @@ export interface CompanionSettings {
   position: 'right' | 'left';
   /** Gentle afternoon question: switch to the soft mode for the rest of the day? */
   softCheck: boolean;
+  /** His home on the home screen: the ambience around him (moonlight by default). */
+  home: HavenId;
 }
 
 export interface WeatherLocation {

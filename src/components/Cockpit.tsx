@@ -189,7 +189,7 @@ export const ROOMS: ReadonlyArray<{ id: LayoutId; label: string; mood: string; t
   { id: 'flow', label: 'Flow', mood: 'Stream', text: 'Eine Bahn nach vorn: Schritt, Danach, Begleiter.' },
 ];
 
-/** A tiny floor plan of each room (for the switch and the settings). */
+/** A tiny floor plan of each room (for the settings). */
 export function RoomGlyph({ id }: { id: LayoutId }) {
   const r = (x: number, y: number, w: number, h: number, strong = false) => <rect x={x} y={y} width={w} height={h} rx={0.8} opacity={strong ? 1 : 0.45} />;
   return (
@@ -228,47 +228,6 @@ export function RoomGlyph({ id }: { id: LayoutId }) {
 }
 
 /**
- * The room switch in the head of "Heute": four floor plans in a quiet row,
- * the name unveils on hover. Arrow keys move between rooms.
- */
-function RoomSwitch({ layout, onLayout }: { layout: LayoutId; onLayout: (id: LayoutId) => void }) {
-  const at = ROOMS.findIndex((r) => r.id === layout);
-  const onKey = (e: KeyboardEvent<HTMLButtonElement>) => {
-    const go = { ArrowRight: at + 1, ArrowDown: at + 1, ArrowLeft: at - 1, ArrowUp: at - 1, Home: 0, End: ROOMS.length - 1 }[e.key];
-    if (go === undefined) return;
-    e.preventDefault();
-    const next = ROOMS[(go + ROOMS.length) % ROOMS.length]!;
-    onLayout(next.id);
-    // The room rebuilds itself; the keyboard stays on the switch.
-    window.setTimeout(() => document.getElementById(`room-${next.id}`)?.focus({ preventScroll: true }), 0);
-  };
-  return (
-    <div className="rooms" role="radiogroup" aria-label="Aufbau von Heute">
-      {ROOMS.map((r) => (
-        <button
-          key={r.id}
-          type="button"
-          role="radio"
-          id={`room-${r.id}`}
-          aria-checked={r.id === layout}
-          aria-label={r.label}
-          tabIndex={r.id === layout ? 0 : -1}
-          className="rooms__opt"
-          onClick={() => r.id !== layout && onLayout(r.id)}
-          onKeyDown={onKey}
-        >
-          <RoomGlyph id={r.id} />
-          <span className="rooms__name" aria-hidden="true">
-            {r.label}
-            <small>{r.mood}</small>
-          </span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/**
  * Sanctuary keeps everything but the main card and the companion behind one
  * quiet line. It unfolds on demand (and for the companion tour).
  */
@@ -301,13 +260,11 @@ const areasFor = (layout: LayoutId) => (layout === 'hub' ? AREAS.map((a) => ({ .
 interface CockpitProps {
   panels: Record<string, ReactNode>;
   meta?: { anchors?: string };
-  /** The room (Classic by default). */
+  /** The room (Classic by default; chosen in the settings). */
   layout?: LayoutId;
-  /** Shows the room switch in the head when given. */
-  onLayout?: (id: LayoutId) => void;
 }
 
-export function Cockpit({ panels, meta = {}, layout = 'classic', onLayout }: CockpitProps) {
+export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps) {
   const panel = (id: string) => (
     <div key={id} className={`panel panel--${id} enter`} style={{ '--i': STEP[id] ?? 4 } as CSSProperties}>
       {panels[id]}
@@ -321,7 +278,6 @@ export function Cockpit({ panels, meta = {}, layout = 'classic', onLayout }: Coc
 
   const head = (
     <header key="head" className="cockpit__head">
-      {onLayout && <RoomSwitch layout={layout} onLayout={onLayout} />}
       {COCKPIT.head.map(panel)}
     </header>
   );

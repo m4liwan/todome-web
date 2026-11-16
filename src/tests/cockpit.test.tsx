@@ -1,8 +1,8 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import postcss, { type Rule } from 'postcss';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { AREAS, COCKPIT, Cockpit, showArea } from '../components/Cockpit';
 
 const IDS = ['greet', 'focus', 'hub', 'plan', 'tl', 'anchors', 'water', 'weather', 'times', 'week', 'impulse', 'thoughts', 'routines'];
@@ -178,15 +178,10 @@ describe('the four rooms', () => {
     expect([...document.querySelectorAll('.cockpit__stream .panel')].map((p) => p.className)).toEqual([expect.stringContaining('panel--hub')]);
   });
 
-  it('switches rooms from the head of Heute', () => {
-    const onLayout = vi.fn();
-    render(<Cockpit panels={stubs} layout="classic" onLayout={onLayout} />);
-    const group = screen.getByRole('radiogroup', { name: 'Aufbau von Heute' });
-    const radios = within(group).getAllByRole('radio');
-    expect(radios.map((r) => r.getAttribute('aria-label'))).toEqual(['Classic', 'Sanctuary', 'Hub', 'Flow']);
-    expect(radios[0]!.getAttribute('aria-checked')).toBe('true');
-    fireEvent.click(radios[3]!);
-    expect(onLayout).toHaveBeenCalledWith('flow');
+  it('keeps Heute free of the room switch: rooms are chosen in the settings only', () => {
+    render(<Cockpit panels={stubs} layout="hub" />);
+    expect(screen.queryByRole('radiogroup', { name: 'Aufbau von Heute' })).toBeNull();
+    expect(document.querySelector('.rooms')).toBeNull();
   });
 
   it('arranges three rooms on top of the Classic base, and the focus styles reach the Sanctuary drawer too', () => {

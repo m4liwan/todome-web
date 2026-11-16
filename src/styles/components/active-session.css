@@ -227,7 +227,7 @@
   min-width: 0;
 }
 
-/* Micro bites: one small step at a time. */
+/* Mikro-Schritt: the next handhold, always the user's own. */
 .bites {
   display: grid;
   align-content: start;
@@ -241,10 +241,28 @@
 .bites__done {
   justify-self: start;
 }
-.bites__more {
+/* The anchor: one line to write on, a hairline that lights up while you write. */
+.bites__anchor {
   display: grid;
-  gap: var(--s2);
+  gap: var(--s3);
   color: var(--ink-3);
+}
+.bites__anchor input:not([type='checkbox']) {
+  min-height: 44px;
+  padding: 0 0 var(--s2);
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: transparent;
+  font-size: var(--fs-h2);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  transition: border-color var(--t-base) var(--ease);
+}
+.bites__anchor input:not([type='checkbox']):focus {
+  outline: none;
+  border-bottom-color: rgb(var(--accent-rgb) / 0.7);
 }
 
 /* Beads (focus progress "beads"): done in the light colour, the next one grey. */

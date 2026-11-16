@@ -11,8 +11,7 @@ import type { AppState, Millis, Task } from '../domain/types';
 import { dayKey, formatClock, formatDuration, formatTime, MIN } from '../lib/time';
 import { AvatarScene } from './AvatarScene';
 import { FocusProgress } from './FocusProgress';
-import { addChecklistItem, addMicroBites, pauseSession, toggleChecklistItem } from '../state/commands';
-import { microBites } from '../domain/micro';
+import { addChecklistItem, pauseSession, toggleChecklistItem } from '../state/commands';
 import { Avatar } from './Avatar';
 import { FOCUS_TIMER_LOCKED, FocusStyleMenu } from './FocusStyle';
 import { PomodoroClock } from './PomodoroClock';
@@ -182,12 +181,6 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
   const style = effectiveFocusStyle(state);
   const timerUnlocked = focusTimerUnlocked(state);
   const timer = style === 'pomodoro' ? pomodoroPhase(state, p, now) : null;
-  const taskForBites = state.tasks[p.taskId];
-  // Mikro-Schritt-Modus: a task without steps gets three small bites right away.
-  useEffect(() => {
-    if (style !== 'micro' || !taskForBites || taskForBites.checklist.length > 0) return;
-    services.run(addMicroBites(services.store.getState(), services.deps(), taskForBites.id, microBites(taskForBites)));
-  }, [style, taskForBites, services]);
   const [newStep, setNewStep] = useState('');
   const task = state.tasks[p.taskId];
   if (!task) return null;
@@ -291,7 +284,7 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
           </dl>
 
           {style === 'micro' ? (
-            <MicroBites task={task} state={state} />
+            <NextHandle task={task} state={state} />
           ) : (
           <div className="steps">
             <p className="steps__title">
@@ -368,16 +361,22 @@ function FocusCard({ state, p, now, onOpen, stackDepth, onBreathe }: { state: Ap
 }
 
 /** Mikro-Schritt-Modus: only the current bite is visible, one tap moves on. */
-function MicroBites({ task, state }: { task: Task; state: AppState }) {
+/**
+ * Mikro-Schritt: one handhold at a time, always your own. The next open step
+ * of the task stands large with a check; when there is none, one quiet field
+ * asks for your real next handhold (it becomes a step of the task). No
+ * generic suggestions: only what you wrote yourself.
+ */
+function NextHandle({ task, state }: { task: Task; state: AppState }) {
   const services = useServices();
-  const [extra, setExtra] = useState('');
+  const [next, setNext] = useState('');
   const items = task.checklist;
   const current = items.find((i) => i.doneAt === null) ?? null;
-  const index = current ? items.indexOf(current) : items.length;
+  const done = items.filter((i) => i.doneAt !== null).length;
   return (
     <div className="bites" aria-live="polite">
       <p className="steps__title">
-        Häppchen {Math.min(index + 1, items.length)} von {items.length}
+        Dein nächster Handgriff {items.length > 0 && <span className="muted">{`${done}/${items.length}`}</span>}
       </p>
       {current ? (
         <>
@@ -388,14 +387,14 @@ function MicroBites({ task, state }: { task: Task; state: AppState }) {
         </>
       ) : (
         <form
-          className="bites__more"
+          className="bites__anchor"
           onSubmit={(e) => {
             e.preventDefault();
-            if (services.run(addChecklistItem(state, services.deps(), task.id, extra))) setExtra('');
+            if (services.run(addChecklistItem(state, services.deps(), task.id, next))) setNext('');
           }}
         >
-          <p className="bites__now">Alle Häppchen geschafft. Schön.</p>
-          <input value={extra} onChange={(e) => setExtra(e.target.value)} placeholder="Noch ein kleines Häppchen?" aria-label="Weiteres Häppchen" />
+          {items.length > 0 && <p className="bites__now">Alles geschafft, was du dir vorgenommen hast. Schön.</p>}
+          <input value={next} onChange={(e) => setNext(e.target.value)} placeholder="Was tust du als Nächstes, ganz konkret?" aria-label="Dein nächster Handgriff" />
         </form>
       )}
     </div>

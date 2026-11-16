@@ -398,7 +398,6 @@ export function App() {
               panels={p}
               meta={{ anchors: anchorsDue.due.length ? `${anchorsDue.done}/${anchorsDue.due.length}` : undefined }}
               layout={state.settings.appearance.layout}
-              onLayout={(layout) => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...state.settings.appearance, layout } } })}
             />
           )}
           {view === 'times' && (

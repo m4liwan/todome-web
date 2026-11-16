@@ -8,6 +8,7 @@ import { bloom, focusTone } from '../../lib/chimes';
 import { freeState, hasPro, isProPalette, openPro, themesUnlocked } from '../../app/pro';
 import { IconArrowUpRight, IconChart, IconChat, IconCompanion, IconHelp, IconLock, IconMusic, IconSettings, IconSparkle } from '../icons';
 import { ROOMS, RoomGlyph } from '../Cockpit';
+import { HavenPicker } from '../Haven';
 import { companionHello } from '../../app/companion';
 import { avatarName } from '../../domain/companion';
 import { COPYRIGHT } from '../../domain/legal';
@@ -322,6 +323,11 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
               services.store.flush();
             }}
           />
+          <div className="field">
+            <span>Zuhause</span>
+            <HavenPicker cards value={s.companion.home} name={avatarName(s.companion.avatar)} onChange={(home) => setCompanion({ home })} />
+            <small className="hint">Das Ambiente um deinen Begleiter auf der Startseite. Du kannst es auch direkt bei ihm wechseln.</small>
+          </div>
           <div className="form--grid">
             <label className="field">
               <span>Vorbeischauen während einer Session</span>
@@ -374,7 +380,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             <>
         <section>
           <h3>Heute</h3>
-          <p className="muted small">Vier Räume für denselben Tag. Jeder gibt dir ein anderes Gefühl; dein nächster Schritt steht in allen in der Mitte. Du kannst auch direkt in „Heute“ oben rechts wechseln.</p>
+          <p className="muted small">Vier Räume für denselben Tag. Jeder gibt dir ein anderes Gefühl; dein nächster Schritt steht in allen in der Mitte.</p>
           <div className="room-picker" role="radiogroup" aria-label="Aufbau von Heute">
             {ROOMS.map((r) => (
               <button

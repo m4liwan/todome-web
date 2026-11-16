@@ -427,11 +427,3 @@ export function closeOpenPrompts(state: AppState, deps: Deps, sessionId: Id, kin
     .map((c) => ({ type: 'checkin/answer', id: c.id, answer: `system:${answer}`, at: deps.now }) as const);
 }
 
-/** Mikro-Schritt-Modus: gives a task without steps three small bites. */
-export function addMicroBites(state: AppState, deps: Deps, taskId: Id, labels: readonly string[]): CommandResult {
-  const task = state.tasks[taskId];
-  if (!task) return fail('Aufgabe nicht gefunden.');
-  if (task.checklist.length > 0) return fail('Die Aufgabe hat schon Schritte.');
-  const checklist: ChecklistItem[] = labels.map((label) => ({ id: deps.newId(), label, doneAt: null }));
-  return ok([{ type: 'task/update', id: taskId, patch: { checklist }, at: deps.now }]);
-}

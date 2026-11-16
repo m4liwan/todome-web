@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import ElectricLogo from './ElectricLogo';
-import { prefersReducedMotion, useAccentColors, useResolvedTheme } from '../app/theme';
+import { prefersReducedMotion } from '../app/theme';
 import { avatarName } from '../domain/companion';
 import { energyProfile, theOneThing } from '../domain/energy';
 import type { AppState, Millis } from '../domain/types';
@@ -10,6 +9,7 @@ import { greetingFor } from './Greeting';
 import { formatTime } from '../lib/time';
 import { useFocusTrap } from '../lib/a11y';
 import { WeatherIcon } from './icons';
+import { Logo } from './Logo';
 import { WindowDrag } from './WindowDrag';
 
 interface Props {
@@ -23,11 +23,12 @@ interface Props {
 const LINE_MS = 1500;
 
 /**
- * Welcome ("Mentaler Login") as a heads-up display: the electric wordmark
- * floats free in the centre of the screen; around it, at the edges, a system
- * message with the greeting and a briefing line by line (top), telemetry for
- * the day (date and time, weather; bottom corners) and the way in (bottom
- * third). It stays until you say you are ready (button, Enter or Esc).
+ * Welcome ("Mentaler Login") as a threshold: an almost empty black room. A
+ * slit of light opens slowly across it; above the light, monumental, the
+ * greeting; below it the briefing, one line at a time. Then two hairlines
+ * draw in from the edges towards the way in ("Ich bin angekommen"). The day
+ * (date, weather) whispers in the lower corners. It stays until you say you
+ * are ready (button, Enter or Esc).
  */
 export function Splash({ state, now, onDone, manual = false }: Props) {
   const [leaving, setLeaving] = useState(false);
@@ -39,9 +40,6 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
   const total = prefersReducedMotion() ? 400 : 900 + lines.length * LINE_MS;
   const [ready, setReady] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
-  const theme = useResolvedTheme(state.settings.theme);
-  // The neon follows the colour world (palette and theme), live.
-  const accent = useAccentColors({ strong: '#10b981', light: '#84cc16' });
 
   useEffect(() => {
     const ids = lines.map((_, i) => window.setTimeout(() => setLine(i), 900 + i * LINE_MS));
@@ -93,31 +91,9 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
       style={{ '--splash-ms': `${total}ms` } as React.CSSProperties}
     >
       <WindowDrag />
-      <div className="splash__grid" aria-hidden="true" />
-      <div className="splash__frame" aria-hidden="true" />
-
-      <div className="splash__hero" role="img" aria-label="ToDoMe.">
-        <ElectricLogo
-          src="/logo-schwarz.png"
-          theme={theme}
-          arcs={0.7}
-          bend={0.25}
-          color={accent.strong}
-          crackle={0.6}
-          cursorIntensity={0.25}
-          cursorRadius={100}
-          fill={0}
-          flicker={0.15}
-          glow={1.05}
-          glowColor={accent.light}
-          intensity={1}
-          interactive
-          scale={0.75}
-          speed={0.55}
-          strands={2}
-          thickness={1.3}
-        />
-      </div>
+      <p className="splash__brand">
+        <Logo height={11} />
+      </p>
 
       <header className="splash__status">
         <p className="splash__sys">
@@ -134,14 +110,21 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
             </>
           )}
         </h1>
-        <div className="splash__line" aria-live="polite">
-          {lines.map((l, i) => (
-            <p key={l} className={i === line ? 'is-on' : i < line ? 'is-past' : undefined}>
-              {l}
-            </p>
-          ))}
-        </div>
       </header>
+
+      {/* The slit of light: the room opens. */}
+      <div className="splash__light" aria-hidden="true">
+        <span className="splash__glow" />
+        <span className="splash__slit" />
+      </div>
+
+      <div className="splash__line" aria-live="polite">
+        {lines.map((l, i) => (
+          <p key={l} className={i === line ? 'is-on' : i < line ? 'is-past' : undefined}>
+            {l}
+          </p>
+        ))}
+      </div>
 
       <dl className="splash__tele splash__tele--left">
         <dt>
@@ -177,11 +160,13 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
       </dl>
 
       <div className="splash__dock">
+        {/* The threshold: two hairlines draw in from the edges to the way in. */}
         <div className={`splash__enter${ready ? ' is-ready' : ''}`}>
+          <span className="splash__rail splash__rail--left" aria-hidden="true" />
           <button
             ref={button}
             type="button"
-            className="btn btn--primary splash__action"
+            className="btn splash__action"
             onClick={() => {
               uiSound(state, 'bloom');
               setLeaving(true);
@@ -189,6 +174,7 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
           >
             {manual ? 'Ich bin angekommen' : 'Lass uns ankommen'}
           </button>
+          <span className="splash__rail splash__rail--right" aria-hidden="true" />
         </div>
         <button type="button" className="splash__skip" onClick={() => setLeaving(true)}>
           {first ? 'Direkt einrichten' : 'Direkt zur Übersicht'}
