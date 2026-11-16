@@ -289,7 +289,10 @@ export interface MediaSettings {
 }
 
 /** The companion's home: a quiet ambience around him (or none). */
-export type HavenId = 'moon' | 'fireflies' | 'stardust' | 'dew' | 'none';
+export type HavenId = 'moon' | 'fireflies' | 'stardust' | 'dew' | 'hearth' | 'rain' | 'sakura' | 'none';
+
+/** Things the user places at the companion's side in his home. */
+export type CompanionObjectId = 'tea' | 'plant' | 'book' | 'candle';
 
 export interface CompanionSettings {
   enabled: boolean;
@@ -307,6 +310,8 @@ export interface CompanionSettings {
   softCheck: boolean;
   /** His home on the home screen: the ambience around him (moonlight by default). */
   home: HavenId;
+  /** Things at his side in his home (Begleiter tab), in the order they were placed. */
+  objects: CompanionObjectId[];
 }
 
 export interface WeatherLocation {

@@ -11,6 +11,7 @@ export const DEFAULT_COMPANION: CompanionSettings = {
   position: 'right',
   softCheck: true,
   home: 'moon',
+  objects: [],
 };
 
 export const DEFAULT_WELLBEING: Wellbeing = {

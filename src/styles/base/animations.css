@@ -389,7 +389,69 @@
   }
   100% {
     opacity: 0;
-    transform: translateY(-44px);
+    transform: translateY(var(--rise, -44px));
+  }
+}
+
+@keyframes haven-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  12% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--fall, 64px));
+  }
+}
+@keyframes haven-petal {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  15% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift, 36px), var(--fall, 90px)) rotate(220deg);
+  }
+}
+@keyframes haven-flicker {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  40% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.7;
+  }
+}
+/* His things (haven.css): steam rises from the tea, the candle's flame moves. */
+@keyframes belonging-steam {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  40% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@keyframes belonging-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.9, 1.08);
   }
 }
 

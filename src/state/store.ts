@@ -47,7 +47,8 @@ const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose', 'bl
 const CORNERS = new Set(['sharp', 'precise', 'soft']);
 const DOCKS = new Set(['top', 'bottom']);
 const LAYOUTS = new Set(['classic', 'sanctuary', 'hub', 'flow', 'duo']);
-const HAVENS = new Set(['moon', 'fireflies', 'stardust', 'dew', 'none']);
+const HAVENS = new Set(['moon', 'fireflies', 'stardust', 'dew', 'hearth', 'rain', 'sakura', 'none']);
+const OBJECTS = new Set(['tea', 'plant', 'book', 'candle']);
 
 /**
  * The three bites the old Mikro-Schritt mode wrote into a task by itself
@@ -218,6 +219,10 @@ export function parseState(raw: string | null): AppState | null {
           avatar: normalizeAvatar((companion as { avatar?: unknown }).avatar ?? DEFAULT_COMPANION.avatar),
           // 2.x: his home on the home screen; anything unknown starts in moonlight.
           home: HAVENS.has(String((companion as { home?: unknown }).home)) ? (companion as AppState['settings']['companion']).home : DEFAULT_COMPANION.home,
+          // 2.x: things at his side; known ones, once each.
+          objects: Array.isArray((companion as { objects?: unknown }).objects)
+            ? ([...new Set((companion as { objects: unknown[] }).objects.filter((o) => OBJECTS.has(String(o))))] as AppState['settings']['companion']['objects'])
+            : [],
         },
         appearance: migrateAppearance(settings.appearance),
         // 1.18: light mode is gone; 'system' and 'light' load as dark.

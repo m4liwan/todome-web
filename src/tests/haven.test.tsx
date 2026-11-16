@@ -1,4 +1,6 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { ServicesContext, type Services } from '../app/services';
 import { CompanionHub } from '../components/CompanionHub';
@@ -38,8 +40,9 @@ describe('the companion at home', () => {
     expect(emptyState().settings.companion.home).toBe('moon');
   });
 
-  it('offers five quiet moods, one of them plain', () => {
-    expect(HAVENS.map((h) => h.id)).toEqual(['moon', 'fireflies', 'stardust', 'dew', 'none']);
+  it('offers eight quiet moods, one of them plain', () => {
+    expect(HAVENS.map((h) => h.id)).toEqual(['moon', 'fireflies', 'stardust', 'dew', 'hearth', 'rain', 'sakura', 'none']);
+    expect(HAVENS.map((h) => h.label)).toEqual(['Mondschein', 'Glühwürmchen', 'Sternenstille', 'Morgentau', 'Kaminfeuer', 'Regennacht', 'Sakura-Abend', 'Schlicht']);
   });
 
   it('lets him stand in his ambience, inside his alcove', () => {
@@ -76,7 +79,7 @@ describe('the companion at home', () => {
       </ServicesContext.Provider>,
     );
     const group = screen.getByRole('radiogroup', { name: /Zuhause/, hidden: true });
-    fireEvent.click(within(group).getByRole('radio', { name: /Sternenstaub/, hidden: true }));
+    fireEvent.click(within(group).getByRole('radio', { name: /Sternenstille/, hidden: true }));
     expect(store.getState().settings.companion.home).toBe('stardust');
   });
 });
@@ -112,5 +115,46 @@ describe('the Begleiter tab: his true home', () => {
     home('moon', onHome);
     fireEvent.click(within(screen.getByRole('radiogroup', { name: /Zuhause/ })).getByRole('radio', { name: 'Morgentau' }));
     expect(onHome).toHaveBeenCalledWith('dew');
+  });
+
+  it('bathes the whole tab in his ambience, not only his alcove', () => {
+    home('rain');
+    // At the window, not inside the tab's box (no edge, no box).
+    const room = document.querySelector('#companion-room > .haven.haven--room.haven--rain');
+    expect(room).not.toBeNull();
+    expect(room!.querySelectorAll('.haven__mote').length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('lets him stand free on the horizon: no box beneath him', () => {
+    const css = readFileSync(join(process.cwd(), 'src', 'styles', 'components', 'companion-hub.css'), 'utf8');
+    expect(css).not.toMatch(/\.companion-hub__home::after/);
+    expect(css).toMatch(/\.companion-hub__floor\s*\{[^}]*radial-gradient/);
+    home('moon');
+    expect(document.querySelector('.companion-hub__home .companion-hub__floor')).not.toBeNull();
+  });
+
+  it('places the things you choose at his side, on his horizon', () => {
+    const onObjects = vi.fn();
+    const s = withHome('moon');
+    render(<CompanionHub state={{ ...s, settings: { ...s.settings, companion: { ...s.settings.companion, objects: ['tea', 'candle'] } } }} now={NOW} onObjects={onObjects} />);
+    const placed = [...document.querySelectorAll('.companion-hub__home .belonging')].map((e) => e.getAttribute('data-id'));
+    expect(placed).toEqual(['tea', 'candle']);
+    const group = screen.getByRole('group', { name: 'An seiner Seite' });
+    expect(within(group).getByRole('button', { name: 'Teetasse' }).getAttribute('aria-pressed')).toBe('true');
+    fireEvent.click(within(group).getByRole('button', { name: 'Pflanze' }));
+    expect(onObjects).toHaveBeenCalledWith(['tea', 'candle', 'plant']);
+    fireEvent.click(within(group).getByRole('button', { name: 'Teetasse' }));
+    expect(onObjects).toHaveBeenLastCalledWith(['candle']);
+  });
+});
+
+describe('his things, remembered', () => {
+  it('keeps known things once each and drops anything else', () => {
+    const base = emptyState();
+    const load = (objects: unknown) =>
+      parseState(JSON.stringify({ ...base, settings: { ...base.settings, companion: { ...base.settings.companion, objects } } }))?.settings.companion.objects;
+    expect(load(['tea', 'book', 'tea', 'sofa'])).toEqual(['tea', 'book']);
+    expect(load('tea')).toEqual([]);
+    expect(emptyState().settings.companion.objects).toEqual([]);
   });
 });

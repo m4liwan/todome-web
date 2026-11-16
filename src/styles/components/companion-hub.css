@@ -6,6 +6,7 @@
    ======================================================================== */
 
 .companion-hub {
+  position: relative;
   display: grid;
   gap: 0;
 }
@@ -27,25 +28,23 @@
   place-items: end center;
   height: clamp(340px, 48vh, 480px);
   overflow: hidden;
-  /* Deep, organic black: a breath of his light colour at the floor, the
-     room's corners marked like the main card's, no box. */
-  background:
-    var(--hud-frame),
-    radial-gradient(ellipse 70% 40% at 50% 100%, rgb(var(--accent-2-rgb) / 0.1), rgb(var(--accent-2-rgb) / 0) 70%),
-    radial-gradient(ellipse 50% 60% at 50% 30%, rgb(var(--accent-rgb) / 0.035), rgb(var(--accent-rgb) / 0) 70%);
+  /* His room is open: the corners are marked like the main card's, the
+     light comes from his ambience; no surface, no box. */
+  background: var(--hud-frame);
   background-repeat: no-repeat;
 }
-/* The floor below the horizon holds a little more warmth. */
-.companion-hub__home::after {
-  content: '';
+/* The floor: a soft, organic pool of light on the horizon, wider than he is;
+   he stands free on the line, nothing beneath him but light. */
+.companion-hub__floor {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 24%;
-  background: linear-gradient(rgb(var(--accent-2-rgb) / 0.045), rgb(var(--accent-2-rgb) / 0));
+  bottom: calc(24% - 34px);
+  left: 50%;
+  width: min(78%, 560px);
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.14), rgb(var(--accent-rgb) / 0.05) 55%, rgb(var(--accent-rgb) / 0));
   pointer-events: none;
-  mask-image: linear-gradient(90deg, rgb(0 0 0 / 0), #000 22%, #000 78%, rgb(0 0 0 / 0));
+  translate: -50% 0;
 }
 .companion-hub__horizon {
   position: absolute;
@@ -243,10 +242,33 @@
   color: var(--ink-3);
 }
 
+/* The rooms of his home below the alcove: a quiet label that runs out into a
+   hairline, the same for your bond (the numbers) and your path. */
+.companion-hub__label,
+.companion-hub__path .card__head h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+.companion-hub__label {
+  padding-top: var(--s6);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.companion-hub__label::after,
+.companion-hub__path .card__head h2::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line-strong), rgb(var(--tint-rgb) / 0));
+}
 .companion-hub__stats {
   --cols: 4;
-  padding-block: var(--s7);
-  border-top: 1px solid var(--line);
+  padding-block: var(--s6) var(--s7);
 }
 .companion-hub__stat-label {
   display: inline-flex;

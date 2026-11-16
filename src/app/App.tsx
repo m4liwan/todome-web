@@ -415,6 +415,7 @@ export function App() {
                 introReady={!tour && !modal && !breathe && !routine && !splash && !onboarding && !landing}
                 onIntroSeen={markIntroSeen}
                 onHome={(home) => services.store.dispatch({ type: 'settings/update', patch: { companion: { ...state.settings.companion, home } } })}
+                onObjects={(objects) => services.store.dispatch({ type: 'settings/update', patch: { companion: { ...state.settings.companion, objects } } })}
               />
             </div>
           )}

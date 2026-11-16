@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { hasPro } from '../app/pro';
 import { avatarName } from '../domain/companion';
 import {
@@ -14,13 +15,13 @@ import {
   type PathStep,
   type Reward,
 } from '../domain/companionProgression';
-import type { AppState, HavenId, Millis } from '../domain/types';
+import type { AppState, CompanionObjectId, HavenId, Millis } from '../domain/types';
 import { useEffectsMode } from '../lib/effects';
 import { dayKey } from '../lib/time';
 import { Avatar } from './Avatar';
 import { AvatarFx, holoFor } from './AvatarFx';
 import { CompanionIntro, type IntroSpot } from './CompanionIntro';
-import { Haven, HavenPicker } from './Haven';
+import { Belongings, BelongingsPicker, Haven, HavenPicker } from './Haven';
 import { IconCheck, IconFlame, IconLock, IconSnowflake } from './icons';
 
 /**
@@ -91,9 +92,11 @@ interface HubProps {
   onIntroSeen?: () => void;
   /** Changes his home (the ambience); shows the choice in his room when given. */
   onHome?: (id: HavenId) => void;
+  /** Changes the things at his side; shows the choice in his room when given. */
+  onObjects?: (ids: CompanionObjectId[]) => void;
 }
 
-export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHome }: HubProps) {
+export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHome, onObjects }: HubProps) {
   const { stats, daily } = state.progression;
   const avatar = state.settings.companion.avatar;
   const name = avatarName(avatar);
@@ -112,10 +115,15 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHo
   // The energy pulses on the trail are an effect: only with effects on and nothing asking for calm.
   const live = useEffectsMode(fx) === 'full';
   const intro = useHubIntro(introReady, state.settings.companionIntroSeen, onIntroSeen, live);
+  const [roomLayer] = useState(companionRoomLayer);
   const spotOf = (part: IntroSpot) => (intro.spot === part ? ' is-spot' : '');
 
   return (
-    <section className={`companion-hub${intro.spot ? ' is-touring' : ''}`} aria-label={`Dein Begleiter ${name}`}>
+    <section className={`companion-hub companion-hub--${state.settings.companion.home}${intro.spot ? ' is-touring' : ''}`} aria-label={`Dein Begleiter ${name}`}>
+      {/* His ambience fills the whole window, not only his alcove. Portalled to
+          <body>: the view's entrance animation would otherwise clip a fixed
+          layer to its own box (a transform makes a containing block). */}
+      {createPortal(<Haven id={state.settings.companion.home} still={!live} room />, roomLayer)}
       <div ref={intro.refs.hero} className={`companion-hub__hero is-${tier}${spotOf('hero')}`}>
         <button
           ref={intro.help}
@@ -141,6 +149,8 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHo
         >
           <span className="companion-hub__lantern" aria-hidden="true" />
           <span className="companion-hub__horizon" aria-hidden="true" />
+          <span className="companion-hub__floor" aria-hidden="true" />
+          <Belongings items={state.settings.companion.objects} still={!live} />
           <div className="companion-hub__stage" aria-hidden="true">
             <Haven id={state.settings.companion.home} still={!live} />
             <AvatarFx level={progress.level} enabled={fx}>
@@ -163,6 +173,12 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHo
               <HavenPicker value={state.settings.companion.home} name={name} onChange={onHome} />
             </div>
           )}
+          {onObjects && (
+            <div className="companion-hub__ambience">
+              <span className="companion-hub__ambience-label">An seiner Seite</span>
+              <BelongingsPicker value={state.settings.companion.objects} onChange={onObjects} />
+            </div>
+          )}
           <XpBar key={progress.level} level={progress.level} into={progress.xpIntoLevel} span={progress.xpForNext} ratio={progress.ratio} />
           <p className="companion-hub__next muted">
             {next ? (
@@ -176,6 +192,7 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHo
         </div>
       </div>
 
+      <h2 className="companion-hub__label">Eure Verbundenheit</h2>
       <ul ref={intro.refs.stats} className={`band companion-hub__stats${spotOf('stats')}`} aria-label="Eure Zahlen">
         <li className={streak > 0 ? 'is-lit' : ''}>
           <span className="companion-hub__stat-label">
@@ -244,6 +261,17 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHo
       )}
     </section>
   );
+}
+
+/** The layer for his room's ambience: one element at the end of <body>, made once. */
+function companionRoomLayer(): HTMLElement {
+  let layer = document.getElementById('companion-room');
+  if (!layer || !layer.isConnected) {
+    layer = document.createElement('div');
+    layer.id = 'companion-room';
+    document.body.appendChild(layer);
+  }
+  return layer;
 }
 
 /**
