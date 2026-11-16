@@ -1,8 +1,11 @@
 import { dayKey } from '../lib/time';
 import { applyTaskTransition } from '../domain/companionProgression';
 import { anchorTitle, canAddAnchor, normalizeDays } from '../domain/anchors';
+import { MAX_EVENTS, sanitizeEvents, sortReminders } from '../domain/calendar';
 import type {
   AppState,
+  CalendarEvent,
+  ReminderId,
   CheckIn,
   CheckInKind,
   Client,
@@ -52,6 +55,11 @@ export type Action =
   | { type: 'anchor/remove'; id: Id }
   /** Set (done) or loosen (not done) an anchor for the given day. */
   | { type: 'anchor/mark'; id: Id; day: string; done: boolean }
+  /** Adds a calendar date or replaces the one with the same id. */
+  | { type: 'event/upsert'; event: CalendarEvent }
+  | { type: 'event/remove'; id: Id }
+  /** The companion gave these reminders for a date (each only once). */
+  | { type: 'event/reminded'; id: Id; reminders: ReminderId[] }
   | { type: 'state/replace'; state: AppState };
 
 /** Pure reducer. The event log is append-only: events are never edited or removed. */
@@ -229,6 +237,23 @@ export function reducer(state: AppState, action: Action): AppState {
           // Loosening only undoes today's tick; it never reaches into other days.
           return a.lastDoneDay === action.day ? { ...a, lastDoneDay: null } : a;
         }),
+      };
+
+    case 'event/upsert': {
+      const [clean] = sanitizeEvents([action.event]);
+      if (!clean) return state;
+      const exists = state.calendar.some((e) => e.id === clean.id);
+      if (!exists && state.calendar.length >= MAX_EVENTS) return state;
+      return { ...state, calendar: exists ? state.calendar.map((e) => (e.id === clean.id ? clean : e)) : [...state.calendar, clean] };
+    }
+
+    case 'event/remove':
+      return { ...state, calendar: state.calendar.filter((e) => e.id !== action.id) };
+
+    case 'event/reminded':
+      return {
+        ...state,
+        calendar: state.calendar.map((e) => (e.id === action.id ? { ...e, sent: sortReminders([...new Set([...e.sent, ...action.reminders])]) } : e)),
       };
 
     case 'state/replace':

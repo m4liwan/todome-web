@@ -44,12 +44,25 @@ export function useAccentColors(fallback: { strong: string; light: string }): { 
 export const prefersReducedMotion = () =>
   typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
-type Look = Pick<AppearanceSettings, 'palette' | 'ambient' | 'corners' | 'dock'>;
+type Look = Pick<AppearanceSettings, 'palette' | 'ambient' | 'corners' | 'dock'> & Partial<Pick<AppearanceSettings, 'lightMode' | 'companionSize' | 'uiScale'>>;
+
+/**
+ * The interface size (Settings → Design): on the desktop the window's own
+ * zoom, so the whole layout scales cleanly and stays sharp; in a browser
+ * (development, demo) the page zoom of the document stands in for it.
+ */
+export function applyUiScale(factor: number): void {
+  if (desktop) desktop.setUiScale(factor as 0.9 | 1 | 1.1 | 1.2);
+  else document.documentElement.style.setProperty('zoom', factor === 1 ? '' : String(factor));
+}
 
 /** Remembers the theme, light, corners and the dock side for public/boot.js (first frame, before React). */
 export function rememberBoot(look: Look, theme: 'dark' | 'light' = 'dark'): void {
   try {
-    window.localStorage.setItem('todome:boot', JSON.stringify({ theme, palette: look.palette, ambient: look.ambient, corners: look.corners, dock: look.dock }));
+    window.localStorage.setItem(
+      'todome:boot',
+      JSON.stringify({ theme, palette: look.palette, ambient: look.ambient, corners: look.corners, dock: look.dock, light: look.lightMode ?? 'drift', buddy: look.companionSize ?? 'standard' }),
+    );
   } catch {
     /* ignore */
   }
@@ -63,13 +76,14 @@ export function writeAmbient(ambient: number): void {
 /**
  * Applies the look: night or Tageslicht (`data-theme`), the ambient light
  * colour (`data-palette`), its strength (`--ambient`), the corner rounding
- * (`data-corners`) and the dock side (`data-dock`). Theme and light changes
+ * (`data-corners`), the dock side (`data-dock`), how the light moves
+ * (`data-light`) and the companion's size (`data-buddy`). Theme and light changes
  * fade softly; the desktop shell follows (title bar, window background).
  */
 export function useApplyTheme(look: Look, pref: ThemePreference = 'dark'): void {
-  const { palette, ambient, corners, dock } = look;
+  const { palette, ambient, corners, dock, lightMode = 'drift', companionSize = 'standard', uiScale = 1 } = look;
   const theme = resolveTheme(pref);
-  useEffect(() => rememberBoot({ palette, ambient, corners, dock }, theme), [palette, ambient, corners, dock, theme]);
+  useEffect(() => rememberBoot({ palette, ambient, corners, dock, lightMode, companionSize }, theme), [palette, ambient, corners, dock, lightMode, companionSize, theme]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -97,6 +111,15 @@ export function useApplyTheme(look: Look, pref: ThemePreference = 'dark'): void 
   useEffect(() => {
     document.documentElement.setAttribute('data-dock', dock);
   }, [dock]);
+
+  // Ambient Light 4.0: how the light moves; and how large the companion stands.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-light', lightMode);
+  }, [lightMode]);
+  useEffect(() => {
+    document.documentElement.setAttribute('data-buddy', companionSize);
+  }, [companionSize]);
+  useEffect(() => applyUiScale(uiScale), [uiScale]);
 }
 
 const LAST_LIGHT = 'todome:ambient:last';

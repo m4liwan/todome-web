@@ -14,12 +14,12 @@ export function InlineCompanion({ onOpen }: { onOpen: OpenModal }) {
   }, []);
   if (!current || desktop) return null;
   return (
-    <div className="buddy-layer buddy-layer--left">
+    <div className={`buddy-layer buddy-layer--${current.position}`}>
       <CompanionBubble
         key={current.message.id}
         message={current.message}
         avatar={current.avatar}
-        position="left"
+        position={current.position}
         dismissed={current.dismissed}
         variant="inline"
         onReply={(optionId) => handleCompanionReply(services, onOpen, current.message.id, optionId)}

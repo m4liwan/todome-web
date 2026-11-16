@@ -1,8 +1,10 @@
-import type { AppearanceSettings, AppState, PomodoroSettings } from '../domain/types';
+import type { AppearanceSettings, AppState, PomodoroSettings, QuickOrbSettings } from '../domain/types';
 import type { KeyValueStore } from '../lib/storage';
 import type { CommandResult } from './commands';
 import { normalizeUserContext } from '../domain/userContext';
-import { DEFAULT_APPEARANCE, DEFAULT_COMPANION, DEFAULT_MEDIA, DEFAULT_OVERLAY, DEFAULT_POMODORO, DEFAULT_SETTINGS, DEFAULT_WELLBEING, emptyState } from './defaults';
+import { DEFAULT_APPEARANCE, DEFAULT_COMPANION, DEFAULT_MEDIA, DEFAULT_OVERLAY, DEFAULT_POMODORO, DEFAULT_QUICK_ORB, DEFAULT_SETTINGS, DEFAULT_WELLBEING, emptyState } from './defaults';
+import { isQuickShortcut, MAX_ORB_ITEMS, MIN_ORB_ITEMS } from '../domain/quickOrb';
+import { sanitizeEvents } from '../domain/calendar';
 import type { Task } from '../domain/types';
 import { normalizeAvatar } from '../domain/companion';
 import { sanitizeProgression } from '../domain/companionProgression';
@@ -43,12 +45,17 @@ const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = {
   // 'lavender' is a palette again (2.x, Lavendel-Traum); old saves keep it.
   pulse: 'rose',
 };
-const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose', 'blush', 'lavender', 'peach', 'sakura', 'lilac']);
+const PALETTES = new Set(['lime', 'cyan', 'cobalt', 'emerald', 'amber', 'ruby', 'mono', 'violet', 'rose', 'blush', 'lavender', 'peach', 'sakura', 'lilac', 'rainbow']);
+const UI_SCALES = new Set([0.9, 1, 1.1, 1.2]);
+const CORNERS_OF_SCREEN = new Set(['bottom-right', 'bottom-left', 'top-right', 'top-left']);
+const LIGHT_MODES = new Set(['drift', 'breathe', 'aurora', 'center', 'corners']);
+const BUDDY_SIZES = new Set(['compact', 'standard', 'large']);
+const AMBIENCES = new Set(['none', 'rain', 'clouds', 'snow', 'leaves', 'hearth', 'live']);
 const CORNERS = new Set(['sharp', 'precise', 'soft']);
 const DOCKS = new Set(['top', 'bottom']);
 const LAYOUTS = new Set(['classic', 'sanctuary', 'hub', 'flow', 'duo']);
 const HAVENS = new Set(['moon', 'fireflies', 'stardust', 'dew', 'hearth', 'rain', 'sakura', 'none']);
-const OBJECTS = new Set(['tea', 'plant', 'book', 'candle']);
+const OBJECTS = new Set(['tea', 'plant', 'book', 'candle', 'hearth', 'instrument']);
 
 /**
  * The three bites the old Mikro-Schritt mode wrote into a task by itself
@@ -87,6 +94,12 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   if (!LAYOUTS.has(String(a.layout))) a.layout = DEFAULT_APPEARANCE.layout;
   // 2.x: level effects arrive switched on; only a real choice survives.
   if (typeof a.companionFx !== 'boolean') a.companionFx = DEFAULT_APPEARANCE.companionFx;
+  // 2.x: Ambient Light 4.0 (how the light moves) and the companion's size.
+  if (!LIGHT_MODES.has(String(a.lightMode))) a.lightMode = DEFAULT_APPEARANCE.lightMode;
+  if (!BUDDY_SIZES.has(String(a.companionSize))) a.companionSize = DEFAULT_APPEARANCE.companionSize;
+  if (!AMBIENCES.has(String(a.ambience))) a.ambience = DEFAULT_APPEARANCE.ambience;
+  if (!['off', 'december', 'always'].includes(String(a.xmas))) a.xmas = DEFAULT_APPEARANCE.xmas;
+  if (!UI_SCALES.has(a.uiScale)) a.uiScale = DEFAULT_APPEARANCE.uiScale;
   return a;
 }
 
@@ -129,6 +142,28 @@ function normalizePomodoro(raw: unknown): PomodoroSettings {
     focusMin: minutes(r.focusMin, 120, DEFAULT_POMODORO.focusMin),
     breakMin: minutes(r.breakMin, 60, DEFAULT_POMODORO.breakMin),
     longBreakMin: minutes(r.longBreakMin, 60, DEFAULT_POMODORO.longBreakMin),
+  };
+}
+
+/** Where the visit appears: a known corner from revision 3 on; older places map once. */
+function companionCorner(c: { position?: unknown; positionRev?: unknown }): Pick<AppState['settings']['companion'], 'position' | 'positionRev'> {
+  if (c.positionRev === 3 && CORNERS_OF_SCREEN.has(String(c.position))) return { position: c.position as AppState['settings']['companion']['position'], positionRev: 3 };
+  return { position: c.position === 'left' ? 'bottom-left' : 'bottom-right', positionRev: 3 };
+}
+
+/**
+ * The quick-shortcut orb: on/off, 2–5 known shortcuts (once each) and its
+ * place as a fraction of the window (kept inside it).
+ */
+function normalizeQuickOrb(raw: unknown): QuickOrbSettings {
+  const r: Record<string, unknown> = isRecord(raw) ? raw : {};
+  const items = Array.isArray(r.items) ? [...new Set(r.items.filter((i): i is string => typeof i === 'string' && isQuickShortcut(i)))].slice(0, MAX_ORB_ITEMS) : [];
+  const place = (v: unknown, fallback: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : fallback);
+  return {
+    enabled: r.enabled === true,
+    items: items.length >= MIN_ORB_ITEMS ? items : [...DEFAULT_QUICK_ORB.items],
+    x: place(r.x, DEFAULT_QUICK_ORB.x),
+    y: place(r.y, DEFAULT_QUICK_ORB.y),
   };
 }
 
@@ -212,6 +247,7 @@ export function parseState(raw: string | null): AppState | null {
         companionIntroSeen: settings.companionIntroSeen === true,
         quickCapture: (['ctrl_alt_space', 'ctrl_alt_t', 'alt_shift_n', 'off'] as const).find((k) => k === settings.quickCapture) ?? DEFAULT_SETTINGS.quickCapture,
         pomodoro: normalizePomodoro(settings.pomodoro),
+        quickOrb: normalizeQuickOrb(settings.quickOrb),
         companion: {
           ...DEFAULT_COMPANION,
           ...(companion as Partial<AppState['settings']['companion']>),
@@ -223,6 +259,9 @@ export function parseState(raw: string | null): AppState | null {
           objects: Array.isArray((companion as { objects?: unknown }).objects)
             ? ([...new Set((companion as { objects: unknown[] }).objects.filter((o) => OBJECTS.has(String(o))))] as AppState['settings']['companion']['objects'])
             : [],
+          // 2.x: the visit comes to a corner of the main screen (bottom right); applied once
+          // for everyone (an earlier left edge becomes the bottom left), later choices stay.
+          ...companionCorner(companion as { position?: unknown; positionRev?: unknown }),
         },
         appearance: migrateAppearance(settings.appearance),
         // 1.18: light mode is gone; 'system' and 'light' load as dark.
@@ -245,6 +284,8 @@ export function parseState(raw: string | null): AppState | null {
       thoughts: Array.isArray(data.thoughts) ? (data.thoughts as AppState['thoughts']).filter((t) => isRecord(t) && typeof t.text === 'string') : [],
       // Added in 1.17 (no schema bump: older data simply has none yet).
       anchors: sanitizeAnchors(data.anchors),
+      // 2.x: the calendar (no schema bump: older data simply has none yet).
+      calendar: sanitizeEvents(data.calendar),
       archive: Array.isArray(data.archive)
         ? (data.archive as AppState['archive']).filter((a) => isRecord(a) && typeof a.day === 'string' && Number.isFinite(a.netMs))
         : [],

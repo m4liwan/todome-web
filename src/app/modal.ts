@@ -19,6 +19,8 @@ export type Modal =
   | { kind: 'weather' }
   /** Tages-Anker pop-up (opened from the floating glass pill). */
   | { kind: 'anchors' }
+  /** The Horizont view (the calendar), on a day; App turns it into the view, not a dialog. */
+  | { kind: 'calendar'; day?: string }
   /** Right after the onboarding: the companion collects the first tasks. */
   | { kind: 'first_tasks' }
   | { kind: 'settings'; tab?: SettingsTab };

@@ -12,9 +12,9 @@ import { createStore, parseState } from '../state/store';
 
 const SOFT: Array<[PaletteId, string]> = [
   ['blush', 'Soft Rose'],
-  ['lavender', 'Lavendel-Traum'],
+  ['lavender', 'Lavendel-Nebel'],
   ['peach', 'Pfirsich-Seide'],
-  ['sakura', 'Sakura-Verlauf'],
+  ['sakura', 'Sakura-Pink'],
   ['lilac', 'Flieder-Aura'],
 ];
 const tokens = readFileSync(join(process.cwd(), 'src', 'styles', 'base', 'tokens.css'), 'utf8');
@@ -42,7 +42,7 @@ describe('the soft palettes', () => {
       const option = screen.getByRole('radio', { name: new RegExp(label), hidden: true });
       expect(option.querySelector<HTMLElement>('.palette__swatch')?.style.getPropertyValue('--swatch-2')).toMatch(/^#/);
     }
-    fireEvent.click(screen.getByRole('radio', { name: /Sakura-Verlauf/, hidden: true }));
+    fireEvent.click(screen.getByRole('radio', { name: /Sakura-Pink/, hidden: true }));
     expect(store.getState().settings.appearance.palette).toBe('sakura');
     expect(within(document.body).queryAllByText('Flieder-Aura').length).toBeGreaterThan(0);
   });

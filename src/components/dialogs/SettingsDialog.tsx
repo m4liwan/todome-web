@@ -1,12 +1,15 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useAppState } from '../../app/hooks';
 import { useServices } from '../../app/services';
-import type { AppState, Client, CornerStyle, DockPosition, PaletteId, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
+import type { AppState, Client, CornerStyle, DockPosition, QuickCaptureKey, Rounding, Settings, Tone } from '../../domain/types';
+import { COMPANION_SIZES, LIGHT_FAMILIES, LIGHT_MODES, LIGHTS, UI_SCALES } from '../../domain/lights';
+import { QuickOrbSection } from './QuickOrbSection';
+import { SettingsPreview } from './SettingsPreview';
 import { QUICK_KEY_LABELS, useQuickStatus } from '../../app/quickCapture';
 import { desktop, type AutostartStatus } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
 import { freeState, hasPro, isProPalette, openPro, themesUnlocked } from '../../app/pro';
-import { IconArrowUpRight, IconChart, IconChat, IconCompanion, IconHelp, IconLock, IconMusic, IconSettings, IconSparkle } from '../icons';
+import { IconArrowUpRight, IconChart, IconChat, IconChevronLeft, IconCompanion, IconHelp, IconLock, IconMusic, IconOrb, IconSettings, IconSparkle } from '../icons';
 import { ROOMS, RoomGlyph } from '../Cockpit';
 import { HavenPicker } from '../Haven';
 import { companionHello } from '../../app/companion';
@@ -28,7 +31,7 @@ import { downloadBackup } from '../../app/backup';
 import { AmbientField, AmbiencePicker, AmbienceSoundSection, BrainSection, CompanionFxSection, TimelineStyleField, MediaSection, MoodSection, OverlaySection, StandbySection } from './SettingsSections';
 import { USER_CONTEXTS, businessShown, contextLabels, normalizeUserContext, type ContextLabels } from '../../domain/userContext';
 
-export type SettingsTab = 'general' | 'companion' | 'design' | 'overlay' | 'media' | 'data' | 'about';
+export type SettingsTab = 'general' | 'companion' | 'design' | 'shortcuts' | 'overlay' | 'media' | 'data' | 'about';
 
 /** Switches the open settings sheet to a tab (used by the companion tour). */
 export const SETTINGS_TAB_EVENT = 'todome:settings-tab';
@@ -49,32 +52,35 @@ const TABS: Array<{ id: SettingsTab; label: string; lead: string; icon: ReactNod
   { id: 'general', label: 'Allgemein', lead: 'Wie ToDoMe mit dir spricht und wie dein Tag tickt.', icon: <IconSettings size={17} /> },
   { id: 'companion', label: 'Begleiter', lead: 'Wer dich begleitet, wie oft er vorbeischaut und woran er erinnert.', icon: <IconCompanion size={17} /> },
   { id: 'design', label: 'Design', lead: 'Navigation, Licht, Ecken und die Atmosphäre, in der du arbeitest.', icon: <IconSparkle size={17} /> },
+  { id: 'shortcuts', label: 'Schnellzugriff', lead: 'Ein schwebender Punkt auf deiner Startseite, darin deine Lieblings-Schalter.', icon: <IconOrb size={17} /> },
   { id: 'overlay', label: 'Overlay', lead: 'Die kleine Glasbox, die bei dir bleibt, während du woanders arbeitest.', icon: <IconArrowUpRight size={17} /> },
   { id: 'media', label: 'Audio', lead: 'Klänge, Töne und deine Musik.', icon: <IconMusic size={17} /> },
   { id: 'data', label: 'Daten', lead: 'Kunden, Backups und alles, was auf diesem Gerät liegt.', icon: <IconChart size={17} /> },
   { id: 'about', label: 'Über', lead: 'Version, Rechtliches und wer hinter ToDoMe steht.', icon: <IconHelp size={17} /> },
 ];
 const tabIndex = (id: SettingsTab) => TABS.findIndex((t) => t.id === id);
+/** Dock magnification: how far (px) the pointer's pull reaches, and how much the nearest area grows. */
+const DOCK_REACH = 300;
+const DOCK_GROW = 0.26;
+
+/**
+ * Like the macOS dock: the area under the pointer grows softly, its
+ * neighbours a little less, the rest stays as it is. Written straight to
+ * each tab's style (--m), so the pointer never re-renders the studio.
+ */
+function magnify(list: HTMLElement | null, pointerX: number | null): void {
+  list?.querySelectorAll<HTMLElement>('[role="tab"]').forEach((t) => {
+    if (pointerX === null) return t.style.setProperty('--m', '1');
+    const r = t.getBoundingClientRect();
+    const near = Math.max(0, 1 - Math.abs(pointerX - (r.left + r.width / 2)) / DOCK_REACH);
+    t.style.setProperty('--m', (1 + DOCK_GROW * near * near).toFixed(3));
+  });
+}
 
 const TONES: Array<{ id: Tone; label: string; example: string }> = [
   { id: 'gentle', label: 'Sanft', example: '„Du bist etwas über der Zeit – völlig okay.“' },
   { id: 'direct', label: 'Direkt', example: '„15 min drüber. Noch etwas Zeit oder ein sauberer Schnitt?“' },
   { id: 'sporty', label: 'Sportlich', example: '„Nachspielzeit! Noch mal ran oder abpfeifen?“' },
-];
-
-/** Ambient light colours: a soft light behind the modules, muted in the accents. Two tones each (the swatch shows the gradient). */
-const LIGHTS: Array<{ id: PaletteId; label: string; color: string; color2: string }> = [
-  { id: 'lime', label: 'Fokus-Lime', color: '#a3e635', color2: '#84cc16' },
-  { id: 'cyan', label: 'Tiefsee-Cyan', color: '#62d4dc', color2: '#3fa3c0' },
-  { id: 'amber', label: 'Warmes Bernstein', color: '#e9b46a', color2: '#cf8a4c' },
-  { id: 'mono', label: 'Reines Weiß', color: '#e6e8ee', color2: '#a7acb8' },
-  { id: 'violet', label: 'Tiefes Violett', color: '#a593ff', color2: '#7d6bea' },
-  { id: 'rose', label: 'Gedämpftes Rosé', color: '#e49aae', color2: '#c46a86' },
-  { id: 'blush', label: 'Soft Rose', color: '#f4aebc', color2: '#e284a0' },
-  { id: 'lavender', label: 'Lavendel-Traum', color: '#beaafa', color2: '#9680e8' },
-  { id: 'peach', label: 'Pfirsich-Seide', color: '#ffbe96', color2: '#f29678' },
-  { id: 'sakura', label: 'Sakura-Verlauf', color: '#ffb7d5', color2: '#d6b0ff' },
-  { id: 'lilac', label: 'Flieder-Aura', color: '#cda0f0', color2: '#8ca0ff' },
 ];
 
 const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
@@ -106,9 +112,13 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
     setDir(tabIndex(next) < tabIndex(current.current) ? 'back' : 'forward');
     current.current = next;
     setTabNow(next);
+    // A new area starts at its top.
+    stage.current?.scrollTo?.({ top: 0 });
   };
   // The lens under the chosen tab (tabs differ in width, so it is measured).
   const bar = useRef<HTMLDivElement>(null);
+  /** The one scroll container of the studio: its scrollbar runs along the window's right edge. */
+  const stage = useRef<HTMLDivElement>(null);
   const [lens, setLens] = useState<{ x: number; w: number } | null>(null);
   useLayoutEffect(() => {
     const place = () => {
@@ -169,27 +179,42 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
   return (
     <Dialog open={open} title="Einstellungen" wide onClose={onClose} className="dialog--settings">
       <div className="settings" style={{ '--tab': tabIndex(tab) } as CSSProperties}>
-        {/* The floating bar: it stays put while the content runs beneath it. */}
-        <div className="settings__bar">
-          <div className="settings__tabs" role="tablist" aria-label="Bereiche" ref={bar}>
-            {lens && <span className="settings__lens" aria-hidden="true" style={{ '--x': `${lens.x}px`, '--w': `${lens.w}px` } as CSSProperties} />}
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                role="tab"
-                id={`settings-tab-${t.id}`}
-                aria-selected={tab === t.id}
-                aria-controls="settings-panel"
-                className={tab === t.id ? 'is-on' : undefined}
-                onClick={() => setTab(t.id)}
-              >
-                {t.icon}
-                <span>{t.label}</span>
-              </button>
-            ))}
+        {/* The studio's head: the way back on the left, the areas on one straight line like a dock. */}
+        <div className="settings__top">
+          <button type="button" className="settings__back" onClick={onClose}>
+            <IconChevronLeft size={18} />
+            Zurück
+          </button>
+          <div className="settings__bar">
+            <div
+              className="settings__tabs"
+              role="tablist"
+              aria-label="Bereiche"
+              ref={bar}
+              onMouseMove={(e) => magnify(bar.current, e.clientX)}
+              onMouseLeave={() => magnify(bar.current, null)}
+            >
+              {lens && <span className="settings__lens" aria-hidden="true" style={{ '--x': `${lens.x}px`, '--w': `${lens.w}px` } as CSSProperties} />}
+              {TABS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="tab"
+                  id={`settings-tab-${t.id}`}
+                  aria-selected={tab === t.id}
+                  aria-controls="settings-panel"
+                  className={tab === t.id ? 'is-on' : undefined}
+                  onClick={() => setTab(t.id)}
+                >
+                  {t.icon}
+                  <span>{t.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
+        <div className="settings__stage" ref={stage}>
+        <div className="settings__columns">
         <div className="settings__panel" id="settings-panel" role="tabpanel" aria-labelledby={`settings-tab-${tab}`} key={tab} data-dir={dir}>
           <header className="settings__intro">
             <h2 className="settings__title">{TABS[tabIndex(tab)]?.label}</h2>
@@ -363,11 +388,14 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             </label>
             <NumberField label="Tagesziel Wasser (Gläser)" value={s.companion.waterGoal} min={1} max={16} step={1} onChange={(v) => setCompanion({ waterGoal: v })} />
             <label className="field">
-              <span>Erscheint am</span>
-              <Select value={s.companion.position} onChange={(v) => setCompanion({ position: v as 'left' | 'right' })}>
-                <option value="right">rechten Bildschirmrand</option>
-                <option value="left">linken Bildschirmrand</option>
+              <span>Schaut vorbei in der Ecke</span>
+              <Select value={s.companion.position} onChange={(v) => setCompanion({ position: v as Settings['companion']['position'] })}>
+                <option value="bottom-right">unten rechts</option>
+                <option value="bottom-left">unten links</option>
+                <option value="top-right">oben rechts</option>
+                <option value="top-left">oben links</option>
               </Select>
+              <small className="hint">{desktop ? 'Immer auf deinem Hauptbildschirm.' : 'Im App-Fenster.'}</small>
             </label>
           </div>
           <label className="check">
@@ -413,6 +441,28 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           </div>
         </section>
         <section>
+          <h3>Größe der Oberfläche</h3>
+          <p className="muted small">Wie beim Anzeige-Zoom eines Handys: alles wird gleichmäßig größer oder kleiner, Schrift, Abstände und Begleiter.</p>
+          <div className="ui-scales" role="radiogroup" aria-label="Größe der Oberfläche">
+            {UI_SCALES.map((u) => (
+              <button
+                key={u.id}
+                type="button"
+                role="radio"
+                aria-checked={s.appearance.uiScale === u.id}
+                className={`option ui-scale${s.appearance.uiScale === u.id ? ' is-on' : ''}`}
+                onClick={() => set({ appearance: { ...s.appearance, uiScale: u.id } })}
+              >
+                <span className="ui-scale__preview" aria-hidden="true" style={{ '--k': u.id } as CSSProperties}>
+                  Aa
+                </span>
+                <strong>{u.label}</strong>
+                <span>{u.text}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+        <section>
           <h3>Heute</h3>
           <p className="muted small">Fünf Räume für denselben Tag. Jeder gibt dir ein anderes Gefühl; dein nächster Schritt steht in allen in der Mitte.</p>
           <div className="room-picker" role="radiogroup" aria-label="Aufbau von Heute">
@@ -434,6 +484,27 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
               </button>
             ))}
           </div>
+          <p className="settings__label">Größe deines Begleiters</p>
+          <div className="buddy-sizes" role="radiogroup" aria-label="Größe deines Begleiters">
+            {COMPANION_SIZES.map((z) => (
+              <button
+                key={z.id}
+                type="button"
+                role="radio"
+                aria-checked={s.appearance.companionSize === z.id}
+                className={`option buddy-size${s.appearance.companionSize === z.id ? ' is-on' : ''}`}
+                data-size={z.id}
+                onClick={() => set({ appearance: { ...s.appearance, companionSize: z.id } })}
+              >
+                <span className="buddy-size__preview" aria-hidden="true">
+                  <i />
+                </span>
+                <strong>{z.label}</strong>
+                <span>{z.text}</span>
+              </button>
+            ))}
+          </div>
+          <small className="hint">So groß steht {avatarName(s.companion.avatar)} in deinen Räumen, etwa rechts im Classic-Raum oder als Partner im Duo-Raum.</small>
         </section>
         <section>
           <h3>Navigation</h3>
@@ -462,14 +533,20 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           <p className="muted small">Die Flächen bleiben dunkel. Hinter deinen Modulen liegt ein leises Licht, ganz nach deiner Stimmung.</p>
           <p className="settings__label">Lichtfarbe</p>
           <div className="palettes" role="radiogroup" aria-label="Lichtfarbe">
-            {LIGHTS.map((p) => (
+            {/* Free colours first, by family; the exclusive ones always together at the end. */}
+            {LIGHT_FAMILIES.map((family) => (
+              <div key={family.id} className={`palettes__family palettes__family--${family.id}`} role="presentation">
+                <span className="palettes__name" aria-hidden="true">
+                  {family.label}
+                </span>
+            {LIGHTS.filter((l) => l.family === family.id).map((p) => (
               <button
                 key={p.id}
                 type="button"
                 role="radio"
                 aria-checked={s.appearance.palette === p.id}
                 aria-disabled={isProPalette(p.id, themes) || undefined}
-                className={`palette${s.appearance.palette === p.id ? ' is-on' : ''}${isProPalette(p.id, themes) ? ' is-pro' : ''}`}
+                className={`palette palette--${p.id}${s.appearance.palette === p.id ? ' is-on' : ''}${isProPalette(p.id, themes) ? ' is-pro' : ''}`}
                 onClick={() => {
                   if (isProPalette(p.id, themes)) return openPro('palettes');
                   set({ appearance: { ...s.appearance, palette: p.id } });
@@ -485,6 +562,28 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
                 </span>
                 <span>{p.label}</span>
                 {isProPalette(p.id, themes) && <ProLock />}
+              </button>
+            ))}
+              </div>
+            ))}
+          </div>
+          <p className="settings__label">Wie sich das Licht bewegt</p>
+          <div className="light-modes" role="radiogroup" aria-label="Wie sich das Licht bewegt">
+            {LIGHT_MODES.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                role="radio"
+                aria-checked={s.appearance.lightMode === m.id}
+                className={`option light-mode${s.appearance.lightMode === m.id ? ' is-on' : ''}`}
+                onClick={() => set({ appearance: { ...s.appearance, lightMode: m.id } })}
+              >
+                <span className={`light-mode__preview light-mode__preview--${m.id}`} aria-hidden="true">
+                  <i />
+                  <i />
+                </span>
+                <strong>{m.label}</strong>
+                <span>{m.text}</span>
               </button>
             ))}
           </div>
@@ -519,6 +618,7 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
               <StandbySection />
             </>
           )}
+          {tab === 'shortcuts' && <QuickOrbSection />}
           {tab === 'overlay' && <OverlaySection />}
           {tab === 'media' && (
             <>
@@ -609,6 +709,9 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
             </>
           )}
           {tab !== 'about' && <p className="settings__copyright">{COPYRIGHT}</p>}
+        </div>
+        <SettingsPreview state={state} />
+        </div>
         </div>
       </div>
     </Dialog>

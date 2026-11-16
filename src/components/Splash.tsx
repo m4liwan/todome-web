@@ -38,18 +38,20 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const lines = useMemo(() => (state.settings.onboarded ? briefing(state, now) : FIRST_LINES), []);
   const total = prefersReducedMotion() ? 400 : 900 + lines.length * LINE_MS;
+  // The way in appears with the first line already; the briefing keeps speaking beside it.
+  const readyAt = prefersReducedMotion() ? 200 : 900 + Math.min(lines.length, 1) * LINE_MS * 0.6;
   const [ready, setReady] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const ids = lines.map((_, i) => window.setTimeout(() => setLine(i), 900 + i * LINE_MS));
-    // The last line stays; then the way in appears. Nothing closes by itself.
-    const done = window.setTimeout(() => setReady(true), total);
+    // The way in appears early; the last line stays. Nothing closes by itself.
+    const done = window.setTimeout(() => setReady(true), readyAt);
     return () => {
       ids.forEach((id) => window.clearTimeout(id));
       window.clearTimeout(done);
     };
-  }, [lines, total]);
+  }, [lines, readyAt]);
 
   useEffect(() => {
     if (ready) button.current?.focus();
@@ -92,7 +94,7 @@ export function Splash({ state, now, onDone, manual = false }: Props) {
     >
       <WindowDrag />
       <p className="splash__brand">
-        <Logo height={11} />
+        <Logo height={24} />
       </p>
 
       <header className="splash__status">

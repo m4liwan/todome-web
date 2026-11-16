@@ -8,6 +8,7 @@ import type { SessionProjection } from '../domain/session';
 import type { AppState, Millis } from '../domain/types';
 import { dayKey, formatDate, HOUR, MIN } from '../lib/time';
 import { businessShown, contextLabels } from '../domain/userContext';
+import { IconBreath, IconRest, IconThreshold } from './icons';
 
 interface Props {
   state: AppState;
@@ -79,15 +80,27 @@ export function Greeting({ state, projections, now, onOpen, onLogin, onStandby, 
           <button type="button" className={`energy-chip${energy !== null ? ` energy-chip--${profile?.mode}` : ''}`} onClick={() => onOpen({ kind: 'energy' })}>
           {energy !== null ? `Energie ${energy}, ${ENERGY_WORDS[energy]}. ${profile?.label}` : 'Wie ist deine Energie heute?'}
         </button>
-          <button type="button" className="energy-chip" onClick={onLogin} title="Kurz bewusst ankommen">
-            Mentaler Login
-          </button>
-          <button type="button" className="energy-chip" onClick={onStandby} title="Bildschirm zur Ruhe bringen">
-            Ruhemodus
-          </button>
-          <button type="button" className="energy-chip energy-chip--breathe" onClick={onBreathe} title="Alles ausblenden und kurz durchatmen">
-            Durchatmen
-          </button>
+          {/* The three calm tools: always within reach, in every room. */}
+          <span className="calm-tools" role="group" aria-label="Für dich, jederzeit">
+            <button type="button" className="calm-tool" onClick={onLogin} title="Kurz bewusst ankommen">
+              <span className="calm-tool__icon" aria-hidden="true">
+                <IconThreshold size={15} />
+              </span>
+              Mentaler Login
+            </button>
+            <button type="button" className="calm-tool" onClick={onStandby} title="Den Bildschirm zur Ruhe bringen">
+              <span className="calm-tool__icon" aria-hidden="true">
+                <IconRest size={15} />
+              </span>
+              Ruhemodus
+            </button>
+            <button type="button" className="calm-tool calm-tool--breathe" onClick={onBreathe} title="Alles ausblenden und eine Minute nur atmen">
+              <span className="calm-tool__icon" aria-hidden="true">
+                <IconBreath size={15} />
+              </span>
+              Durchatmen
+            </button>
+          </span>
         </div>
       </div>
       <dl className="vitals">

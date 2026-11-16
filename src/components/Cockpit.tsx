@@ -26,7 +26,7 @@ export const AREAS: ReadonlyArray<{ id: AreaId; label: string; panels: readonly 
 ];
 
 /** Entrance stagger: reading order, capped so the last module never waits long. */
-const STEP: Record<string, number> = { greet: 0, focus: 1, hub: 1, water: 2, plan: 2, times: 2, tl: 3, anchors: 4 };
+const STEP: Record<string, number> = { greet: 0, focus: 1, hub: 1, water: 2, plan: 2, times: 2, impulse: 3, tl: 3, anchors: 4 };
 
 const AREA_KEY = 'todome:area';
 const AREA_EVENT = 'todome:area';
@@ -126,6 +126,9 @@ function Areas({ panels, areas = AREAS }: { panels: Record<string, ReactNode>; a
             aria-label={`Bereich: ${areas[at]?.label}. Andere Bereiche zeigen`}
             onClick={() => setOpen((o) => !o)}
           >
+            <span className="orbit__kicker" aria-hidden="true">
+              Bereich
+            </span>
             <span className="orbit__name" key={active}>
               {areas[at]?.label}
             </span>
@@ -263,8 +266,19 @@ function Hush({ children }: { children: ReactNode }) {
   );
 }
 
-/** Hub moves the times of today into its command room. */
-const areasFor = (layout: LayoutId) => (layout === 'hub' ? AREAS.map((a) => ({ ...a, panels: a.panels.filter((p) => p !== 'times') })) : AREAS);
+/** Rooms where "Dein Gedanke für heute" stays in view, beneath the companion, water and what comes next. */
+const THOUGHT_IN_VIEW: ReadonlySet<LayoutId> = new Set<LayoutId>(['classic', 'hub', 'flow']);
+
+/**
+ * Which panels the area switch still holds in a room: Hub moves the times of
+ * today into its command room; Duo gives "Dein Rhythmus" a section of its
+ * own; Classic, Hub and Flow keep the thought of the day in view instead.
+ */
+const areasFor = (layout: LayoutId) => {
+  const moved = new Set<string>([...(layout === 'hub' ? ['times'] : []), ...(THOUGHT_IN_VIEW.has(layout) ? ['impulse'] : [])]);
+  const areas = layout === 'duo' ? AREAS.filter((a) => a.id !== 'rhythm') : AREAS;
+  return areas.map((a) => ({ ...a, panels: a.panels.filter((p) => !moved.has(p)) })).filter((a) => a.panels.length > 0);
+};
 
 interface CockpitProps {
   panels: Record<string, ReactNode>;
@@ -318,6 +332,19 @@ export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps)
     </div>
   );
 
+  // Duo: "Dein Rhythmus" (the times of today and the week) as a named section, two columns.
+  const rhythm = (
+    <section key="rhythm" className="cockpit__rhythm enter" aria-labelledby="cockpit-rhythm" style={{ '--i': 4 } as CSSProperties}>
+      <h2 className="cockpit__title" id="cockpit-rhythm">
+        Dein Rhythmus
+      </h2>
+      <div className="cockpit__rhythm-body">
+        <div className="panel panel--times">{panels.times}</div>
+        <div className="panel panel--week">{panels.week}</div>
+      </div>
+    </section>
+  );
+
   // Duo: his own half of the first screen, a bridge of light to the main card.
   const partner = (
     <section key="partner" className="cockpit__partner" aria-label="Ihr zwei: dein Begleiter">
@@ -328,7 +355,7 @@ export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps)
 
   const rooms: Record<LayoutId, ReactNode[]> = {
     // Monolith: the main card thrones, the companion keeps watch at the right edge, the day closes the room.
-    classic: [fold([head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side', 'Begleiter, Wasser und Danach', COCKPIT.side, 'aside')]), day, anchors, more],
+    classic: [fold([head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side', 'Begleiter, Wasser, Danach und dein Gedanke', [...COCKPIT.side, 'impulse'], 'aside')]), day, anchors, more],
     // Zen: the main card alone in the middle, the companion whispers right below it; the rest waits.
     sanctuary: [
       fold([head, region('cockpit__stage', 'Jetzt', ['focus', 'hub'])]),
@@ -339,6 +366,8 @@ export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps)
     hub: [
       fold([head, day, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side cockpit__command', 'Kommandoraum: Begleiter, Wasser und Zeiten', ['hub', 'water', 'times'], 'aside')]),
       region('cockpit__next cockpit__side', 'Danach', ['plan'], 'aside'),
+      // The free space beside "Danach": the thought of the day, in view.
+      region('cockpit__thought', 'Dein Gedanke für heute', ['impulse'], 'aside'),
       anchors,
       more,
     ],
@@ -348,7 +377,7 @@ export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps)
       fold([
         head,
         region('cockpit__stage', 'Jetzt', COCKPIT.stage),
-        region('cockpit__next cockpit__side', 'Danach und Wasser', ['plan', 'water'], 'aside'),
+        region('cockpit__next cockpit__side', 'Danach, Wasser und dein Gedanke', ['plan', 'water', 'impulse'], 'aside'),
         region('cockpit__stream cockpit__side', 'Dein Begleiter', ['hub'], 'aside'),
       ]),
       day,
@@ -360,6 +389,7 @@ export function Cockpit({ panels, meta = {}, layout = 'classic' }: CockpitProps)
     duo: [
       fold([head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), partner]),
       region('cockpit__side cockpit__beside', 'Wasser und Danach', ['water', 'plan'], 'aside'),
+      rhythm,
       day,
       anchors,
       more,

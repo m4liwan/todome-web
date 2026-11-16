@@ -1,8 +1,65 @@
-.garland {
+/* ========================================================================
+   Winterzauber (components/Winter.tsx): a hairline garland of small warm
+   lights along the top edge and a cool frost light along the floor. The
+   snow itself falls in the ambience canvas. Quiet, never in the way.
+   ======================================================================== */
+
+/* No box of its own: the garland hangs above the head strip of the window,
+   the frost lies behind the content. */
+.winter {
+  display: contents;
+}
+.winter__garland {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  z-index: 31;
   pointer-events: none;
-  display: none;
+  top: 2px;
+  left: 6%;
+  right: 6%;
+  height: 24px;
+  opacity: 0.85;
+}
+.winter__wire {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.winter__wire path {
+  fill: none;
+  stroke: var(--line-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.winter__bulb {
+  position: absolute;
+  width: 4px;
+  height: 5px;
+  margin-left: -2px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: rgb(255 196 120);
+  box-shadow: 0 0 8px 1px rgb(255 176 90 / 0.55);
+  animation: winter-glow 4.2s ease-in-out var(--d) infinite;
+}
+/* Every third light a cool silver, so the chain is not all one tone. */
+.winter__bulb:nth-child(3n + 2) {
+  background: rgb(214 228 255);
+  box-shadow: 0 0 8px 1px rgb(190 210 255 / 0.5);
+}
+/* The frost: a cool, low light along the floor of the window. */
+.winter__frost {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  right: 0;
+  bottom: -14vh;
+  left: 0;
+  height: 34vh;
+  background: radial-gradient(ellipse 70% 60% at 50% 100%, rgb(200 220 255 / 0.1), rgb(200 220 255 / 0) 70%);
+  animation: winter-frost 14s ease-in-out infinite alternate;
+}
+/* While a block runs the winter steps back with everything else. */
+.shell.is-focusing :is(.winter__garland, .winter__frost) {
+  opacity: 0.4;
 }

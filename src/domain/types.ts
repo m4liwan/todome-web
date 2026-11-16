@@ -190,7 +190,37 @@ export type AvatarId = 'spike' | 'mark' | 'bit' | 'spark' | 'kiki' | 'pixie' | '
  * Ambient light colour: a soft light behind the floating modules, which also
  * tints the accents, muted. violet and rose are exclusive (Pro or companion level 15).
  */
-export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose' | 'blush' | 'lavender' | 'peach' | 'sakura' | 'lilac';
+export type PaletteId =
+  | 'lime'
+  | 'cyan'
+  | 'cobalt'
+  | 'emerald'
+  | 'amber'
+  | 'ruby'
+  | 'mono'
+  | 'violet'
+  | 'rose'
+  | 'blush'
+  | 'lavender'
+  | 'peach'
+  | 'sakura'
+  | 'lilac'
+  | 'rainbow';
+
+/**
+ * How the ambient light moves: drifting clouds (the classic), a slow breath,
+ * northern lights, one aura in the centre, or a glow from the corners.
+ */
+export type LightMode = 'drift' | 'breathe' | 'aurora' | 'center' | 'corners';
+
+/** How large the companion stands in the rooms of "Heute". */
+export type CompanionSize = 'compact' | 'standard' | 'large';
+
+/** The size of the whole interface (like the display zoom of a phone). */
+export type UiScale = 0.9 | 1 | 1.1 | 1.2;
+
+/** The screen corner the desktop companion drops by in. */
+export type CompanionCorner = 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
 
 /** Global corner rounding: architectural, precise, or soft (the original look). */
 export type CornerStyle = 'sharp' | 'precise' | 'soft';
@@ -208,7 +238,7 @@ export type DockPosition = 'top' | 'bottom';
 export type StandbyLayout = 'calm' | 'bigclock' | 'drift' | 'breath';
 
 /** Subtle animated environment behind the glass. */
-export type AmbienceId = 'none' | 'rain' | 'clouds' | 'snow' | 'leaves' | 'live';
+export type AmbienceId = 'none' | 'rain' | 'clouds' | 'snow' | 'leaves' | 'hearth' | 'live';
 
 export interface AppearanceSettings {
   /** Ambient light colour (the field kept its old name: overlay and boot read it). */
@@ -237,6 +267,47 @@ export interface AppearanceSettings {
    * glow in the app. On by default; off shows the plain companion everywhere.
    */
   companionFx: boolean;
+  /** How the ambient light moves (Ambient Light 4.0). */
+  lightMode: LightMode;
+  /** How large the companion stands in the rooms of "Heute". */
+  companionSize: CompanionSize;
+  /** The size of the whole interface: 90 / 100 / 110 / 120 %. */
+  uiScale: UiScale;
+}
+
+/**
+ * Quick-Shortcut-Orb: a floating point on the home screen that unfolds into
+ * 2–4 favourite shortcuts. Position is kept as a fraction of the window.
+ */
+export type QuickShortcutId = string;
+export interface QuickOrbSettings {
+  enabled: boolean;
+  /** 2–5 shortcut ids (see domain/quickOrb), in the user's order. */
+  items: QuickShortcutId[];
+  /** Centre of the orb, 0 … 1 of the window width and height. */
+  x: number;
+  y: number;
+}
+
+/** What kind of date it is (changes the wording, the colour and the reminder's words). */
+export type CalendarKind = 'appointment' | 'exam' | 'meeting' | 'deadline' | 'focus' | 'private' | 'birthday' | 'other';
+/** When the companion gently reminds: days or hours ahead. */
+export type ReminderId = '3d' | '1d' | '3h' | '1h';
+
+/** A date in the calendar: meeting, exam or something private. */
+export interface CalendarEvent {
+  id: Id;
+  title: string;
+  kind: CalendarKind;
+  /** Local day YYYY-MM-DD. */
+  day: string;
+  /** HH:MM, or null for an all-day event (reminders count from 9:00). */
+  time: string | null;
+  /** When the companion should remind, earliest first. */
+  remind: ReminderId[];
+  /** Reminders already given (each one only once). */
+  sent: ReminderId[];
+  createdAt: Millis;
 }
 
 /**
@@ -291,8 +362,8 @@ export interface MediaSettings {
 /** The companion's home: a quiet ambience around him (or none). */
 export type HavenId = 'moon' | 'fireflies' | 'stardust' | 'dew' | 'hearth' | 'rain' | 'sakura' | 'none';
 
-/** Things the user places at the companion's side in his home. */
-export type CompanionObjectId = 'tea' | 'plant' | 'book' | 'candle';
+/** Things the user furnishes his room with; he walks to them and uses them. */
+export type CompanionObjectId = 'tea' | 'plant' | 'book' | 'candle' | 'hearth' | 'instrument';
 
 export interface CompanionSettings {
   enabled: boolean;
@@ -304,13 +375,15 @@ export interface CompanionSettings {
   /** Glasses per day. */
   waterGoal: number;
   motivation: boolean;
-  /** Screen edge the desktop companion appears on. */
-  position: 'right' | 'left';
+  /** The corner of the main screen the companion drops by in (bottom right by default). */
+  position: CompanionCorner;
+  /** Placement revision (3 = the corner visit was introduced once for everyone). */
+  positionRev?: number;
   /** Gentle afternoon question: switch to the soft mode for the rest of the day? */
   softCheck: boolean;
   /** His home on the home screen: the ambience around him (moonlight by default). */
   home: HavenId;
-  /** Things at his side in his home (Begleiter tab), in the order they were placed. */
+  /** The furniture of his room (Begleiter tab), in the order it was placed. */
   objects: CompanionObjectId[];
 }
 
@@ -368,6 +441,8 @@ export interface Settings {
   breathBeforeStart: boolean;
   /** Focus timer lengths (the timer itself is the focus style "pomodoro"). */
   pomodoro: PomodoroSettings;
+  /** The floating quick-shortcut orb on the home screen. */
+  quickOrb: QuickOrbSettings;
 }
 
 /** Small wellbeing counters behind the companion (water, last visits). */
@@ -496,6 +571,8 @@ export interface AppState {
   anchors: DailyAnchor[];
   /** Condensed old sessions (see DaySummary). */
   archive: DaySummary[];
+  /** Calendar: appointments, exams and private dates (see domain/calendar). */
+  calendar: CalendarEvent[];
   /** Companion XP, level, streak and unlocks (see domain/companionProgression). */
   progression: CompanionProgression;
 }

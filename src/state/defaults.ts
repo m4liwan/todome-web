@@ -1,4 +1,4 @@
-import type { AppState, AppearanceSettings, CompanionSettings, MediaSettings, OverlaySettings, PomodoroSettings, Settings, Wellbeing } from '../domain/types';
+import type { AppState, AppearanceSettings, CompanionSettings, MediaSettings, OverlaySettings, PomodoroSettings, QuickOrbSettings, Settings, Wellbeing } from '../domain/types';
 import { emptyProgression } from '../domain/companionProgression';
 
 export const DEFAULT_COMPANION: CompanionSettings = {
@@ -8,7 +8,8 @@ export const DEFAULT_COMPANION: CompanionSettings = {
   hydrationIntervalMin: 60,
   waterGoal: 8,
   motivation: true,
-  position: 'right',
+  position: 'bottom-right',
+  positionRev: 3,
   softCheck: true,
   home: 'moon',
   objects: [],
@@ -37,7 +38,10 @@ export const DEFAULT_WELLBEING: Wellbeing = {
   feelLog: {},
 };
 
-export const DEFAULT_APPEARANCE: AppearanceSettings = { palette: 'lime', ambient: 0.55, corners: 'precise', layout: 'classic', dock: 'top', ambience: 'none', standby: 'calm', xmas: 'december', focusStyle: 'breathe', sound: false, soundVolume: 0.5, timeline: 'wave', companionFx: true };
+export const DEFAULT_APPEARANCE: AppearanceSettings = { palette: 'lime', ambient: 0.55, corners: 'precise', layout: 'classic', dock: 'top', ambience: 'none', standby: 'calm', xmas: 'december', focusStyle: 'breathe', sound: false, soundVolume: 0.5, timeline: 'wave', companionFx: true, lightMode: 'drift', companionSize: 'standard', uiScale: 1 };
+
+/** The quick-shortcut orb: off until chosen; the light switch, the hearth and the winter to start with. */
+export const DEFAULT_QUICK_ORB: QuickOrbSettings = { enabled: false, items: ['light', 'ambience:hearth', 'winter'], x: 0.975, y: 0.5 };
 
 export const DEFAULT_MEDIA: MediaSettings = { enabled: true, inTopbar: false, rev: 2 };
 
@@ -87,6 +91,7 @@ export const DEFAULT_SETTINGS: Settings = {
   uiSounds: true,
   breathBeforeStart: false,
   pomodoro: { ...DEFAULT_POMODORO },
+  quickOrb: { ...DEFAULT_QUICK_ORB, items: [...DEFAULT_QUICK_ORB.items] },
 };
 
 export function emptyState(): AppState {
@@ -100,12 +105,21 @@ export function emptyState(): AppState {
     snapshots: {},
     checkIns: {},
     coach: { lastRaised: {}, snoozedUntil: {}, closedDay: null, secondShiftDay: null },
-    settings: { ...DEFAULT_SETTINGS, pomodoro: { ...DEFAULT_POMODORO }, companion: { ...DEFAULT_COMPANION }, appearance: { ...DEFAULT_APPEARANCE }, overlay: { ...DEFAULT_OVERLAY }, media: { ...DEFAULT_MEDIA } },
+    settings: {
+      ...DEFAULT_SETTINGS,
+      pomodoro: { ...DEFAULT_POMODORO },
+      companion: { ...DEFAULT_COMPANION },
+      appearance: { ...DEFAULT_APPEARANCE },
+      overlay: { ...DEFAULT_OVERLAY },
+      media: { ...DEFAULT_MEDIA },
+      quickOrb: { ...DEFAULT_QUICK_ORB, items: [...DEFAULT_QUICK_ORB.items] },
+    },
     wellbeing: { ...DEFAULT_WELLBEING },
     weather: null,
     thoughts: [],
     anchors: [],
     archive: [],
+    calendar: [],
     progression: emptyProgression(),
   };
 }

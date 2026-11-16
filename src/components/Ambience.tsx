@@ -3,7 +3,7 @@ import { prefersReducedMotion } from '../app/theme';
 import type { AmbienceId, WeatherSnapshot } from '../domain/types';
 import { describeCode } from '../domain/weather';
 
-type Effect = 'rain' | 'clouds' | 'snow' | 'leaves';
+type Effect = 'rain' | 'clouds' | 'snow' | 'leaves' | 'hearth';
 
 /** "Live" follows the weather outside; clear skies stay calm. */
 export function resolveAmbience(kind: AmbienceId, weather: WeatherSnapshot | null): Effect | null {
@@ -81,8 +81,8 @@ function makeCloud(w: number, dark: boolean): HTMLCanvasElement {
 const LEAF_HUES = [28, 18, 40, 8, 48];
 
 /**
- * Subtle weather layer behind the glass: drizzle, drifting clouds, snow or
- * falling leaves. Runs on a single canvas, pauses when the window is hidden
+ * Subtle weather layer behind the glass: drizzle, drifting clouds, snow,
+ * falling leaves or the embers of a fireplace. Runs on a single canvas, pauses when the window is hidden
  * and moves at a third of the pace for reduced motion.
  */
 export function Ambience({ kind, weather, dark }: { kind: AmbienceId; weather: WeatherSnapshot | null; dark: boolean }) {
@@ -107,7 +107,10 @@ export function Ambience({ kind, weather, dark }: { kind: AmbienceId; weather: W
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
     const spawn = (initial: boolean): Particle => {
       if (effect === 'rain') return { x: rand(-50, w + 50), y: initial ? rand(-h, h) : rand(-120, -10), vx: -0.9, vy: rand(9, 14), r: rand(9, 18), a: rand(0.12, 0.28), spin: 0, rot: 0, hue: 0 };
-      if (effect === 'snow') return { x: rand(0, w), y: initial ? rand(-h, h) : -10, vx: rand(-0.3, 0.3), vy: rand(0.35, 1.1), r: rand(1.2, 3.2), a: rand(0.35, 0.8), spin: rand(0.005, 0.02), rot: rand(0, 6.28), hue: 0 };
+      if (effect === 'snow') return { x: rand(0, w), y: initial ? rand(-h, h) : -10, vx: rand(-0.3, 0.3), vy: rand(0.3, 0.9), r: rand(0.8, 2.4), a: rand(0.25, 0.65), spin: rand(0.005, 0.02), rot: rand(0, 6.28), hue: 0 };
+      // Hearth: warm embers rising from the floor of the window, slowly, swaying.
+      if (effect === 'hearth')
+        return { x: rand(0, w), y: initial ? rand(h * 0.3, h) : h + rand(0, 40), vx: rand(-0.15, 0.15), vy: -rand(0.25, 0.75), r: rand(0.8, 2.2), a: rand(0.35, 0.85), spin: rand(0.01, 0.03), rot: rand(0, 6.28), hue: rand(18, 42) };
       if (effect === 'leaves')
         return { x: rand(0, w), y: initial ? rand(-h, h) : -20, vx: rand(-0.4, 0.4), vy: rand(0.5, 1.1), r: rand(5, 9), a: rand(0.35, 0.7), spin: rand(-0.03, 0.03), rot: rand(0, 6.28), hue: LEAF_HUES[Math.floor(rand(0, LEAF_HUES.length))] ?? 28 };
       // clouds: three depths, the far ones smaller, fainter and slower
@@ -118,8 +121,9 @@ export function Ambience({ kind, weather, dark }: { kind: AmbienceId; weather: W
     const density = () => {
       const area = (w * h) / (1280 * 800);
       if (effect === 'rain') return Math.round(70 * area);
-      if (effect === 'snow') return Math.round(80 * area);
+      if (effect === 'snow') return Math.round(55 * area);
       if (effect === 'leaves') return Math.round(16 * area);
+      if (effect === 'hearth') return Math.round(46 * area);
       return Math.max(5, Math.round(8 * area));
     };
 
@@ -160,6 +164,23 @@ export function Ambience({ kind, weather, dark }: { kind: AmbienceId; weather: W
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fill();
           if (p.y > h + 10) Object.assign(p, spawn(false));
+        } else if (effect === 'hearth') {
+          p.x += Math.sin(p.rot) * 0.35 * k;
+          // Embers cool as they rise: brightest low, fading towards the top.
+          const life = Math.max(0, Math.min(1, p.y / h));
+          const alpha = p.a * (0.25 + life * 0.75);
+          const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+          glow.addColorStop(0, `hsla(${p.hue}, 100%, 62%, ${alpha})`);
+          glow.addColorStop(1, `hsla(${p.hue}, 100%, 50%, 0)`);
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = `hsla(${p.hue + 10}, 100%, 75%, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 0.7, 0, Math.PI * 2);
+          ctx.fill();
+          if (p.y < -20) Object.assign(p, spawn(false));
         } else if (effect === 'leaves') {
           p.x += Math.sin(p.rot * 2) * 0.6 * k;
           ctx.save();

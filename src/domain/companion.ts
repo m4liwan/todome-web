@@ -13,7 +13,7 @@ import { pomodoroPhase } from './pomodoro';
  * Planning is pure; delivery (desktop window or in-app bubble) lives in the app layer.
  */
 
-export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel' | 'update' | 'dock_in' | 'pomodoro';
+export type CompanionKind = 'focus_check' | 'hydration' | 'motivation' | 'checkin' | 'hello' | 'soft_check' | 'feel' | 'update' | 'dock_in' | 'pomodoro' | 'reminder';
 export type Mood = 'happy' | 'curious' | 'calm' | 'alert' | 'sleepy';
 
 export interface CompanionOption {
@@ -35,6 +35,8 @@ export interface CompanionMessage {
   sessionId?: Id;
   /** For kind "dock_in": the task chosen as the first step. */
   taskId?: Id;
+  /** For kind "reminder": the calendar date it is about. */
+  eventId?: Id;
   /** Auto-hide after this many ms. */
   ttlMs: number;
 }

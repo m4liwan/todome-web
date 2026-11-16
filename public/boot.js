@@ -1,7 +1,7 @@
 /*
  * ToDoMe. boot: runs before the first paint (classic script, same origin, CSP-safe).
  * Sets the saved theme (night or Tageslicht), the light colour, its strength, the corner
- * rounding and the dock side on <html>, so the very first frame already looks right. No app logic here.
+ * rounding, the dock side, how the light moves and the companion's size on <html>, so the very first frame already looks right. No app logic here.
  */
 (function () {
   var root = document.documentElement;
@@ -16,6 +16,8 @@
     if (typeof boot.palette === 'string' && /^[a-z]{2,12}$/.test(boot.palette)) root.setAttribute('data-palette', boot.palette);
     if (boot.corners === 'sharp' || boot.corners === 'precise' || boot.corners === 'soft') root.setAttribute('data-corners', boot.corners);
     if (boot.dock === 'top' || boot.dock === 'bottom') root.setAttribute('data-dock', boot.dock);
+    if (/^(drift|breathe|aurora|center|corners)$/.test(boot.light)) root.setAttribute('data-light', boot.light);
+    if (/^(compact|standard|large)$/.test(boot.buddy)) root.setAttribute('data-buddy', boot.buddy);
     if (typeof boot.ambient === 'number' && boot.ambient >= 0 && boot.ambient <= 1) root.style.setProperty('--ambient', String(boot.ambient));
   } catch (e) {
     /* storage blocked: the defaults in the tokens apply */

@@ -252,3 +252,44 @@ export const IconSparkle = (p: IconProps) => (
     <path d="M18.5 15.5c.2 1.4 1 2.1 2.3 2.3-1.3.2-2.1.9-2.3 2.3-.2-1.4-1-2.1-2.3-2.3 1.3-.2 2.1-.9 2.3-2.3Z" />
   </Svg>
 );
+
+/* ---------- calendar, quick orb, the three calm tools ---------- */
+export const IconCalendar = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="4" y="5.5" width="16" height="14.5" rx="1.5" />
+    <path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" />
+  </Svg>
+);
+/** Quick shortcuts: a small orb with three points around it. */
+export const IconOrb = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="3" />
+    <circle cx="12" cy="4.5" r="1.2" />
+    <circle cx="18.5" cy="16" r="1.2" />
+    <circle cx="5.5" cy="16" r="1.2" />
+  </Svg>
+);
+/** Durchatmen: a breath rising and falling. */
+export const IconBreath = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M3 12c2.5 0 2.5-4 5-4s2.5 8 5 8 2.5-8 5-8 2 4 3 4" />
+  </Svg>
+);
+/** Mentaler Login: a threshold with a slit of light. */
+export const IconThreshold = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M6 20V6a2 2 0 012-2h8a2 2 0 012 2v14" />
+    <path d="M4 20h16M12 9v6" />
+  </Svg>
+);
+/** Ruhemodus: a calm moon over a line. */
+export const IconRest = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M15.5 4.5a6.5 6.5 0 106 8.8 5.2 5.2 0 01-6-8.8z" />
+  </Svg>
+);
+export const IconTrash = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+  </Svg>
+);

@@ -12,8 +12,9 @@
   gap: var(--s3);
 }
 .hello h1 {
-  font-size: 40px;
-  letter-spacing: -0.04em;
+  font-size: clamp(44px, 3.9vw, 60px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
 }
 .hello p {
   max-width: 60ch;
@@ -22,8 +23,64 @@
 .hello__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s2);
+  align-items: center;
+  gap: var(--s2) var(--s4);
   margin-top: var(--s2);
+}
+/* The three calm tools (Mentaler Login, Ruhemodus, Durchatmen): real
+   buttons of the one button family, each with its sign in the light colour,
+   so they are found at a glance and never get lost beside the greeting. */
+.calm-tools {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.calm-tool {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: 36px;
+  padding: 0 var(--s4) 0 6px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: rgb(var(--tint-rgb) / 0.025);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+.calm-tool__icon {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgb(var(--accent-rgb) / 0.12);
+  color: rgb(var(--accent-rgb));
+  transition: box-shadow var(--t-base) var(--ease);
+}
+.calm-tool:hover {
+  border-color: rgb(var(--accent-rgb) / 0.45);
+  background: rgb(var(--accent-rgb) / 0.06);
+}
+.calm-tool:hover .calm-tool__icon {
+  box-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.45);
+}
+.calm-tool:active {
+  transform: scale(0.97);
+}
+.calm-tool:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px var(--bg),
+    0 0 0 3px rgb(var(--accent-rgb) / 0.7);
 }
 .energy-chip {
   display: inline-flex;

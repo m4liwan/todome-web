@@ -1,0 +1,415 @@
+/* ========================================================================
+   Horizont (components/HorizonView.tsx, CalendarBoard.tsx): the calendar as
+   a calm place. The companion at the head, the next seven days open like a
+   horizon, the month drawn in hairlines, the chosen day and a calm form.
+   Dates are small dots of light by kind; nothing is red, nothing is late.
+   ======================================================================== */
+
+.horizon {
+  position: relative;
+  display: grid;
+  gap: var(--s7);
+  padding-bottom: var(--s8);
+}
+/* A warm light rises behind the head, like early morning over a horizon. */
+.horizon__glow {
+  position: absolute;
+  top: -12%;
+  left: 50%;
+  z-index: -1;
+  width: min(1200px, 120%);
+  height: 520px;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.1), rgb(var(--accent-rgb) / 0.03) 60%, rgb(var(--accent-rgb) / 0)),
+    radial-gradient(ellipse 50% 30% at 50% 70%, rgb(255 196 140 / 0.06), rgb(255 196 140 / 0) 70%);
+  translate: -50% 0;
+  pointer-events: none;
+  animation: arrival-glow 14s ease-in-out infinite alternate;
+}
+.horizon__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s7);
+  padding-top: var(--s6);
+}
+.horizon__words {
+  display: grid;
+  gap: var(--s4);
+}
+.horizon__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.horizon__title {
+  max-width: 16ch;
+  font-size: clamp(40px, 4.4vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+.horizon__line {
+  max-width: 58ch;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.horizon__buddy {
+  position: relative;
+  padding-bottom: var(--s2);
+}
+.horizon__buddy::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 150%;
+  height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.2), rgb(var(--accent-rgb) / 0));
+  translate: -50% 0;
+}
+
+/* The next seven days: a horizon line, each day a quiet column on it. */
+.horizon__week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.horizon__week li {
+  min-width: 0;
+  animation: rise var(--t-slow) var(--ease) both;
+  animation-delay: calc(var(--i) * 50ms);
+}
+.horizon__week li + li .horizon__day {
+  border-left: 1px solid var(--line);
+}
+.horizon__day {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--s2);
+  width: 100%;
+  min-height: 150px;
+  padding: var(--s4) var(--s3);
+  text-align: left;
+  transition: background-color var(--t-base) var(--ease);
+}
+.horizon__day:hover {
+  background: var(--hover);
+}
+.horizon__day::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgb(var(--accent-rgb));
+  opacity: 0;
+  transform: scaleX(0.3);
+  transition:
+    opacity var(--t-base) var(--ease),
+    transform var(--t-slow) var(--ease);
+}
+.horizon__day.is-picked {
+  background: var(--active);
+}
+.horizon__day.is-picked::before {
+  opacity: 1;
+  transform: none;
+}
+.horizon__weekday {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.horizon__day.is-today .horizon__weekday {
+  color: rgb(var(--accent-rgb));
+}
+.horizon__date {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.horizon__free {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+.horizon__items {
+  display: grid;
+  gap: var(--s1);
+}
+.horizon__item {
+  display: block;
+  padding: 3px var(--s2);
+  overflow: hidden;
+  border-left: 2px solid rgb(var(--kind));
+  border-radius: min(2px, var(--radius));
+  background: rgb(var(--kind) / 0.1);
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.horizon__item em {
+  margin-right: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-style: normal;
+  color: var(--ink-2);
+}
+.horizon__more {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+@media (max-width: 900px) {
+  .horizon__head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .horizon__week {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .horizon__week li + li .horizon__day {
+    border-left: 0;
+  }
+}
+
+.cal {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: var(--s7);
+}
+.cal__month,
+.cal__day-pane {
+  display: grid;
+  align-content: start;
+  gap: var(--s4);
+  min-width: 0;
+}
+.cal__day-pane {
+  padding-left: var(--s7);
+  border-left: 1px solid var(--line);
+}
+.cal__head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+.cal__title {
+  min-width: 11ch;
+  font-size: var(--fs-h2);
+  text-align: center;
+  text-transform: capitalize;
+}
+.cal__today {
+  margin-left: auto;
+}
+
+/* The month: seven columns, hairlines between the days. */
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+.cal__weekday {
+  padding: var(--s2) 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink-3);
+}
+.cal__day {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: start;
+  min-height: 58px;
+  padding: 6px var(--s2);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  transition:
+    background-color var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.cal__day:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.cal__day.is-outside {
+  color: var(--ink-3);
+  opacity: 0.5;
+}
+.cal__day.is-past .cal__date {
+  color: var(--ink-3);
+}
+.cal__day.is-picked {
+  background: var(--active);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.cal__date {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.cal__day.is-today .cal__date {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  margin: -2px 0 0 -4px;
+  border-radius: 50%;
+  background: rgb(var(--accent-rgb));
+  color: var(--bg);
+  font-weight: 600;
+}
+.cal__dots {
+  display: flex;
+  align-self: end;
+  gap: 3px;
+}
+.cal__dot {
+  display: inline-block;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgb(var(--kind));
+  box-shadow: 0 0 6px rgb(var(--kind) / 0.5);
+}
+
+/* ---------- the kinds of dates: each its own warm tone, never an alarm ---------- */
+.kind--appointment,
+.kind--focus {
+  --kind: var(--accent-rgb);
+}
+.kind--exam {
+  --kind: var(--accent-2-rgb);
+}
+.kind--meeting {
+  --kind: 128 196 236;
+}
+.kind--deadline {
+  --kind: 246 190 112;
+}
+.kind--private {
+  --kind: 240 160 186;
+}
+.kind--birthday {
+  --kind: 255 206 120;
+}
+.kind--other {
+  --kind: 150 150 160;
+}
+
+
+/* The chosen day. */
+.cal__day-title {
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.cal__events {
+  display: grid;
+}
+.cal__event {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.cal__event-time {
+  padding-top: 2px;
+  font-size: 13px;
+  color: rgb(var(--kind));
+}
+.cal__event-body {
+  display: grid;
+  gap: 2px;
+}
+.cal__form {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s3);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--line);
+}
+.cal__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--s4);
+}
+.cal__allday {
+  padding-bottom: var(--s2);
+}
+.cal__remind {
+  display: grid;
+  gap: var(--s2);
+}
+.cal__remind-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.cal__remind-opts .chip.is-on {
+  border-color: rgb(var(--accent-rgb) / 0.55);
+  background: rgb(var(--accent-rgb) / 0.1);
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .cal {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cal__day-pane {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ---------- on the home: the mini calendar's link and what comes next ---------- */
+.cal-peek {
+  display: grid;
+  gap: var(--s2);
+}
+.cal-peek__list {
+  display: grid;
+}
+.cal-peek__item {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.cal-peek__item span:last-child {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}

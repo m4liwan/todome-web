@@ -12,6 +12,7 @@ import { FocusProgress } from '../FocusProgress';
 import { FOCUS_STYLES, FOCUS_TIMER_LOCKED, TimerLock } from '../FocusStyle';
 import { focusTimerUnlocked } from '../../app/focusTimer';
 import { MediaControl } from '../MediaControl';
+import { winterWaiting } from '../Winter';
 
 type Modules = Settings['overlay']['modules'];
 
@@ -262,8 +263,8 @@ export function MediaSection() {
 
 const XMAS: Array<[Settings['appearance']['xmas'], string]> = [
   ['off', 'Aus'],
-  ['december', '1. bis 26. Dezember'],
-  ['always', 'Immer'],
+  ['december', 'Im Dezember'],
+  ['always', 'Jetzt an'],
 ];
 
 const TIMER_LENGTHS: Array<{ key: keyof PomodoroSettings; label: string; options: number[] }> = [
@@ -291,7 +292,13 @@ export function MoodSection() {
           </button>
         ))}
       </div>
-      <small className="hint">Leise Schneeflocken, warme Lichter oben am Rand und ein adventlicher Gruß. Ganz dezent.</small>
+      <small className="hint" aria-live="polite">
+        {winterWaiting(a.xmas, services.clock?.now?.() ?? Date.now())
+          ? 'Wartet auf den 1. Dezember und bleibt bis zum 26. Mit „Jetzt an“ fällt der Schnee sofort.'
+          : a.xmas === 'off'
+            ? 'Leise Schneeflocken, eine feine Lichterkette oben am Rand und ein kühles Frostlicht am Boden. Ganz dezent.'
+            : 'Es schneit leise. Oben am Rand glimmt eine feine Lichterkette, am Boden liegt ein kühles Frostlicht.'}
+      </small>
       <p className="settings__label">Fokus-Stil, während ein Block läuft</p>
       <div className="focus-styles" role="radiogroup" aria-label="Fokus-Stil">
         {FOCUS_STYLES.map((f) => {
@@ -307,10 +314,10 @@ export function MoodSection() {
               onClick={() => (locked ? services.announce(FOCUS_TIMER_LOCKED) : setA({ focusStyle: f.id }))}
             >
               <strong>{f.label}</strong>
-              {locked && <TimerLock />}
               <span>
                 {f.level}. {f.text}
               </span>
+              {locked && <TimerLock />}
             </button>
           );
         })}
@@ -351,6 +358,7 @@ const AMBIENCES: Array<{ id: AmbienceId; label: string }> = [
   { id: 'clouds', label: 'Wolken' },
   { id: 'snow', label: 'Schnee' },
   { id: 'leaves', label: 'Herbstlaub' },
+  { id: 'hearth', label: 'Kaminfeuer' },
 ];
 
 /**
@@ -421,7 +429,7 @@ export function AmbienceSoundField() {
     <div className="sound-field">
       <label className="check">
         <input type="checkbox" checked={a.sound} onChange={(e) => setA({ sound: e.target.checked })} />
-        <span>Hintergrundklang abspielen: leiser Regen, Wind, Schneestille oder raschelndes Laub</span>
+        <span>Hintergrundklang abspielen: leiser Regen, Wind, Schneestille, raschelndes Laub oder ein knisterndes Kaminfeuer</span>
       </label>
       {a.sound && (
         <label className="field sound-field__volume">

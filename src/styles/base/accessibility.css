@@ -55,6 +55,7 @@
 /* Calm motion: the wandering light holds where it is (no jump back to its start). */
 .shell.is-fx-calm .light__source,
 .shell.is-fx-calm .light__aurora,
-.shell.is-fx-calm .light__wash {
+.shell.is-fx-calm .light__wash,
+.shell.is-fx-calm .light__rainbow {
   animation-play-state: paused;
 }

@@ -44,7 +44,8 @@ describe('the focus cockpit', () => {
     render(<Cockpit panels={stubs} />);
     const steps = [...document.querySelectorAll<HTMLElement>('.panel')].map((p) => Number(p.style.getPropertyValue('--i')));
     expect(steps.every((n) => n >= 0 && n <= 5)).toBe(true);
-    expect(document.querySelectorAll('.cockpit .panel.enter')).toHaveLength(7);
+    // Seven on the first screen and below it, plus the thought of the day in the side column.
+    expect(document.querySelectorAll('.cockpit .panel.enter')).toHaveLength(8);
   });
 });
 

@@ -3,7 +3,7 @@ import type { AppState } from '../domain/types';
 import { desktop } from '../lib/desktop';
 import { MediaControl } from './MediaControl';
 
-export type View = 'today' | 'times' | 'companion' | 'closing';
+export type View = 'today' | 'horizon' | 'times' | 'companion' | 'closing';
 
 /**
  * The header, reduced to what a window needs: an invisible strip along the

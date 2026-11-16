@@ -86,13 +86,13 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   cursor: default;
 }
 
-/* The wordmark: small and quiet at the top, the room belongs to you. */
+/* The wordmark: clearly present at the top, calm, the room still belongs to you. */
 .splash__brand {
   grid-area: brand;
   justify-self: center;
   margin: 0;
-  opacity: 0.55;
-  animation: fade-in 1.4s ease 0.2s both;
+  opacity: 0.9;
+  animation: fade-in 0.9s ease 0.1s both;
 }
 
 /* Above the light: a whisper of status, then the greeting, monumental. */
@@ -216,7 +216,7 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   gap: var(--s4);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.9s ease;
+  transition: opacity 0.45s ease;
 }
 .splash__enter.is-ready {
   opacity: 1;
@@ -226,7 +226,7 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   width: clamp(40px, 14vw, 180px);
   height: 1px;
   transform: scaleX(0);
-  transition: transform 1.2s var(--ease) 0.15s;
+  transition: transform 0.8s var(--ease) 0.05s;
 }
 .splash__rail--left {
   background: linear-gradient(90deg, rgb(var(--tint-rgb) / 0), var(--line-strong));

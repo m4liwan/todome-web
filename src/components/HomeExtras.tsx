@@ -202,24 +202,38 @@ export function ThoughtParking({ state, now }: { state: AppState; now: Millis })
  * A text field that, when its text is longer than the field and it is not
  * being edited, lets the text glide by slowly like a ticker.
  */
+/**
+ * An input whose text runs softly like a marquee instead of being cut off:
+ * the placeholder while nothing is typed, and a long thought once the field
+ * rests. It runs only when the text does not fit, in a seamless loop, and
+ * stops as soon as the field has focus.
+ */
 function TickerInput({ inputRef, value, onChange, placeholder }: { inputRef: React.RefObject<HTMLInputElement>; value: string; onChange: (v: string) => void; placeholder: string }) {
   const [focused, setFocused] = useState(false);
   const [overflow, setOverflow] = useState(0);
+  const probe = useRef<HTMLSpanElement>(null);
+  const shown = value || placeholder;
   useEffect(() => {
     const el = inputRef.current;
     if (!el) return;
     const measure = () => {
-      const extra = el.scrollWidth - el.clientWidth;
+      // The typed text measures itself; the placeholder through a hidden twin.
+      const width = value ? el.scrollWidth : (probe.current?.offsetWidth ?? 0);
+      const extra = width - el.clientWidth;
       setOverflow(extra > 2 ? extra : 0);
     };
     measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [value, focused, inputRef]);
-  const ticking = !focused && overflow > 0 && value.length > 0;
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, [value, focused, inputRef, placeholder]);
+  const ticking = !focused && overflow > 0;
+  const distance = overflow + 140;
   return (
-    <div className={`ticker-field${ticking ? ' is-ticking' : ''}`} style={{ '--tick': `${overflow + 24}px`, '--tick-s': `${Math.max(6, (overflow + 24) / 22)}s` } as React.CSSProperties}>
+    <div
+      className={`ticker-field${ticking ? ' is-ticking' : ''}${value ? '' : ' is-empty'}`}
+      style={{ '--tick-s': `${Math.max(9, distance / 24)}s` } as React.CSSProperties}
+    >
       <input
         ref={inputRef}
         value={value}
@@ -230,9 +244,15 @@ function TickerInput({ inputRef, value, onChange, placeholder }: { inputRef: Rea
         placeholder={placeholder}
         aria-label="Gedanke"
       />
+      <span className="ticker-field__probe" ref={probe} aria-hidden="true">
+        {placeholder}
+      </span>
       {ticking && (
         <span className="ticker-field__text" aria-hidden="true">
-          <span>{value}</span>
+          <span className="ticker-field__track">
+            <span>{shown}</span>
+            <span>{shown}</span>
+          </span>
         </span>
       )}
     </div>

@@ -63,7 +63,7 @@ export function buildSegments(todays: SessionProjection[], state: AppState, span
 }
 
 /**
- * The day as a living ribbon: quarter-hour ticks, focus and interruption
+ * The day as a calm ribbon: half-hour ticks, focus and interruption
  * segments with a shimmer on the live one, pauses, lunch, planned starts and a
  * glowing "now" marker that glides along.
  */
@@ -85,7 +85,8 @@ export function Timeline({ state, projections, now }: Props) {
   const segs = useMemo(() => buildSegments(todays, state, span), [todays, state, span]);
 
   const ticks: Array<{ at: Millis; hour: boolean }> = [];
-  for (let t = Math.ceil(from / (15 * MIN)) * 15 * MIN; t <= to; t += 15 * MIN) {
+  // Half-hour ticks: enough to read the day, few enough to stay calm.
+  for (let t = Math.ceil(from / (30 * MIN)) * 30 * MIN; t <= to; t += 30 * MIN) {
     ticks.push({ at: t, hour: new Date(t).getMinutes() === 0 });
   }
 
@@ -124,7 +125,13 @@ export function Timeline({ state, projections, now }: Props) {
         <div className="timeline__canvas">
           <div className="timeline__planned" aria-label="Geplante Starts">
             {planned.map((t) => (
-              <span key={t.id} className="plan-pin" style={{ left: pct(t.plannedStart ?? 0) }} title={`Geplant: ${t.title} um ${formatTime(t.plannedStart ?? 0)}`}>
+              <span
+                key={t.id}
+                // Near the end of the day the label opens to the left, so it never leaves the track.
+                className={`plan-pin${pos(t.plannedStart ?? 0) > 0.72 ? ' is-end' : ''}`}
+                style={{ left: pct(t.plannedStart ?? 0) }}
+                title={`Geplant: ${t.title} um ${formatTime(t.plannedStart ?? 0)}`}
+              >
                 <span className="plan-pin__label">{t.title}</span>
               </span>
             ))}
@@ -151,7 +158,7 @@ export function Timeline({ state, projections, now }: Props) {
                 />
               ),
             )}
-            <div className="now" style={{ left: pct(now) }}>
+            <div className={`now${pos(now) > 0.88 ? ' is-end' : ''}`} style={{ left: pct(now) }}>
               <span className="now__label">{formatTime(now)}</span>
             </div>
           </div>

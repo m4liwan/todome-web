@@ -1,8 +1,8 @@
 /* ========================================================================
-   Companion hub (components/CompanionHub.tsx): his home. A room of his own
-   (horizon, a floor that holds a little light, his alcove, his ambience, a
-   lantern that follows you), beside it the welcome, his level and XP; then
-   the numbers as one hairline row and the reward path as a quiet line.
+   Companion hub (components/CompanionHub.tsx): his home. His room fills the
+   upper half (CompanionRoom: window, floor light, lamp, his ambience, a
+   lantern that follows you); beneath it the welcome, his level and XP; then,
+   quieter, the numbers as one hairline row and the reward path.
    ======================================================================== */
 
 .companion-hub {
@@ -13,53 +13,52 @@
 .companion-hub__hero {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  align-items: center;
-  gap: var(--s8);
-  padding-bottom: var(--s8);
+  gap: var(--s6);
+  padding-bottom: var(--s7);
 }
 
-/* ---------- his room ---------- */
+/* ---------- his room (drawn in components/CompanionRoom, companion-room.css) ---------- */
 .companion-hub__home {
   --mx: 50%;
   --my: 42%;
   position: relative;
-  display: grid;
-  place-items: end center;
-  height: clamp(340px, 48vh, 480px);
+  height: clamp(400px, 58vh, 620px);
   overflow: hidden;
-  /* His room is open: the corners are marked like the main card's, the
-     light comes from his ambience; no surface, no box. */
+  /* His room is open: the corners are marked like the main card's; the
+     light comes from his window, his lamp and his ambience; no box. */
   background: var(--hud-frame);
   background-repeat: no-repeat;
 }
-/* The floor: a soft, organic pool of light on the horizon, wider than he is;
-   he stands free on the line, nothing beneath him but light. */
+/* The floor light: a soft, organic pool of warmth on the floor, wider than
+   he is; he stands free on it, nothing beneath him but light. */
 .companion-hub__floor {
   position: absolute;
-  bottom: calc(24% - 34px);
-  left: 50%;
-  width: min(78%, 560px);
-  height: 68px;
+  bottom: 6%;
+  left: var(--mark-x, 56%);
+  transition: left 2200ms cubic-bezier(0.45, 0, 0.35, 1);
+  width: min(46%, 520px);
+  height: 96px;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.14), rgb(var(--accent-rgb) / 0.05) 55%, rgb(var(--accent-rgb) / 0));
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.16), rgb(var(--accent-rgb) / 0.05) 55%, rgb(var(--accent-rgb) / 0));
   pointer-events: none;
   translate: -50% 0;
 }
+/* Where the back wall meets the floor: a hairline with his light in the middle. */
 .companion-hub__horizon {
   position: absolute;
-  right: 6%;
-  bottom: 24%;
-  left: 6%;
+  right: 27%;
+  bottom: 35%;
+  left: 27%;
   height: 1px;
-  background: linear-gradient(90deg, rgb(var(--tint-rgb) / 0), var(--line-strong) 25%, rgb(var(--accent-rgb) / 0.3) 50%, var(--line-strong) 75%, rgb(var(--tint-rgb) / 0));
+  background: linear-gradient(90deg, rgb(var(--tint-rgb) / 0), var(--line-strong) 20%, rgb(var(--accent-rgb) / 0.32) 55%, var(--line-strong) 85%, rgb(var(--tint-rgb) / 0));
   pointer-events: none;
 }
 /* A soft lantern follows your pointer through his room. */
 .companion-hub__lantern {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle 180px at var(--mx) var(--my), rgb(var(--accent-rgb) / 0.08), rgb(var(--accent-rgb) / 0) 70%);
+  z-index: 1;
+  background: radial-gradient(circle 200px at var(--mx) var(--my), rgb(var(--accent-rgb) / 0.08), rgb(var(--accent-rgb) / 0) 70%);
   opacity: 0;
   pointer-events: none;
   transition: opacity 900ms var(--ease);
@@ -67,27 +66,34 @@
 .companion-hub__home:hover .companion-hub__lantern {
   opacity: 1;
 }
-/* He stands on the horizon in his alcove, his ambience around him. */
+/* He stands on the floor of his room, in front of the back wall, his ambience
+   around him. He walks: his place (--mark-x) glides across the floor. */
 .companion-hub__stage {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  bottom: 11%;
+  left: var(--mark-x, 56%);
+  z-index: 2;
   display: grid;
   place-items: center;
-  width: 260px;
-  margin-bottom: calc(24% - 18px);
+  width: 230px;
+  translate: -50% 0;
+  transition: left 2200ms cubic-bezier(0.45, 0, 0.35, 1);
+}
+/* A soft step while he walks; facing the way he goes. */
+.companion-hub__stage.is-walking > :not(.haven) {
+  animation: room-walk 550ms ease-in-out infinite;
+}
+.companion-hub__stage.is-facing-left .scene {
+  transform: scaleX(-1);
 }
 .companion-hub__stage > :not(.haven) {
   position: relative;
   z-index: 1;
 }
-.companion-hub__stage > svg {
-  width: 80%;
-  height: auto;
-}
 .companion-hub__stage::before {
   content: '';
   position: absolute;
-  bottom: -6px;
+  bottom: -8px;
   left: 50%;
   width: 120%;
   height: 46px;
@@ -95,25 +101,20 @@
   background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.22), rgb(var(--accent-rgb) / 0));
   translate: -50% 0;
 }
-.companion-hub__stage::after {
-  content: '';
-  position: absolute;
-  top: -28px;
-  bottom: 10px;
-  left: 50%;
-  width: 92%;
-  border: 1px solid var(--line-strong);
-  border-bottom: 0;
-  border-radius: 999px 999px 0 0;
-  pointer-events: none;
-  translate: -50% 0;
-  mask-image: linear-gradient(#000 40%, transparent 94%);
-}
 
+/* Beneath the room: who he is on the left, how you grow together on the right. */
 .companion-hub__intro {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  gap: var(--s5) var(--s8);
+  min-width: 0;
+}
+.companion-hub__who,
+.companion-hub__grow {
+  display: grid;
   justify-items: start;
-  gap: var(--s4);
+  gap: var(--s3);
   min-width: 0;
 }
 .companion-hub__welcome {
@@ -188,7 +189,7 @@
   display: flex;
   align-items: baseline;
   gap: var(--s3);
-  font-size: var(--fs-display);
+  font-size: 48px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.045em;
@@ -251,7 +252,7 @@
   gap: var(--s3);
 }
 .companion-hub__label {
-  padding-top: var(--s6);
+  padding-top: var(--s7);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   font-weight: 400;
@@ -266,9 +267,11 @@
   height: 1px;
   background: linear-gradient(90deg, var(--line-strong), rgb(var(--tint-rgb) / 0));
 }
+/* Your bond and your path: present, but quieter than his room. */
 .companion-hub__stats {
   --cols: 4;
-  padding-block: var(--s6) var(--s7);
+  padding-block: var(--s5) var(--s6);
+  opacity: 0.86;
 }
 .companion-hub__stat-label {
   display: inline-flex;
@@ -282,7 +285,7 @@
 }
 .companion-hub__stat-value {
   font-family: var(--font-mono);
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.04em;
@@ -312,23 +315,33 @@
 }
 
 /* ---------- reward path ---------- */
+/* The path as a horizon: milestones side by side on one line, each with
+   what it brings beneath it; the line between them fills as you grow. */
 .reward-path {
   display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(170px, 1fr);
+  gap: 0;
+  margin: 0;
+  padding: var(--s2) 0 var(--s3);
+  overflow-x: auto;
   list-style: none;
+  scrollbar-width: thin;
 }
 .reward-path__step {
   position: relative;
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr);
-  gap: var(--s5);
-  padding-bottom: var(--s6);
+  grid-template-rows: 32px auto;
+  align-content: start;
+  gap: var(--s4);
+  padding-right: var(--s5);
 }
 .reward-path__strand {
   position: absolute;
-  left: 15.5px;
-  top: 38px;
-  bottom: 6px;
-  width: 1px;
+  top: 15.5px;
+  left: 40px;
+  right: 8px;
+  height: 1px;
   overflow: hidden;
   background: var(--line-strong);
 }
@@ -338,8 +351,8 @@
 .reward-path__charge {
   position: absolute;
   inset: 0;
-  transform-origin: top;
-  scale: 1 var(--fill, 0);
+  transform-origin: left;
+  scale: var(--fill, 0) 1;
   background: var(--accent);
   transition: scale var(--t-slow) var(--ease);
 }
@@ -365,9 +378,9 @@
 }
 .reward-path__body {
   display: grid;
+  align-content: start;
   gap: var(--s2);
   min-width: 0;
-  padding-top: 5px;
 }
 .reward-path__level {
   display: flex;
@@ -393,26 +406,26 @@
   gap: 2px;
 }
 .reward-path__rewards strong {
-  font-size: 17px;
+  font-size: 14px;
   letter-spacing: -0.02em;
 }
 .reward-path__step.is-later .reward-path__rewards {
   opacity: 0.6;
 }
 .reward-path__rewards .muted {
-  max-width: 60ch;
+  max-width: 28ch;
+  font-size: 12.5px;
+  line-height: 1.45;
 }
 
 @media (max-width: 1000px) {
-  .companion-hub__hero {
+  .companion-hub__intro {
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--s6);
   }
 }
 @media (max-width: 720px) {
   .companion-hub__stage {
-    width: 180px;
-    justify-self: center;
+    width: 170px;
   }
 }
 

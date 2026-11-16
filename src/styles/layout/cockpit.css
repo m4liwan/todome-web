@@ -67,6 +67,11 @@
 }
 .cockpit__side > .panel--plan {
   flex: 1 1 auto;
+  padding-bottom: var(--s5);
+}
+/* The thought of the day closes the column, in view (Classic, Flow). */
+.cockpit__side > .panel--impulse {
+  flex: none;
   padding-bottom: 0;
 }
 .cockpit__day,
@@ -175,7 +180,7 @@
   }
 }
 
-/* ---------- areas: a round switch, one pane at a time ---------- */
+/* ---------- areas: a switch, one pane at a time; its corners follow the setting ---------- */
 .areas {
   display: grid;
   gap: var(--s7);
@@ -187,24 +192,27 @@
   justify-content: space-between;
   gap: var(--s4);
 }
-/* The orbit: a round pill naming the current area. Opened, the other areas
+/* The orbit: a pill naming the current area (corners from --radius). Opened, the other areas
    grow out of it one after another; chosen, it folds back around the name. */
 .orbit {
   position: relative;
   display: inline-flex;
   align-items: center;
   gap: 2px;
-  padding: 3px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: rgb(var(--raised-rgb) / 0.6);
+  padding: 4px;
+  border: 1px solid rgb(var(--accent-rgb) / 0.32);
+  border-radius: var(--radius);
+  background: rgb(var(--raised-rgb) / 0.75);
+  box-shadow: 0 0 24px rgb(var(--accent-rgb) / 0.1);
+  backdrop-filter: blur(14px) saturate(1.2);
   transition:
     border-color var(--t-base) var(--ease),
     box-shadow var(--t-slow) var(--ease);
 }
 .orbit:hover,
 .orbit.is-open {
-  border-color: rgb(var(--tint-rgb) / 0.18);
+  border-color: rgb(var(--accent-rgb) / 0.6);
+  box-shadow: 0 0 30px rgb(var(--accent-rgb) / 0.18);
 }
 .orbit.is-open {
   box-shadow:
@@ -215,17 +223,30 @@
   display: inline-flex;
   align-items: center;
   gap: var(--s3);
-  height: 36px;
-  padding: 0 5px 0 var(--s4);
-  border-radius: 999px;
+  height: 44px;
+  padding: 0 6px 0 var(--s4);
+  border-radius: var(--radius);
   font-size: 14px;
   font-weight: 500;
   color: var(--ink);
   white-space: nowrap;
   transition: padding var(--t-slow) var(--ease);
 }
+.orbit__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  transition: opacity var(--t-base) var(--ease);
+}
+.orbit.is-open .orbit__kicker {
+  display: none;
+}
 .orbit__name {
   display: inline-block;
+  font-size: 15px;
   max-width: 220px;
   overflow: hidden;
   animation: fade-up var(--t-base) var(--ease) both;
@@ -244,11 +265,11 @@
 .orbit__knob {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: var(--active);
-  color: var(--ink-2);
+  background: rgb(var(--accent-rgb) / 0.14);
+  color: rgb(var(--accent-rgb));
   transition:
     transform var(--t-slow) var(--ease),
     background-color var(--t-base) var(--ease);
@@ -267,10 +288,10 @@
 }
 .orbit__option {
   max-width: 0;
-  height: 36px;
+  height: 44px;
   padding: 0;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: var(--radius);
   font-size: 14px;
   font-weight: 500;
   color: var(--ink-2);
@@ -367,11 +388,6 @@
 }
 .cockpit--sanctuary .cockpit__head .hello__chips {
   justify-content: center;
-  opacity: 0.45;
-  transition: opacity var(--t-base) var(--ease);
-}
-.cockpit--sanctuary .cockpit__head .hello__chips:is(:hover, :focus-within) {
-  opacity: 1;
 }
 .cockpit--sanctuary .cockpit__stage {
   display: grid;
@@ -396,7 +412,7 @@
   gap: var(--s4);
 }
 .cockpit--sanctuary .home-hub__house {
-  zoom: 0.5;
+  zoom: calc(0.5 * var(--buddy-k));
 }
 .cockpit--sanctuary .home-hub__info {
   display: flex;
@@ -490,7 +506,8 @@
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   grid-template-areas:
     'fold fold'
-    'next anchors'
+    'next thought'
+    'anchors anchors'
     'more more';
 }
 .cockpit--hub .cockpit__fold {
@@ -572,9 +589,17 @@
   border-left: 0;
   border-image: none;
 }
+/* The thought of the day fills the space beside "Danach"; the Tages-Anker
+   below get the whole width, so their week never has to squeeze. */
+.cockpit--hub .cockpit__thought {
+  grid-area: thought;
+  margin-top: var(--s8);
+  padding: var(--s7) 0 0 var(--s7);
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
 .cockpit--hub .cockpit__anchors {
   grid-area: anchors;
-  padding-left: var(--s7);
 }
 .cockpit--hub .cockpit__more {
   grid-area: more;
@@ -708,7 +733,7 @@
   text-align: center;
 }
 .cockpit--duo .cockpit__partner .home-hub__house {
-  zoom: 1.45;
+  zoom: calc(1.45 * var(--buddy-k));
 }
 .cockpit--duo .cockpit__partner .home-hub__info {
   justify-content: center;
@@ -741,6 +766,53 @@
   border-left: 1px solid var(--line);
   background: var(--bg);
   transform: rotate(45deg);
+}
+/* "Dein Rhythmus": its own section in Duo, the times of today and the week
+   side by side, the title running out into a hairline like the others. */
+.cockpit__rhythm {
+  position: relative;
+  grid-column: 1 / -1;
+  display: grid;
+  gap: var(--s6);
+  min-width: 0;
+  margin-top: var(--s8);
+  padding-top: var(--s7);
+  border-top: 1px solid var(--line);
+}
+.cockpit__rhythm > .cockpit__title {
+  display: flex;
+  align-items: baseline;
+}
+.cockpit__rhythm > .cockpit__title::after {
+  content: '';
+  flex: 1 1 auto;
+  align-self: center;
+  min-width: var(--s6);
+  height: 1px;
+  margin-left: var(--s3);
+  background: linear-gradient(90deg, var(--line-strong), rgb(var(--tint-rgb) / 0));
+}
+.cockpit__rhythm-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: var(--s8);
+}
+.cockpit__rhythm-body > .panel + .panel {
+  padding-left: var(--s8);
+  margin-left: calc(var(--s8) * -1);
+  border-left: 1px solid var(--line);
+}
+@media (max-width: 1180px) {
+  .cockpit__rhythm-body {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--s6);
+  }
+  .cockpit__rhythm-body > .panel + .panel {
+    padding: var(--s6) 0 0;
+    margin-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
 }
 /* Water and what comes next follow the first screen, side by side. */
 .cockpit--duo .cockpit__beside {
@@ -879,8 +951,8 @@
 .cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more) {
   position: relative;
 }
-.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more)::before,
-.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more)::after {
+.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more, .cockpit__rhythm)::before,
+.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more, .cockpit__rhythm)::after {
   content: '';
   position: absolute;
   top: -5px;
@@ -891,10 +963,10 @@
     linear-gradient(var(--line-strong), var(--line-strong)) center / 100% 1px no-repeat;
   pointer-events: none;
 }
-.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more)::before {
+.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more, .cockpit__rhythm)::before {
   left: -4px;
 }
-.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more)::after {
+.cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more, .cockpit__rhythm)::after {
   right: -4px;
 }
 /* Hub's overview row has no line above the day. */
@@ -961,7 +1033,7 @@
     gap: var(--s4);
   }
   .cockpit__head .hello h1 {
-    font-size: 34px;
+    font-size: 48px;
   }
   .cockpit .panel--focus {
     padding: var(--s6);
@@ -1017,13 +1089,13 @@
     -webkit-line-clamp: 1;
   }
   .cockpit .home-hub__house {
-    zoom: 0.86;
+    zoom: calc(0.86 * var(--buddy-k));
   }
   .cockpit--sanctuary .cockpit__stage .home-hub__house {
-    zoom: 0.42;
+    zoom: calc(0.42 * var(--buddy-k));
   }
   .cockpit--duo .cockpit__partner .home-hub__house {
-    zoom: 1.3;
+    zoom: calc(1.3 * var(--buddy-k));
   }
   /* While a block runs in Sanctuary, the shortcuts of the greeting rest
      (breathing is on the main card), so "Wenn du magst" stays in view. */
@@ -1087,7 +1159,7 @@
     padding-top: var(--s3);
   }
   .cockpit__head .hello h1 {
-    font-size: 30px;
+    font-size: 42px;
   }
   .cockpit__head .hello__chips {
     margin-top: 0;
@@ -1111,7 +1183,7 @@
     padding-block: var(--s2);
   }
   .cockpit .home-hub__house {
-    zoom: 0.72;
+    zoom: calc(0.72 * var(--buddy-k));
   }
   .cockpit .hydro__line {
     display: none;
@@ -1124,7 +1196,7 @@
     display: none;
   }
   .cockpit--duo .cockpit__partner .home-hub__house {
-    zoom: 1.1;
+    zoom: calc(1.1 * var(--buddy-k));
   }
 }
 
@@ -1133,7 +1205,7 @@
     display: none;
   }
   .cockpit__head .hello h1 {
-    font-size: 28px;
+    font-size: 32px;
   }
   .cockpit .focus__time {
     font-size: 52px;
@@ -1145,10 +1217,10 @@
     height: 24px;
   }
   .cockpit .home-hub__house {
-    zoom: 0.6;
+    zoom: calc(0.6 * var(--buddy-k));
   }
   .cockpit--duo .cockpit__partner .home-hub__house {
-    zoom: 0.9;
+    zoom: calc(0.9 * var(--buddy-k));
   }
 }
 

@@ -18,9 +18,10 @@
 .legend {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s4);
-  font-size: 12px;
+  gap: var(--s3);
+  font-size: 11.5px;
   color: var(--ink-3);
+  opacity: 0.8;
 }
 .legend li {
   display: inline-flex;
@@ -47,10 +48,14 @@
 }
 .timeline__scroll {
   overflow-x: auto;
+  overflow-y: hidden;
 }
+/* Air on both sides: the first and last hour and the labels of the day
+   stay inside the track instead of being cut by its edge. */
 .timeline__canvas {
   position: relative;
-  min-width: 640px;
+  min-width: 520px;
+  margin: 0 var(--s4);
   padding-top: 30px;
 }
 .timeline__planned {
@@ -67,6 +72,13 @@
   max-width: 160px;
   padding-left: 6px;
   border-left: 1px dashed var(--line-strong);
+}
+.plan-pin.is-end {
+  flex-direction: row-reverse;
+  padding: 0 6px 0 0;
+  border-left: 0;
+  border-right: 1px dashed var(--line-strong);
+  transform: translateX(-100%);
 }
 .plan-pin__label {
   overflow: hidden;
@@ -90,11 +102,12 @@
   position: absolute;
   bottom: 0;
   width: 1px;
-  height: 5px;
-  background: var(--line-strong);
+  height: 4px;
+  background: var(--line);
 }
 .track__ticks span.is-hour {
-  height: 10px;
+  height: 8px;
+  background: var(--line-strong);
 }
 .seg {
   position: absolute;
@@ -151,6 +164,10 @@
   border-radius: 50%;
   background: var(--accent);
   animation: pulse-dot 2.4s var(--ease) infinite;
+}
+.now.is-end .now__label {
+  right: 8px;
+  left: auto;
 }
 .now__label {
   position: absolute;

@@ -8,7 +8,7 @@ import { DEFAULT_APPEARANCE } from '../state/defaults';
 import type { AppState } from '../domain/types';
 import { contextLabels } from '../domain/userContext';
 import { dayKey } from '../lib/time';
-import { IconBell, IconBellOff, IconChart, IconCompanion, IconHome, IconMoon, IconPlay, IconSettings, IconSun, IconSunset } from './icons';
+import { IconBell, IconBellOff, IconCalendar, IconChart, IconCompanion, IconHome, IconMoon, IconPlay, IconSettings, IconSun, IconSunset } from './icons';
 import { PillNav, type PillNavItem } from './PillNav';
 import type { View } from './Topbar';
 
@@ -23,6 +23,7 @@ interface Props {
 
 const STATIONS: Array<{ id: Exclude<View, 'closing'>; label: string; icon: ReactNode }> = [
   { id: 'today', label: 'Heute', icon: <IconHome size={18} /> },
+  { id: 'horizon', label: 'Horizont', icon: <IconCalendar size={18} /> },
   { id: 'times', label: 'Rückblick', icon: <IconChart size={18} /> },
   { id: 'companion', label: 'Begleiter', icon: <IconCompanion size={18} /> },
 ];

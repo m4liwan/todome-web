@@ -2,6 +2,80 @@
   display: grid;
   gap: 0;
 }
+/* ---------- the arrival: a warm, still opening ---------- */
+.weekview__arrival {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--s6);
+  padding: var(--s8) 0 var(--s9);
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+/* Soft light gathers behind the numbers, in both tones of the light. */
+.weekview__glow {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  z-index: -1;
+  width: min(1100px, 120%);
+  height: 130%;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.12), rgb(var(--accent-rgb) / 0.04) 55%, rgb(var(--accent-rgb) / 0)),
+    radial-gradient(ellipse 60% 40% at 50% 80%, rgb(var(--accent-2-rgb) / 0.08), rgb(var(--accent-2-rgb) / 0) 70%);
+  translate: -50% 0;
+  pointer-events: none;
+  animation: arrival-glow 12s ease-in-out infinite alternate;
+}
+.weekview__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  animation: fade-up var(--t-slow) var(--ease) 120ms both;
+}
+.weekview__pride {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0;
+}
+.weekview__pride div {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 200px;
+  padding: 0 var(--s8);
+  border-left: 1px solid var(--line);
+  animation: rise 900ms var(--ease) both;
+  animation-delay: calc(200ms + var(--i) * 140ms);
+}
+.weekview__pride div:first-child {
+  border-left: 0;
+}
+.weekview__pride dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(64px, 7vw, 112px);
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+.weekview__pride dt {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+@media (max-width: 760px) {
+  .weekview__pride div {
+    min-width: 0;
+    padding: var(--s4) var(--s5);
+    border-left: 0;
+  }
+}
 .weekview__hero {
   display: grid;
   gap: var(--s4);
@@ -93,7 +167,8 @@
   width: 100%;
   height: max(2px, calc(var(--h) * 100%));
   border-radius: 2px 2px 0 0;
-  background: rgb(var(--tint-rgb) / 0.14);
+  /* The week as warm columns of light, fading into the floor. */
+  background: linear-gradient(rgb(var(--accent-rgb) / 0.45), rgb(var(--accent-rgb) / 0.08));
   transform-origin: bottom;
   animation: rise var(--t-slow) var(--ease) both;
 }
@@ -205,70 +280,12 @@
 .care {
   gap: var(--gap);
 }
-.care__ring {
-  position: relative;
-  display: grid;
-  place-items: center;
-  justify-self: start;
-}
-.care__track {
-  fill: none;
-  stroke: var(--line-strong);
-  stroke-width: 2;
-}
-.care__fill {
-  fill: none;
-  stroke: var(--ink);
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-.care__score {
-  position: absolute;
-  font-family: var(--font-mono);
-  font-size: 24px;
-  letter-spacing: -0.03em;
-}
-.care__parts {
-  display: grid;
-  gap: var(--gap);
-}
-.care__parts li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 90px;
-  align-items: center;
-  gap: var(--gap);
-  color: var(--ink-3);
-}
-.care__bar {
-  height: 2px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--line-strong);
-}
-.care__bar span {
-  display: block;
-  height: 100%;
-  background: var(--ink-2);
-}
-.gauge__track,
-.gauge__zone {
-  fill: none;
-  stroke-width: 3;
-  stroke-linecap: round;
-}
-.gauge__track {
-  stroke: var(--line-strong);
-}
-.gauge__zone {
-  stroke: var(--ink-3);
-}
-.gauge__dot {
-  fill: var(--ink);
-  stroke: var(--bg);
-  stroke-width: 3;
-}
-.gauge__value {
-  fill: var(--ink);
+.care__word {
+  max-width: 34ch;
+  font-size: 19px;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+  color: var(--ink);
 }
 .curve__grid {
   stroke: var(--line);

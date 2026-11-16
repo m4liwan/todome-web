@@ -133,18 +133,17 @@ describe('the Begleiter tab: his true home', () => {
     expect(document.querySelector('.companion-hub__home .companion-hub__floor')).not.toBeNull();
   });
 
-  it('places the things you choose at his side, on his horizon', () => {
-    const onObjects = vi.fn();
+  it('lets him live in a room of his own: a window with the time of day, a lamp, and no things merely set beside him', () => {
     const s = withHome('moon');
-    render(<CompanionHub state={{ ...s, settings: { ...s.settings, companion: { ...s.settings.companion, objects: ['tea', 'candle'] } } }} now={NOW} onObjects={onObjects} />);
-    const placed = [...document.querySelectorAll('.companion-hub__home .belonging')].map((e) => e.getAttribute('data-id'));
-    expect(placed).toEqual(['tea', 'candle']);
-    const group = screen.getByRole('group', { name: 'An seiner Seite' });
-    expect(within(group).getByRole('button', { name: 'Teetasse' }).getAttribute('aria-pressed')).toBe('true');
-    fireEvent.click(within(group).getByRole('button', { name: 'Pflanze' }));
-    expect(onObjects).toHaveBeenCalledWith(['tea', 'candle', 'plant']);
-    fireEvent.click(within(group).getByRole('button', { name: 'Teetasse' }));
-    expect(onObjects).toHaveBeenLastCalledWith(['candle']);
+    render(<CompanionHub state={{ ...s, settings: { ...s.settings, companion: { ...s.settings.companion, objects: ['tea', 'candle'] } } }} now={NOW} />);
+    const room = document.querySelector('.companion-hub__home')!;
+    expect(room.classList.contains('mark-room--day')).toBe(true);
+    expect(room.querySelector('.mark-room__window')).not.toBeNull();
+    expect(room.querySelector('.mark-room__lamp')).not.toBeNull();
+    expect(room.querySelector('.belonging')).toBeNull();
+    expect(screen.queryByRole('group', { name: 'An seiner Seite' })).toBeNull();
+    // He lives along with you: what he does is said in one line.
+    expect(room.querySelector('.mark-room__caption')?.textContent).toMatch(/Spike/);
   });
 });
 

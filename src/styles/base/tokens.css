@@ -140,18 +140,49 @@
   --radius: 10px;
 }
 
-/* Light colours (data-palette on <html>, set by boot.js / app/theme.ts) */
+/* The companion's size in the rooms of Heute (data-buddy, Settings → Design). */
+:root {
+  --buddy-k: 1;
+}
+:root[data-buddy='compact'] {
+  --buddy-k: 0.78;
+}
+:root[data-buddy='large'] {
+  --buddy-k: 1.3;
+}
+
+/* Light colours (data-palette on <html>, set by boot.js / app/theme.ts).
+   Ambient Light 5.0: every colour unmistakably its own. Lime (the default) lives
+   in :root above. Deep, strong tones first: */
 :root[data-palette='cyan'] {
-  --accent-rgb: 98 212 220;
-  --accent-mesh: #62d4dc;
-  --accent-2: #3fa3c0;
-  --accent-2-rgb: 63 163 192;
+  --accent-rgb: 25 227 255;
+  --accent-mesh: #19e3ff;
+  --accent-2: #0aa8ff;
+  --accent-2-rgb: 10 168 255;
+}
+:root[data-palette='cobalt'] {
+  --accent-rgb: 61 91 255;
+  --accent-mesh: #3d5bff;
+  --accent-2: #1a2bd4;
+  --accent-2-rgb: 26 43 212;
+}
+:root[data-palette='emerald'] {
+  --accent-rgb: 16 217 138;
+  --accent-mesh: #10d98a;
+  --accent-2: #05875a;
+  --accent-2-rgb: 5 135 90;
 }
 :root[data-palette='amber'] {
-  --accent-rgb: 233 180 106;
-  --accent-mesh: #e9b46a;
-  --accent-2: #cf8a4c;
-  --accent-2-rgb: 207 138 76;
+  --accent-rgb: 255 176 0;
+  --accent-mesh: #ffb000;
+  --accent-2: #ff6d00;
+  --accent-2-rgb: 255 109 0;
+}
+:root[data-palette='ruby'] {
+  --accent-rgb: 255 45 85;
+  --accent-mesh: #ff2d55;
+  --accent-2: #b0122f;
+  --accent-2-rgb: 176 18 47;
 }
 :root[data-palette='mono'] {
   --accent-rgb: 230 232 238;
@@ -160,48 +191,54 @@
   --accent-2-rgb: 167 172 184;
 }
 :root[data-palette='violet'] {
-  --accent-rgb: 165 147 255;
-  --accent-mesh: #a593ff;
-  --accent-2: #7d6bea;
-  --accent-2-rgb: 125 107 234;
-}
-:root[data-palette='rose'] {
-  --accent-rgb: 228 154 174;
-  --accent-mesh: #e49aae;
-  --accent-2: #c46a86;
-  --accent-2-rgb: 196 106 134;
+  --accent-rgb: 122 60 255;
+  --accent-mesh: #7a3cff;
+  --accent-2: #4b17d6;
+  --accent-2-rgb: 75 23 214;
 }
 
 /* The soft palettes: two tones each, a gentle gradient in the light. */
+:root[data-palette='rose'] {
+  --accent-rgb: 201 154 168;
+  --accent-mesh: #c99aa8;
+  --accent-2: #956274;
+  --accent-2-rgb: 149 98 116;
+}
 :root[data-palette='blush'] {
-  --accent-rgb: 244 174 188;
-  --accent-mesh: #f4aebc;
-  --accent-2: #e284a0;
-  --accent-2-rgb: 226 132 160;
-}
-:root[data-palette='lavender'] {
-  --accent-rgb: 190 170 250;
-  --accent-mesh: #beaafa;
-  --accent-2: #9680e8;
-  --accent-2-rgb: 150 128 232;
-}
-:root[data-palette='peach'] {
-  --accent-rgb: 255 190 150;
-  --accent-mesh: #ffbe96;
-  --accent-2: #f29678;
-  --accent-2-rgb: 242 150 120;
+  --accent-rgb: 255 143 177;
+  --accent-mesh: #ff8fb1;
+  --accent-2: #ff6b9a;
+  --accent-2-rgb: 255 107 154;
 }
 :root[data-palette='sakura'] {
-  --accent-rgb: 255 183 213;
-  --accent-mesh: #ffb7d5;
-  --accent-2: #d6b0ff;
-  --accent-2-rgb: 214 176 255;
+  --accent-rgb: 255 107 230;
+  --accent-mesh: #ff6be6;
+  --accent-2: #e040fb;
+  --accent-2-rgb: 224 64 251;
+}
+:root[data-palette='peach'] {
+  --accent-rgb: 255 179 138;
+  --accent-mesh: #ffb38a;
+  --accent-2: #ff9466;
+  --accent-2-rgb: 255 148 102;
+}
+:root[data-palette='lavender'] {
+  --accent-rgb: 143 168 255;
+  --accent-mesh: #8fa8ff;
+  --accent-2: #6f86ff;
+  --accent-2-rgb: 111 134 255;
 }
 :root[data-palette='lilac'] {
-  --accent-rgb: 205 160 240;
-  --accent-mesh: #cda0f0;
-  --accent-2: #8ca0ff;
-  --accent-2-rgb: 140 160 255;
+  --accent-rgb: 196 156 255;
+  --accent-mesh: #c49cff;
+  --accent-2: #a066ff;
+  --accent-2-rgb: 160 102 255;
+}
+:root[data-palette='rainbow'] {
+  --accent-rgb: 255 110 199;
+  --accent-mesh: #ff6ec7;
+  --accent-2: #6ad3ff;
+  --accent-2-rgb: 106 211 255;
 }
 
 /* ---------- Tageslicht: the light theme (Settings → Design) ----------
@@ -243,16 +280,34 @@
   --accent-2-rgb: 77 124 15;
 }
 :root[data-theme='light'][data-palette='cyan'] {
-  --accent-rgb: 14 145 160;
-  --accent-mesh: #0e91a0;
-  --accent-2: #155e75;
-  --accent-2-rgb: 21 94 117;
+  --accent-rgb: 8 148 184;
+  --accent-mesh: #0894b8;
+  --accent-2: #0a6fc2;
+  --accent-2-rgb: 10 111 194;
+}
+:root[data-theme='light'][data-palette='cobalt'] {
+  --accent-rgb: 47 69 214;
+  --accent-mesh: #2f45d6;
+  --accent-2: #1a2496;
+  --accent-2-rgb: 26 36 150;
+}
+:root[data-theme='light'][data-palette='emerald'] {
+  --accent-rgb: 10 154 98;
+  --accent-mesh: #0a9a62;
+  --accent-2: #06724a;
+  --accent-2-rgb: 6 114 74;
 }
 :root[data-theme='light'][data-palette='amber'] {
-  --accent-rgb: 196 120 40;
-  --accent-mesh: #c47828;
-  --accent-2: #9a5a1e;
-  --accent-2-rgb: 154 90 30;
+  --accent-rgb: 217 134 0;
+  --accent-mesh: #d98600;
+  --accent-2: #b85000;
+  --accent-2-rgb: 184 80 0;
+}
+:root[data-theme='light'][data-palette='ruby'] {
+  --accent-rgb: 208 23 63;
+  --accent-mesh: #d0173f;
+  --accent-2: #8d0d27;
+  --accent-2-rgb: 141 13 39;
 }
 :root[data-theme='light'][data-palette='mono'] {
   --accent-rgb: 64 66 74;
@@ -261,44 +316,50 @@
   --accent-2-rgb: 38 40 46;
 }
 :root[data-theme='light'][data-palette='violet'] {
-  --accent-rgb: 109 88 230;
-  --accent-mesh: #6d58e6;
-  --accent-2: #5440c8;
-  --accent-2-rgb: 84 64 200;
+  --accent-rgb: 92 40 214;
+  --accent-mesh: #5c28d6;
+  --accent-2: #3f14a8;
+  --accent-2-rgb: 63 20 168;
 }
 :root[data-theme='light'][data-palette='rose'] {
-  --accent-rgb: 196 86 120;
-  --accent-mesh: #c45678;
-  --accent-2: #a03c5f;
-  --accent-2-rgb: 160 60 95;
+  --accent-rgb: 160 98 120;
+  --accent-mesh: #a06278;
+  --accent-2: #764558;
+  --accent-2-rgb: 118 69 88;
 }
 :root[data-theme='light'][data-palette='blush'] {
-  --accent-rgb: 200 90 120;
-  --accent-mesh: #c85a78;
-  --accent-2: #a84062;
-  --accent-2-rgb: 168 64 98;
-}
-:root[data-theme='light'][data-palette='lavender'] {
-  --accent-rgb: 116 92 214;
-  --accent-mesh: #745cd6;
-  --accent-2: #5c46bc;
-  --accent-2-rgb: 92 70 188;
-}
-:root[data-theme='light'][data-palette='peach'] {
-  --accent-rgb: 210 112 70;
-  --accent-mesh: #d27046;
-  --accent-2: #b05634;
-  --accent-2-rgb: 176 86 52;
+  --accent-rgb: 224 76 122;
+  --accent-mesh: #e04c7a;
+  --accent-2: #b8325e;
+  --accent-2-rgb: 184 50 94;
 }
 :root[data-theme='light'][data-palette='sakura'] {
-  --accent-rgb: 210 90 150;
-  --accent-mesh: #d25a96;
-  --accent-2: #8e5cd2;
-  --accent-2-rgb: 142 92 210;
+  --accent-rgb: 204 48 178;
+  --accent-mesh: #cc30b2;
+  --accent-2: #9c1fc0;
+  --accent-2-rgb: 156 31 192;
+}
+:root[data-theme='light'][data-palette='peach'] {
+  --accent-rgb: 224 116 70;
+  --accent-mesh: #e07446;
+  --accent-2: #c0552c;
+  --accent-2-rgb: 192 85 44;
+}
+:root[data-theme='light'][data-palette='lavender'] {
+  --accent-rgb: 80 102 230;
+  --accent-mesh: #5066e6;
+  --accent-2: #3a4cc4;
+  --accent-2-rgb: 58 76 196;
 }
 :root[data-theme='light'][data-palette='lilac'] {
-  --accent-rgb: 150 90 200;
-  --accent-mesh: #965ac8;
-  --accent-2: #5a68d2;
-  --accent-2-rgb: 90 104 210;
+  --accent-rgb: 136 76 220;
+  --accent-mesh: #884cdc;
+  --accent-2: #6a30c4;
+  --accent-2-rgb: 106 48 196;
+}
+:root[data-theme='light'][data-palette='rainbow'] {
+  --accent-rgb: 214 54 150;
+  --accent-mesh: #d63696;
+  --accent-2: #1c86c4;
+  --accent-2-rgb: 28 134 196;
 }

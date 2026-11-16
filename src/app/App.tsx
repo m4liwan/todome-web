@@ -13,19 +13,21 @@ import { PromptCenter } from '../components/PromptCenter';
 import { ReportPanel, TodayTimesCard } from '../components/ReportPanel';
 import { CompanionHome, DailyImpulse, MicroRoutines, RoutineTimer, ThoughtParking, WeekTeaser, type Routine } from '../components/HomeExtras';
 import { AnchorsDialog, AnchorsSection } from '../components/DailyAnchors';
+import { HorizonView } from '../components/HorizonView';
 import { ANCHOR_IMPULSE_SECONDS, anchorsToday } from '../domain/anchors';
 import type { DailyAnchor } from '../domain/types';
 import { Onboarding } from '../components/Onboarding';
 import { StorageNotice } from '../components/StorageNotice';
 import { FirstTasks } from '../components/FirstTasks';
 import { CompanionTour } from '../components/CompanionTour';
-import { Garland, isWinterActive } from '../components/Winter';
+import { isWinterActive, WinterMagic } from '../components/Winter';
 import { Splash } from '../components/Splash';
 import { Standby } from '../components/Standby';
 import { Breathe } from '../components/Breathe';
 import { Timeline } from '../components/Timeline';
 import { Toasts } from '../components/Toasts';
 import { Cockpit } from '../components/Cockpit';
+import { QuickOrb } from '../components/QuickOrb';
 import { focusStyleLabel } from '../components/FocusStyle';
 import { Dock } from '../components/Dock';
 import { Topbar, type View } from '../components/Topbar';
@@ -117,6 +119,8 @@ export function App() {
   const services = useServices();
   const [modal, setModalRaw] = useState<Modal | null>(null);
   const [view, setView] = useState<View>('today');
+  /** The day the Horizont opens on (a reminder or the mini calendar chose it). */
+  const [horizonDay, setHorizonDay] = useState<string | null>(null);
   const [planOpen, setPlanOpen] = useState(false);
   // Every launch (the very first one too) begins on the warm welcome; the setup follows after it.
   const [splash, setSplash] = useState<'launch' | 'manual' | null>(() => (splashAlreadyShown() ? null : 'launch'));
@@ -126,10 +130,16 @@ export function App() {
   const [routine, setRoutine] = useState<Routine | null>(null);
   const energyAsked = useRef(false);
 
-  // The day's close is a calm screen of its own, not a dialog.
+  // The day's close and the calendar are calm screens of their own, not dialogs.
   const setModal = useCallback((m: Modal | null) => {
     if (m?.kind === 'shutdown') {
       setView('closing');
+      setModalRaw(null);
+      return;
+    }
+    if (m?.kind === 'calendar') {
+      setHorizonDay(m.day ?? null);
+      setView('horizon');
       setModalRaw(null);
       return;
     }
@@ -375,7 +385,7 @@ export function App() {
     thoughts: <ThoughtParking state={state} now={now} />,
     routines: <MicroRoutines state={state} now={now} onStart={setRoutine} />,
     week: <WeekTeaser state={state} projections={projections} now={now} onOpen={() => setView('times')} />,
-    anchors: <AnchorsSection state={state} now={now} onManage={() => setModal({ kind: 'anchors' })} onImpulse={startImpulse} />,
+    anchors: <AnchorsSection state={state} now={now} onManage={() => setModal({ kind: 'anchors' })} onImpulse={startImpulse} onCalendar={(day) => setModal({ kind: 'calendar', day })} />,
   };
   const anchorsDue = anchorsToday(state.anchors, now, today);
 
@@ -384,7 +394,7 @@ export function App() {
       <AmbientLight />
       <Ambience kind={state.settings.appearance.ambience} weather={state.weather} dark={theme === 'dark'} />
       {winter && state.settings.appearance.ambience !== 'snow' && <Ambience kind="snow" weather={null} dark={theme === 'dark'} />}
-      {winter && <Garland />}
+      {winter && <WinterMagic />}
       <a className="skip-link" href="#main">
         Zum Inhalt springen
       </a>
@@ -399,6 +409,11 @@ export function App() {
               meta={{ anchors: anchorsDue.due.length ? `${anchorsDue.done}/${anchorsDue.due.length}` : undefined }}
               layout={state.settings.appearance.layout}
             />
+          )}
+          {view === 'horizon' && (
+            <div className="view-fade view-fade--wide" key="horizon">
+              <HorizonView state={state} now={now} day={horizonDay} />
+            </div>
           )}
           {view === 'times' && (
             <div className="view-fade view-fade--wide" key="times">
@@ -415,7 +430,7 @@ export function App() {
                 introReady={!tour && !modal && !breathe && !routine && !splash && !onboarding && !landing}
                 onIntroSeen={markIntroSeen}
                 onHome={(home) => services.store.dispatch({ type: 'settings/update', patch: { companion: { ...state.settings.companion, home } } })}
-                onObjects={(objects) => services.store.dispatch({ type: 'settings/update', patch: { companion: { ...state.settings.companion, objects } } })}
+                onThings={(objects) => services.store.dispatch({ type: 'settings/update', patch: { companion: { ...state.settings.companion, objects } } })}
               />
             </div>
           )}
@@ -440,6 +455,8 @@ export function App() {
           {focusStyleLabel(style)}
         </p>
       )}
+      {/* The quick-shortcut orb floats on the home screen once it is switched on. */}
+      {view === 'today' && state.settings.quickOrb.enabled && state.settings.onboarded && !splash && <QuickOrb state={state} />}
       <Toasts />
       <StorageNotice />
 

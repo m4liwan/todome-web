@@ -60,59 +60,132 @@ html.is-companion,
 html.is-companion body {
   overflow: hidden;
 }
+/* ---------- the visit: the companion drops by in a corner ----------
+   He stands in the chosen corner (bottom right by default), his speech
+   bubble beside him; the bubble's tail corner points at him. Only the figure
+   and the bubble take the pointer. */
 .buddy-layer {
   position: fixed;
-  bottom: 0;
   z-index: 50;
   pointer-events: none;
 }
-.buddy-layer--right {
+.buddy-layer--bottom-right,
+.buddy-layer--bottom-left {
+  bottom: 0;
+}
+.buddy-layer--top-right,
+.buddy-layer--top-left {
+  top: 0;
+}
+.buddy-layer--bottom-right,
+.buddy-layer--top-right {
   right: 0;
 }
-.buddy-layer--left {
+.buddy-layer--bottom-left,
+.buddy-layer--top-left {
   left: 0;
 }
-.buddy-layer:not(.buddy-layer--desktop) {
-  bottom: calc(var(--frame-b) + 20px + env(safe-area-inset-bottom, 0px));
-  left: calc(var(--frame-l) + 16px + env(safe-area-inset-left, 0px));
-  right: auto;
+/* In the app window: clear of the navigation, the frame and the prompts. */
+.buddy-layer:not(.buddy-layer--desktop):is(.buddy-layer--bottom-right, .buddy-layer--bottom-left) {
+  bottom: calc(var(--frame-b) + var(--s5) + env(safe-area-inset-bottom, 0px));
+}
+.buddy-layer:not(.buddy-layer--desktop):is(.buddy-layer--top-right, .buddy-layer--top-left) {
+  top: calc(var(--frame-t) + var(--s4));
+}
+.buddy-layer:not(.buddy-layer--desktop):is(.buddy-layer--bottom-right, .buddy-layer--top-right) {
+  right: calc(var(--frame-r) + var(--s5) + env(safe-area-inset-right, 0px));
+}
+.buddy-layer:not(.buddy-layer--desktop):is(.buddy-layer--bottom-left, .buddy-layer--top-left) {
+  left: calc(var(--frame-l) + var(--s5) + env(safe-area-inset-left, 0px));
 }
 .buddy {
   display: flex;
   align-items: flex-end;
-  gap: var(--gap);
+  gap: var(--s3);
+  animation: buddy-arrive 520ms var(--ease) both;
 }
-.buddy--right {
+.buddy.is-out {
+  animation: buddy-leave 420ms var(--ease) both;
+  pointer-events: none;
+}
+/* Right corners: he stands at the edge, the bubble on his inner side. */
+.buddy--bottom-right,
+.buddy--top-right {
   flex-direction: row-reverse;
 }
+.buddy--top-right,
+.buddy--top-left {
+  align-items: flex-start;
+}
 .buddy__avatar {
+  position: relative;
   flex: none;
   pointer-events: auto;
   filter: drop-shadow(0 8px 22px rgb(var(--accent-rgb) / 0.16));
 }
+/* A small pool of light under him, so he stands somewhere. */
+.buddy__avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  z-index: -1;
+  width: 110%;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.22), rgb(var(--accent-rgb) / 0));
+  translate: -50% 0;
+}
 .buddy__bubble {
   position: relative;
   display: grid;
-  gap: var(--s2);
-  width: 280px;
-  padding: var(--s4);
+  gap: var(--s3);
+  width: min(340px, calc(100vw - 150px));
+  margin-bottom: var(--s5);
+  padding: var(--s5);
   overflow: hidden;
   pointer-events: auto;
   border: 1px solid var(--line-float);
   border-radius: var(--radius);
-  /* The corner towards him: the bubble is his, it points at the speaker. */
-  border-bottom-left-radius: 2px;
   background: rgb(var(--raised-rgb) / 0.92);
   backdrop-filter: blur(16px) saturate(1.2);
   box-shadow:
     var(--shadow-float),
     inset 0 1px 0 rgb(var(--accent-rgb) / 0.14);
-  font-size: 14px;
-  animation: rise var(--t-base) var(--ease) both;
+  font-size: 15px;
+  animation: buddy-card 600ms var(--ease) 140ms both;
 }
-.buddy--right .buddy__bubble {
-  border-bottom-left-radius: var(--radius);
-  border-bottom-right-radius: 2px;
+.buddy--top-right .buddy__bubble,
+.buddy--top-left .buddy__bubble {
+  margin: var(--s5) 0 0;
+}
+/* The tail: the one corner that points at him. */
+.buddy--bottom-right .buddy__bubble {
+  border-bottom-right-radius: min(2px, var(--radius));
+}
+.buddy--bottom-left .buddy__bubble {
+  border-bottom-left-radius: min(2px, var(--radius));
+}
+.buddy--top-right .buddy__bubble {
+  border-top-right-radius: min(2px, var(--radius));
+}
+.buddy--top-left .buddy__bubble {
+  border-top-left-radius: min(2px, var(--radius));
+}
+/* A hairline of his light across the top of the bubble. */
+.buddy__bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb) / 0.6), rgb(var(--accent-rgb) / 0));
+}
+.buddy__text {
+  line-height: 1.55;
+  color: var(--ink);
+  text-wrap: pretty;
 }
 .buddy__head {
   display: flex;
@@ -121,11 +194,21 @@ html.is-companion body {
   gap: var(--gap);
 }
 .buddy__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--ink-3);
+}
+.buddy__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgb(var(--accent-rgb));
+  box-shadow: 0 0 8px rgb(var(--accent-rgb) / 0.6);
 }
 .buddy__close {
   display: grid;
@@ -144,7 +227,8 @@ html.is-companion body {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s2);
-  margin-top: var(--s1);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line);
 }
 .buddy__timer {
   position: absolute;
@@ -200,21 +284,12 @@ html.is-companion body {
     width: 230px;
   }
 }
+/* In its own window the visit fills the window and sits in its corner. */
 .buddy-layer--desktop {
-  top: auto;
-  bottom: 0;
   max-height: 100vh;
-}
-.buddy-layer--desktop.buddy-layer--right {
-  right: 0;
-  left: auto;
-}
-.buddy-layer--desktop.buddy-layer--left {
-  left: 0;
-  right: auto;
+  padding: var(--s2);
 }
 .buddy--desktop .buddy__bubble {
-  width: min(300px, calc(100vw - 150px));
   max-height: calc(100vh - 76px);
   overflow-y: auto;
   overscroll-behavior: contain;

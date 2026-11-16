@@ -1,59 +1,95 @@
 /* ========================================================================
-   Settings (dialogs/SettingsDialog.tsx, SettingsSections.tsx): a floating
-   bar of tabs above the content, which runs beneath it. Sections are divided by
-   hairlines; choices are hairline options, the chosen one brighter.
+   Settings studio (dialogs/SettingsDialog.tsx, SettingsSections.tsx,
+   SettingsPreview.tsx): a calm full-screen view. At its head the way back
+   and the areas on one straight line that floats free in the black, like a
+   dock: the area under the pointer grows, its neighbours a little. Below,
+   one scroll space for the whole width (its scrollbar runs along the
+   window's right edge): the content with generous air and, beside it, the
+   live preview where the companion notices every change. Sections are
+   divided by hairlines; chosen options stay marked in the light colour.
    ======================================================================== */
 
 .settings {
   position: relative;
   flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
 }
-/* A living light in the sheet: it travels along with the chosen tab. */
+/* A living light in the studio: it travels with the chosen area. */
 .settings::before {
   content: '';
   position: absolute;
-  top: -260px;
-  left: 6%;
-  width: 560px;
-  height: 520px;
+  top: -300px;
+  left: 50%;
+  width: 760px;
+  height: 560px;
+  margin-left: -380px;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.1), rgb(var(--accent-rgb) / 0.035) 55%, rgb(var(--accent-rgb) / 0));
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.1), rgb(var(--accent-rgb) / 0.03) 55%, rgb(var(--accent-rgb) / 0));
   pointer-events: none;
-  transform: translateX(calc(var(--tab) * 88px));
+  transform: translateX(calc((var(--tab) - 3.5) * 70px));
   transition: transform 900ms var(--ease);
 }
-/* The floating bar: centred above the content, which runs beneath it. */
-.settings__bar {
-  position: absolute;
-  top: var(--s4);
-  left: 0;
-  right: 0;
+
+/* ---------- the head: the way back and the areas, like a dock ---------- */
+.settings__top {
+  position: relative;
   z-index: 3;
-  display: flex;
-  justify-content: center;
-  padding: 0 calc(var(--s7) + 40px);
-  pointer-events: none;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s7);
+  padding: calc(var(--chrome-h) + var(--s4)) var(--s8) var(--s4) var(--s6);
 }
+.settings__back {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--s2);
+  height: 44px;
+  padding: 0 var(--s4) 0 var(--s3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition:
+    color var(--t-fast) var(--ease),
+    border-color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease);
+}
+.settings__back:hover {
+  border-color: rgb(var(--tint-rgb) / 0.24);
+  background: var(--hover);
+  color: var(--ink);
+}
+.settings__back:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 1px var(--bg),
+    0 0 0 3px rgb(var(--accent-rgb) / 0.7);
+}
+.settings__bar {
+  min-width: 0;
+}
+/* One straight line from the way back to the right edge; the areas spread
+   over it with air between them. No hairline beneath: it floats. */
 .settings__tabs {
   position: relative;
   display: flex;
-  gap: 2px;
-  max-width: 100%;
-  padding: 4px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  width: 100%;
+  padding: var(--s3) 0 var(--s4);
   overflow-x: auto;
+  overflow-y: visible;
   scrollbar-width: none;
-  border: 1px solid var(--line-float);
-  border-radius: var(--radius);
-  background: rgb(var(--raised-rgb) / 0.72);
-  backdrop-filter: blur(18px) saturate(1.3);
-  box-shadow: var(--shadow-float);
-  pointer-events: auto;
   animation: fade-up var(--t-slow) var(--ease) 80ms both;
 }
+/* Each area: large and calm; the dock's pull (--m) lets it grow from its base. */
 .settings__tabs button {
   position: relative;
   z-index: 1;
@@ -61,88 +97,136 @@
   align-items: center;
   gap: var(--s2);
   flex: none;
-  height: 36px;
-  padding: 0 var(--s3);
+  height: 48px;
+  padding: 0 var(--s5);
   border-radius: var(--radius);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--ink-3);
   white-space: nowrap;
-  transition: color var(--t-base) var(--ease);
+  transform: scale(var(--m, 1));
+  transform-origin: 50% 70%;
+  transition:
+    color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    transform 220ms cubic-bezier(0.25, 1.2, 0.5, 1);
 }
 .settings__tabs button svg {
   flex: none;
-  transition: transform var(--t-base) var(--ease);
+  width: 20px;
+  height: 20px;
 }
 .settings__tabs button:hover {
   color: var(--ink);
 }
-.settings__tabs button:hover svg {
-  transform: translateY(-1px);
-}
+/* The chosen area: its own light, its icon in the light colour. */
 .settings__tabs button[aria-selected='true'] {
+  background: rgb(var(--accent-rgb) / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.4);
   color: var(--ink);
 }
-/* The lens glides to the chosen tab, like the one in the navigation. */
+.settings__tabs button[aria-selected='true'] svg {
+  color: rgb(var(--accent-rgb));
+}
+/* Beneath the chosen area a line of light glides from area to area. */
 .settings__lens {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
+  bottom: 6px;
   left: 0;
   width: var(--w);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius);
-  background: var(--active);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb)), rgb(var(--accent-rgb) / 0));
+  box-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.6);
   pointer-events: none;
   transform: translateX(var(--x));
   transition:
     transform var(--t-slow) var(--ease),
     width var(--t-slow) var(--ease);
 }
-.settings__panel {
-  position: relative;
-  flex: 1 1 auto;
-  display: grid;
-  align-content: start;
-  gap: 0;
+
+/* ---------- the stage: one scroll space, the content beside the live preview ---------- */
+.settings__stage {
   min-height: 0;
-  padding: calc(var(--s4) + 46px + var(--s4)) max(var(--s7), calc((100% - 820px) / 2)) var(--s7);
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  /* Content that scrolls up fades out beneath the bar. */
-  mask-image: linear-gradient(transparent calc(var(--s4) + 46px), #000 calc(var(--s4) + 46px + var(--s6)));
+}
+/* The scrollbar runs along the window's right edge, in the light colour of the app. */
+.settings__stage::-webkit-scrollbar-thumb {
+  background: rgb(var(--accent-rgb) / 0.4) padding-box;
+}
+.settings__stage::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--accent-rgb) / 0.7) padding-box;
+}
+.settings__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: start;
+  gap: var(--s9);
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 0 var(--s8);
+}
+.settings__panel {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0;
+  min-width: 0;
+  padding-bottom: var(--s10);
   animation: panel-forward var(--t-slow) var(--ease) both;
 }
 .settings__panel[data-dir='back'] {
   animation-name: panel-back;
 }
+/* Every section rises in after the one before: the area opens like a page. */
+.settings__panel > :is(header, section) {
+  animation: rise 560ms var(--ease) both;
+}
+.settings__panel > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.settings__panel > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.settings__panel > :nth-child(4) {
+  animation-delay: 180ms;
+}
+.settings__panel > :nth-child(5) {
+  animation-delay: 240ms;
+}
+.settings__panel > :nth-child(n + 6) {
+  animation-delay: 300ms;
+}
 .settings__intro {
   display: grid;
-  gap: var(--s2);
-  padding: var(--s6) 0 var(--s2);
+  gap: var(--s3);
+  padding: var(--s8) 0 var(--s5);
 }
 .settings__title {
-  font-size: var(--fs-h1);
-  line-height: 1.1;
-  letter-spacing: var(--track-tight);
+  font-size: clamp(52px, 4.6vw, 76px);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
 }
 .settings__lead {
-  max-width: 52ch;
-  font-size: var(--fs-body);
+  max-width: 54ch;
+  font-size: 18px;
+  line-height: 1.5;
   color: var(--ink-2);
 }
 .settings section {
   display: grid;
-  gap: var(--s4);
-  padding-block: var(--s6);
+  gap: var(--s5);
+  padding-block: var(--s7);
   border-bottom: 1px solid var(--line);
 }
 .settings section:last-of-type {
   border-bottom: 0;
 }
 .settings section > h3 {
-  font-size: var(--fs-body);
+  font-size: 20px;
+  letter-spacing: -0.02em;
 }
 .settings__label {
   margin-top: var(--s2);
@@ -162,13 +246,179 @@
   color: var(--ink-3);
   text-align: center;
 }
-@media (max-width: 760px) {
-  .settings__bar {
-    justify-content: flex-start;
-    padding: 0 56px 0 var(--s4);
+
+/* ---------- the live preview ---------- */
+.studio-preview {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-content: start;
+  gap: var(--s4);
+  padding: var(--s8) 0 var(--s6) var(--s7);
+  border-left: 1px solid var(--line);
+}
+.studio-preview__sheet {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 190px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.studio-preview__light {
+  position: absolute;
+  top: -30%;
+  left: -20%;
+  width: 90%;
+  height: 120%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / calc(0.15 + var(--ambient) * 0.5)), rgb(var(--accent-rgb) / 0));
+  animation: preview-drift 14s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+}
+.studio-preview__light--b {
+  top: 30%;
+  left: 40%;
+  background: radial-gradient(closest-side, rgb(var(--accent-2-rgb) / calc(0.12 + var(--ambient) * 0.45)), rgb(var(--accent-2-rgb) / 0));
+  animation-direction: alternate-reverse;
+}
+/* The preview moves the way the chosen light moves. */
+.studio-preview__sheet--breathe .studio-preview__light {
+  animation: orb-breathe 6s ease-in-out infinite;
+}
+.studio-preview__sheet--center .studio-preview__light {
+  top: 5%;
+  left: 15%;
+  width: 70%;
+  animation: orb-breathe 9s ease-in-out infinite;
+}
+.studio-preview__sheet--center .studio-preview__light--b,
+.studio-preview__sheet--breathe .studio-preview__light--b {
+  display: none;
+}
+.studio-preview__sheet--corners .studio-preview__light {
+  top: -45%;
+  left: -40%;
+  animation: none;
+}
+.studio-preview__sheet--corners .studio-preview__light--b {
+  top: 55%;
+  left: 65%;
+  animation: none;
+}
+.studio-preview__sheet--aurora .studio-preview__light {
+  top: 18%;
+  left: -20%;
+  width: 140%;
+  height: 34%;
+  background: linear-gradient(100deg, rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb) / 0.6), rgb(var(--accent-2-rgb) / 0.5), rgb(var(--accent-2-rgb) / 0));
+}
+.studio-preview__sheet--aurora .studio-preview__light--b {
+  top: 55%;
+  height: 26%;
+  border-radius: 50%;
+}
+.studio-preview__card {
+  position: relative;
+  display: grid;
+  gap: 0.5em;
+  width: 70%;
+  padding: 1.1em;
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: rgb(var(--raised-rgb) / 0.75);
+}
+.studio-preview__kicker {
+  font-family: var(--font-mono);
+  font-size: 0.7em;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.studio-preview__card strong {
+  font-size: 1.35em;
+  letter-spacing: -0.03em;
+}
+.studio-preview__button {
+  justify-self: start;
+  padding: 0.4em 0.8em;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 0.85em;
+  font-weight: 500;
+}
+.studio-preview__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s3) var(--s4);
+  margin: 0;
+}
+.studio-preview__facts div {
+  display: grid;
+  gap: 2px;
+}
+.studio-preview__facts dt {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.studio-preview__facts dd {
+  margin: 0;
+  font-size: 13.5px;
+}
+.studio-preview__buddy {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: var(--s3);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--line);
+}
+.studio-preview__figure {
+  display: block;
+  animation: preview-hop 700ms var(--ease) both;
+}
+.studio-preview__says {
+  margin-bottom: var(--s3);
+  padding: var(--s2) var(--s3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  border-bottom-left-radius: min(2px, var(--radius));
+  background: rgb(var(--tint-rgb) / 0.03);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+@media (max-width: 1100px) {
+  .settings__columns {
+    grid-template-columns: minmax(0, 1fr);
+    padding-inline: var(--s6);
   }
-  .settings__panel {
+  .studio-preview {
+    display: none;
+  }
+}
+@media (max-width: 1280px) {
+  .settings__tabs button {
+    padding: 0 var(--s3);
+    font-size: 14px;
+  }
+}
+@media (max-width: 900px) {
+  .settings__top {
+    gap: var(--s4);
     padding-inline: var(--s4);
+  }
+  .settings__tabs {
+    justify-content: flex-start;
+  }
+  .settings__tabs button {
+    transform: none;
   }
   .settings__tabs button span {
     display: none;
@@ -176,9 +426,37 @@
   .settings__tabs button[aria-selected='true'] span {
     display: inline;
   }
-  .settings__title {
-    font-size: var(--fs-h2);
+  .settings__lens {
+    display: none;
   }
+  .settings__columns {
+    padding-inline: var(--s4);
+  }
+  .settings__title {
+    font-size: var(--fs-h1);
+  }
+}
+
+/* ---------- the interface size: the same letters, four sizes ---------- */
+.ui-scales {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s2);
+}
+.ui-scale__preview {
+  display: grid;
+  place-items: center;
+  height: 56px;
+  margin-bottom: var(--s2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: calc(18px * var(--k));
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink-2);
+}
+.ui-scale.is-on .ui-scale__preview {
+  color: rgb(var(--accent-rgb));
 }
 
 /* ---------- options: hairline cards to pick one look ---------- */
@@ -327,18 +605,81 @@
   color: var(--ink);
   text-align: left;
   cursor: pointer;
+}
+
+/* ---------- every choice card: a frame, a lift on hover, the chosen one marked ----------
+   The same for options, corners, brain profiles, modules, the tone of voice
+   and the companions: a hairline card that rises a little under the pointer;
+   the chosen one keeps a frame in the light colour, a soft inner glow and a
+   small round check in its corner, so it is clear at a glance. */
+:is(.option, .corner-opt, .brain, .module, .tone, .avatar-option) {
+  position: relative;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgb(var(--tint-rgb) / 0.02), rgb(var(--tint-rgb) / 0));
   transition:
-    background-color var(--t-fast) var(--ease),
-    border-color var(--t-fast) var(--ease);
+    background-color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    transform var(--t-base) var(--ease);
 }
-:is(.option, .corner-opt, .brain, .module):hover {
-  border-color: rgb(var(--tint-rgb) / 0.22);
-  background: var(--hover);
+:is(.option, .corner-opt, .brain, .module, .tone, .avatar-option):hover {
+  border-color: rgb(var(--tint-rgb) / 0.26);
+  background-color: var(--hover);
+  box-shadow: 0 14px 34px rgb(var(--shade-rgb) / calc(0.4 * var(--shade-k)));
+  transform: translateY(-2px);
 }
-:is(.option, .corner-opt, .brain):is([aria-checked='true'], [aria-pressed='true'], .is-on),
+:is(.option, .corner-opt, .brain, .tone, .avatar-option):is([aria-checked='true'], [aria-pressed='true'], .is-on, :has(input:checked)),
 .module:has(input:checked) {
-  border-color: var(--ink);
-  background: var(--active);
+  border-color: rgb(var(--accent-rgb) / 0.75);
+  background: linear-gradient(160deg, rgb(var(--accent-rgb) / 0.13), rgb(var(--accent-rgb) / 0.03) 65%);
+  box-shadow:
+    inset 0 0 0 1px rgb(var(--accent-rgb) / 0.22),
+    0 0 28px rgb(var(--accent-rgb) / 0.12);
+}
+/* The check: a small round mark of light in the top right corner. */
+:is(.option, .corner-opt, .brain, .tone, .avatar-option)::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgb(var(--accent-rgb));
+  box-shadow: 0 0 10px rgb(var(--accent-rgb) / 0.55);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity var(--t-base) var(--ease),
+    transform var(--t-slow) cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+:is(.option, .corner-opt, .brain, .tone, .avatar-option)::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 3;
+  width: 5px;
+  height: 9px;
+  border: solid var(--bg);
+  border-width: 0 2px 2px 0;
+  opacity: 0;
+  transform: rotate(45deg) scale(0.4);
+  transition:
+    opacity var(--t-base) var(--ease),
+    transform var(--t-slow) cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+:is(.option, .corner-opt, .brain, .tone, .avatar-option):is([aria-checked='true'], [aria-pressed='true'], .is-on, :has(input:checked))::before {
+  opacity: 1;
+  transform: none;
+}
+:is(.option, .corner-opt, .brain, .tone, .avatar-option):is([aria-checked='true'], [aria-pressed='true'], .is-on, :has(input:checked))::after {
+  opacity: 1;
+  transform: rotate(45deg);
 }
 .option strong,
 .corner-opt strong {
@@ -356,8 +697,8 @@
 }
 .option__badge {
   position: absolute;
-  top: var(--s2);
-  right: var(--s2);
+  right: var(--s3);
+  bottom: var(--s2);
   display: inline-flex;
   align-items: center;
   height: 18px;
@@ -376,8 +717,23 @@
 .focus-style-opt.is-locked {
   opacity: 0.6;
 }
-.focus-style-opt .pro-lock {
-  justify-self: start;
+/* The level badge sits in the card's own flow, at its foot: never on top of the name. */
+.focus-styles {
+  grid-auto-rows: 1fr;
+}
+.option.focus-style-opt {
+  grid-template-rows: auto 1fr auto;
+}
+.option.focus-style-opt .pro-lock {
+  position: static;
+  justify-self: stretch;
+  align-self: end;
+  justify-content: center;
+  margin-top: var(--s3);
+  padding: var(--s1) var(--s2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: rgb(var(--tint-rgb) / 0.03);
 }
 .timeline-opt__preview {
   display: grid;
@@ -410,9 +766,23 @@
 /* ---------- light colours ---------- */
 .palettes {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  row-gap: var(--s3);
+  gap: var(--s4);
+}
+/* Two families: deep and strong, soft and tender; each on its own hairline row. */
+.palettes__family {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: var(--s2);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--line);
+}
+.palettes__name {
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.palettes__family--exclusive .palettes__name::after {
+  content: ' · mit Pro oder ab Level 15 deines Begleiters';
 }
 .palette {
   position: relative;
@@ -427,12 +797,21 @@
   text-align: center;
   cursor: pointer;
 }
+.palette {
+  transition:
+    background-color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease),
+    transform var(--t-base) var(--ease);
+}
 .palette:hover {
   background: var(--hover);
   color: var(--ink);
+  transform: translateY(-2px);
 }
 .palette.is-on {
-  border-color: var(--line-strong);
+  border-color: rgb(var(--accent-rgb) / 0.7);
+  background: linear-gradient(160deg, rgb(var(--accent-rgb) / 0.13), rgb(var(--accent-rgb) / 0.03) 65%);
+  box-shadow: 0 0 22px rgb(var(--accent-rgb) / 0.12);
   color: var(--ink);
 }
 .palette__frame,
@@ -443,11 +822,15 @@
   place-items: center;
 }
 .palette__swatch {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--swatch), var(--swatch-2, var(--swatch)));
   box-shadow: 0 0 18px var(--swatch);
+}
+/* The rainbow: all colours around one circle. */
+.palette--rainbow .palette__swatch {
+  background: conic-gradient(from 200deg, #ff5f6d, #ffb347, #ffe66d, #6ee7a8, #5fd3ff, #8a7dff, #ff6ec7, #ff5f6d);
 }
 .palette.is-on .palette__swatch {
   box-shadow:
@@ -462,9 +845,20 @@
   top: var(--s2);
   right: var(--s2);
 }
+/* Exclusive colours: the lock sits exactly in the middle of the swatch, the
+   PRO badge centred beneath the name, in the card's own flow. */
 .palette .pro-lock {
-  top: 4px;
-  right: 4px;
+  position: static;
+  justify-self: center;
+  height: 16px;
+  padding: 0 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  font-size: 9.5px;
+}
+.palette .pro-blur__lock {
+  width: 18px;
+  height: 18px;
 }
 .palette.is-pro,
 .avatar-option.is-pro {
@@ -478,6 +872,115 @@
 .ambient-field em {
   font-style: normal;
   color: var(--ink-3);
+}
+
+/* ---------- how the light moves: five little skies ---------- */
+.light-modes {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--s2);
+}
+.light-mode__preview {
+  position: relative;
+  display: block;
+  height: 56px;
+  margin-bottom: var(--s2);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+.light-mode__preview i {
+  position: absolute;
+  width: 70%;
+  height: 90%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.55), rgb(var(--accent-rgb) / 0));
+}
+.light-mode__preview i + i {
+  background: radial-gradient(closest-side, rgb(var(--accent-2-rgb) / 0.5), rgb(var(--accent-2-rgb) / 0));
+}
+.light-mode__preview--drift i {
+  top: -20%;
+  left: -10%;
+}
+.light-mode__preview--drift i + i {
+  top: 30%;
+  left: 40%;
+}
+.light-mode__preview--breathe i {
+  top: 5%;
+  left: 15%;
+  animation: orb-breathe 5s ease-in-out infinite;
+}
+.light-mode__preview--breathe i + i {
+  display: none;
+}
+.light-mode__preview--aurora i {
+  top: 10%;
+  left: -20%;
+  width: 140%;
+  height: 34%;
+  border-radius: 50%;
+  background: linear-gradient(100deg, rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb) / 0.55), rgb(var(--accent-2-rgb) / 0.45), rgb(var(--accent-2-rgb) / 0));
+  transform: rotate(-8deg);
+}
+.light-mode__preview--aurora i + i {
+  top: 50%;
+  transform: rotate(6deg);
+  opacity: 0.7;
+}
+.light-mode__preview--center i {
+  top: 5%;
+  left: 15%;
+}
+.light-mode__preview--center i + i {
+  display: none;
+}
+.light-mode__preview--corners i {
+  top: -45%;
+  left: -35%;
+}
+.light-mode__preview--corners i + i {
+  top: 55%;
+  left: 65%;
+}
+
+/* ---------- the companion's size: the same figure, three heights ---------- */
+.buddy-sizes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s2);
+}
+.buddy-size__preview {
+  display: grid;
+  place-items: end center;
+  height: 56px;
+  margin-bottom: var(--s2);
+  padding-bottom: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: linear-gradient(var(--line), var(--line)) center calc(100% - 8px) / 70% 1px no-repeat;
+}
+.buddy-size__preview i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, rgb(var(--accent-rgb)), rgb(var(--accent-2-rgb)));
+  box-shadow: 0 0 12px rgb(var(--accent-rgb) / 0.4);
+}
+.buddy-size[data-size='standard'] .buddy-size__preview i {
+  width: 24px;
+  height: 24px;
+}
+.buddy-size[data-size='large'] .buddy-size__preview i {
+  width: 34px;
+  height: 34px;
+}
+@media (max-width: 860px) {
+  .light-modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* ---------- clients ---------- */
@@ -592,7 +1095,7 @@
   }
 }
 @media (max-width: 640px) {
-  .palettes {
+  .palettes__family {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .corners,

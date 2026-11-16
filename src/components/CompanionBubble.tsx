@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CompanionMessage } from '../domain/companion';
-import type { AvatarId } from '../domain/types';
+import type { AvatarId, CompanionCorner } from '../domain/types';
 import { Avatar } from './Avatar';
 import { IconClose } from './icons';
 
 interface Props {
   message: CompanionMessage;
   avatar: AvatarId;
-  position: 'left' | 'right';
+  position: CompanionCorner;
   onReply: (optionId: string) => void;
   /** Called after the exit animation finished. */
   onClosed: () => void;
@@ -20,8 +20,10 @@ interface Props {
 const EXIT_MS = 420;
 
 /**
- * The companion peeking in from the screen edge with a speech bubble.
- * Auto-hides after `ttlMs`; hovering pauses the timer.
+ * The companion dropping by in a corner of the screen (bottom right by
+ * default): he stands in the corner, his speech bubble beside him, its tail
+ * corner pointing at him. Every other corner follows the corner setting
+ * (--radius). Auto-hides after `ttlMs`; hovering pauses the timer.
  */
 export function CompanionBubble({ message, avatar, position, onReply, onClosed, onHover, dismissed, variant }: Props) {
   const [phase, setPhase] = useState<'in' | 'out'>('in');
@@ -69,11 +71,14 @@ export function CompanionBubble({ message, avatar, position, onReply, onClosed, 
       aria-label={message.title}
     >
       <div className="buddy__avatar" aria-hidden="true">
-        <Avatar id={avatar} mood={message.mood} size={variant === 'desktop' ? 112 : 88} />
+        <Avatar id={avatar} mood={message.mood} size={variant === 'desktop' ? 104 : 88} />
       </div>
       <div className="buddy__bubble" onMouseEnter={() => hover(true)} onMouseLeave={() => hover(false)}>
         <div className="buddy__head">
-          <span className="buddy__title">{message.title}</span>
+          <span className="buddy__title">
+            <span className="buddy__dot" aria-hidden="true" />
+            {message.title}
+          </span>
           <button type="button" className="buddy__close" aria-label="Schließen" onClick={leave}>
             <IconClose size={14} />
           </button>

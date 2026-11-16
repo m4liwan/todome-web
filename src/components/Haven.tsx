@@ -1,5 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react';
-import type { CompanionObjectId, HavenId } from '../domain/types';
+import type { CSSProperties } from 'react';
+import type { HavenId } from '../domain/types';
 
 /**
  * The companion's home: a quiet ambience in the black around him. Moonlight
@@ -130,96 +130,6 @@ export function HavenPicker({ value, onChange, name, cards = false }: { value: H
           )}
         </button>
       ))}
-    </div>
-  );
-}
-
-/* ---------- his things: quiet line drawings on his horizon ---------- */
-
-export const OBJECTS: ReadonlyArray<{ id: CompanionObjectId; label: string }> = [
-  { id: 'tea', label: 'Teetasse' },
-  { id: 'plant', label: 'Pflanze' },
-  { id: 'book', label: 'Buch' },
-  { id: 'candle', label: 'Kerze' },
-];
-
-const DRAWINGS: Record<CompanionObjectId, ReactNode> = {
-  tea: (
-    <>
-      <path className="belonging__steam" d="M13 4c-2 2 2 4 0 6M18 3c-2 2 2 4 0 6" />
-      <path d="M7 14h17v6a7 7 0 0 1-7 7h-3a7 7 0 0 1-7-7z" />
-      <path d="M24 16h2a3 3 0 0 1 0 6h-2" />
-      <path d="M5 31h22" />
-    </>
-  ),
-  plant: (
-    <>
-      <path d="M16 20c0-6-4-10-9-10 0 6 4 10 9 10z" />
-      <path d="M16 18c0-6 3-11 9-12 0 7-3 11-9 12z" />
-      <path d="M16 20v4" />
-      <path d="M10 24h12l-2 7h-8z" />
-    </>
-  ),
-  book: (
-    <>
-      <path d="M4 27c4-2 8-2 12 0 4-2 8-2 12 0V12c-4-2-8-2-12 0-4-2-8-2-12 0z" />
-      <path d="M16 12v15" />
-      <path d="M3 31h26" />
-    </>
-  ),
-  candle: (
-    <>
-      <path className="belonging__flame" d="M16 4c2 3 3 5 0 8-3-3-2-5 0-8z" />
-      <path d="M12 14h8v15h-8z" />
-      <path d="M16 12v2" />
-      <path d="M8 31h16" />
-    </>
-  ),
-};
-
-/** The chosen things, standing on his horizon at his side (left and right in turn). */
-export function Belongings({ items, still = false }: { items: readonly CompanionObjectId[]; still?: boolean }) {
-  return (
-    <>
-      {items.map((id, i) => (
-        <svg
-          key={id}
-          className={`belonging belonging--${i % 2 === 0 ? 'right' : 'left'} belonging--${id}${still ? ' is-still' : ''}`}
-          data-id={id}
-          style={{ '--slot': Math.floor(i / 2) } as CSSProperties}
-          viewBox="0 0 32 32"
-          width={32}
-          height={32}
-          aria-hidden="true"
-        >
-          {DRAWINGS[id]}
-        </svg>
-      ))}
-    </>
-  );
-}
-
-/** Placing things at his side: quiet toggles. */
-export function BelongingsPicker({ value, onChange }: { value: readonly CompanionObjectId[]; onChange: (ids: CompanionObjectId[]) => void }) {
-  return (
-    <div className="belongings-picker" role="group" aria-label="An seiner Seite">
-      {OBJECTS.map((o) => {
-        const on = value.includes(o.id);
-        return (
-          <button
-            key={o.id}
-            type="button"
-            className={`belongings-picker__opt${on ? ' is-on' : ''}`}
-            aria-pressed={on}
-            onClick={() => onChange(on ? value.filter((v) => v !== o.id) : [...value, o.id])}
-          >
-            <svg viewBox="0 0 32 32" width={18} height={18} aria-hidden="true">
-              {DRAWINGS[o.id]}
-            </svg>
-            {o.label}
-          </button>
-        );
-      })}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { hasPro } from '../app/pro';
 import { avatarName } from '../domain/companion';
@@ -16,17 +16,22 @@ import {
   type Reward,
 } from '../domain/companionProgression';
 import type { AppState, CompanionObjectId, HavenId, Millis } from '../domain/types';
+import { roomLife, roomPhase, roomWeather } from '../domain/companionRoom';
+import { projectAll } from '../domain/session';
 import { useEffectsMode } from '../lib/effects';
 import { dayKey } from '../lib/time';
-import { Avatar } from './Avatar';
+import { AvatarScene } from './AvatarScene';
 import { AvatarFx, holoFor } from './AvatarFx';
 import { CompanionIntro, type IntroSpot } from './CompanionIntro';
-import { Belongings, BelongingsPicker, Haven, HavenPicker } from './Haven';
+import { CompanionRoom } from './CompanionRoom';
+import { RoomThingsPicker } from './RoomThings';
+import { Haven, HavenPicker } from './Haven';
 import { IconCheck, IconFlame, IconLock, IconSnowflake } from './icons';
 
 /**
- * "Begleiter": the companion, its level and the way ahead.
- * Hero (companion + level + XP bar), four calm numbers, the reward path.
+ * "Begleiter": his home. The upper half is his room, where he lives along
+ * with you (components/CompanionRoom); beneath it who he is, his level and
+ * the way ahead; then, quieter, your bond in numbers and the reward path.
  * Reads only; XP is paid in the reducer (domain/companionProgression).
  */
 
@@ -92,11 +97,11 @@ interface HubProps {
   onIntroSeen?: () => void;
   /** Changes his home (the ambience); shows the choice in his room when given. */
   onHome?: (id: HavenId) => void;
-  /** Changes the things at his side; shows the choice in his room when given. */
-  onObjects?: (ids: CompanionObjectId[]) => void;
+  /** Changes the furniture of his room; shows the choice beneath it when given. */
+  onThings?: (ids: CompanionObjectId[]) => void;
 }
 
-export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHome, onObjects }: HubProps) {
+export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHome, onThings }: HubProps) {
   const { stats, daily } = state.progression;
   const avatar = state.settings.companion.avatar;
   const name = avatarName(avatar);
@@ -116,6 +121,9 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHo
   const live = useEffectsMode(fx) === 'full';
   const intro = useHubIntro(introReady, state.settings.companionIntroSeen, onIntroSeen, live);
   const [roomLayer] = useState(companionRoomLayer);
+  // He lives along with you: what he is doing follows your day.
+  const projections = useMemo(() => projectAll(state, now), [state, now]);
+  const life = roomLife(state, projections, now);
   const spotOf = (part: IntroSpot) => (intro.spot === part ? ' is-spot' : '');
 
   return (
@@ -136,59 +144,56 @@ export function CompanionHub({ state, now, introReady = false, onIntroSeen, onHo
         >
           ?
         </button>
-        {/* His home: a room of his own. A horizon, a floor that holds a little
-            light, his alcove and his ambience; a soft lantern follows your pointer. */}
-        <div
-          className="companion-hub__home"
-          onMouseMove={(e) => {
-            const r = e.currentTarget.getBoundingClientRect();
-            if (!r.width || !r.height) return;
-            e.currentTarget.style.setProperty('--mx', `${Math.round(((e.clientX - r.left) / r.width) * 100)}%`);
-            e.currentTarget.style.setProperty('--my', `${Math.round(((e.clientY - r.top) / r.height) * 100)}%`);
-          }}
-        >
-          <span className="companion-hub__lantern" aria-hidden="true" />
-          <span className="companion-hub__horizon" aria-hidden="true" />
-          <span className="companion-hub__floor" aria-hidden="true" />
-          <Belongings items={state.settings.companion.objects} still={!live} />
-          <div className="companion-hub__stage" aria-hidden="true">
-            <Haven id={state.settings.companion.home} still={!live} />
+        {/* His room: the upper half of his home. He lives in it, in tune with you. */}
+        <CompanionRoom
+          phase={roomPhase(now)}
+          weather={roomWeather(state.weather)}
+          home={state.settings.companion.home}
+          still={!live}
+          name={name}
+          life={life}
+          things={state.settings.companion.objects}
+          figure={(activity) => (
             <AvatarFx level={progress.level} enabled={fx}>
-              <Avatar id={avatar} mood="happy" size={184} holo={holoFor(progress.level, fx)} />
+              <AvatarScene avatar={avatar} activity={activity} size={168} holo={holoFor(progress.level, fx)} />
             </AvatarFx>
-          </div>
-        </div>
+          )}
+        />
         <div className="companion-hub__intro">
-          <p className="companion-hub__welcome">Willkommen zu Hause.</p>
-          <h1 className="companion-hub__title">
-            <span className="companion-hub__name">{name}</span>{' '}
-            <span className="companion-hub__level">
-              <span className="companion-hub__level-word">Level</span> <span className="companion-hub__level-num">{progress.level}</span>
-            </span>
-          </h1>
-          <p className="companion-hub__line">{TIER_LINE[tier](name)}</p>
-          {onHome && (
-            <div className="companion-hub__ambience">
-              <span className="companion-hub__ambience-label">Sein Zuhause</span>
-              <HavenPicker value={state.settings.companion.home} name={name} onChange={onHome} />
-            </div>
-          )}
-          {onObjects && (
-            <div className="companion-hub__ambience">
-              <span className="companion-hub__ambience-label">An seiner Seite</span>
-              <BelongingsPicker value={state.settings.companion.objects} onChange={onObjects} />
-            </div>
-          )}
-          <XpBar key={progress.level} level={progress.level} into={progress.xpIntoLevel} span={progress.xpForNext} ratio={progress.ratio} />
-          <p className="companion-hub__next muted">
-            {next ? (
-              <>
-                Bei Level {next.level} wartet: <strong>{next.rewards.map((r) => r.title).join(' und ')}</strong>
-              </>
-            ) : (
-              'Alle Belohnungen gehören euch. Jedes Level von hier ist reine Freude.'
+          <div className="companion-hub__who">
+            <p className="companion-hub__welcome">Willkommen zu Hause.</p>
+            <h1 className="companion-hub__title">
+              <span className="companion-hub__name">{name}</span>{' '}
+              <span className="companion-hub__level">
+                <span className="companion-hub__level-word">Level</span> <span className="companion-hub__level-num">{progress.level}</span>
+              </span>
+            </h1>
+            <p className="companion-hub__line">{TIER_LINE[tier](name)}</p>
+          </div>
+          <div className="companion-hub__grow">
+            <XpBar key={progress.level} level={progress.level} into={progress.xpIntoLevel} span={progress.xpForNext} ratio={progress.ratio} />
+            <p className="companion-hub__next muted">
+              {next ? (
+                <>
+                  Bei Level {next.level} wartet: <strong>{next.rewards.map((r) => r.title).join(' und ')}</strong>
+                </>
+              ) : (
+                'Alle Belohnungen gehören euch. Jedes Level von hier ist reine Freude.'
+              )}
+            </p>
+            {onHome && (
+              <div className="companion-hub__ambience">
+                <span className="companion-hub__ambience-label">Stimmung im Zimmer</span>
+                <HavenPicker value={state.settings.companion.home} name={name} onChange={onHome} />
+              </div>
             )}
-          </p>
+            {onThings && (
+              <div className="companion-hub__ambience">
+                <span className="companion-hub__ambience-label">Einrichtung</span>
+                <RoomThingsPicker value={state.settings.companion.objects} onChange={onThings} />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

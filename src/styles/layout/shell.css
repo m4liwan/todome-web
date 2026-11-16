@@ -87,6 +87,11 @@
   z-index: -1;
   pointer-events: none;
 }
+/* The fireplace: a warm glow rises from the floor of the window, the embers above it. */
+.ambience--hearth {
+  background: radial-gradient(ellipse 80% 42% at 50% 108%, rgb(255 132 48 / 0.16), rgb(255 132 48 / 0.05) 55%, rgb(255 132 48 / 0) 75%);
+  animation: hearth-flicker 5.2s ease-in-out infinite;
+}
 /* Review, companion and day end: one editorial column that rises in. The
    review goes wide: more of the week at a glance, nothing squeezed. */
 .view-fade {

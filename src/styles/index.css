@@ -47,6 +47,9 @@
 @import './components/recovery.css';
 @import './components/quick.css';
 @import './components/pomodoro.css';
+@import './components/quick-orb.css';
+@import './components/calendar.css';
+@import './components/companion-room.css';
 @import './layout/zones.css';
 @import './base/late.css';
 @import './base/accessibility.css';

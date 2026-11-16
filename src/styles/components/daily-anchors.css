@@ -68,6 +68,18 @@
 .week-cal__day.is-picked {
   color: var(--ink);
 }
+/* A date from the calendar on this day: a small mark of light in its corner. */
+.week-cal__day.has-date::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgb(var(--accent-2-rgb));
+  box-shadow: 0 0 6px rgb(var(--accent-2-rgb) / 0.6);
+}
 .week-cal__name {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
@@ -126,6 +138,7 @@
 }
 .anchors-sec__actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--s2);
   padding-top: var(--s2);
 }

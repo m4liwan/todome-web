@@ -31,9 +31,17 @@ function recognition(focusMs: Millis, done: number, activeDays: number): { title
   return { title, text: `${parts.join(', ')}. Das bist du. Das hast du bewegt.` };
 }
 
+/** The arrival numbers: hours as a light number with its unit. */
+function hoursParts(ms: Millis): { value: string; unit: string } {
+  if (ms < HOUR) return { value: String(Math.round(ms / MIN)), unit: 'Minuten Fokus' };
+  return { value: (ms / HOUR).toLocaleString('de-DE', { maximumFractionDigits: 1 }), unit: 'Stunden Fokus' };
+}
+
 /**
- * Week deep-dive: what you achieved, made visible and warm. Borderless: a
- * monumental headline, one band of numbers and calm zones under hairlines.
+ * Week deep-dive: an arrival. Warmer and calmer than the working home: a
+ * soft light gathers around a monumental sentence of recognition, then what
+ * you created as three large, light numbers; beneath, the week as quiet
+ * columns and the calm zones under hairlines.
  */
 export function WeekView({ state, projections, now }: Props) {
   const labels = contextLabels(state.settings.userContext);
@@ -47,6 +55,24 @@ export function WeekView({ state, projections, now }: Props) {
 
   return (
     <section className="weekview" aria-label="Deine Woche">
+      <div className="weekview__arrival">
+        <span className="weekview__glow" aria-hidden="true" />
+        <p className="weekview__kicker">Angekommen. Schau, was du geschaffen hast.</p>
+        <dl className="weekview__pride">
+          <div style={{ '--i': 0 } as React.CSSProperties}>
+            <dd>{hoursParts(w.focusMs).value}</dd>
+            <dt>{hoursParts(w.focusMs).unit}</dt>
+          </div>
+          <div style={{ '--i': 1 } as React.CSSProperties}>
+            <dd>{w.tasksDone.length}</dd>
+            <dt>{w.tasksDone.length === 1 ? 'Sache geschafft' : 'Sachen geschafft'}</dt>
+          </div>
+          <div style={{ '--i': 2 } as React.CSSProperties}>
+            <dd>{w.activeDays}</dd>
+            <dt>{w.activeDays === 1 ? 'Tag für dich da gewesen' : 'Tage für dich da gewesen'}</dt>
+          </div>
+        </dl>
+      </div>
       <div className="weekview__hero">
         <p className="zone__label">Dein Rückblick · die letzten sieben Tage</p>
         <h1 className="weekview__title">{r.title}</h1>
@@ -101,37 +127,20 @@ export function WeekView({ state, projections, now }: Props) {
         )}
       </div>
 
+      {/* Your balance: three calm sentences, no scores. Only the energy keeps its gentle line. */}
       <section className="zone" aria-labelledby="weekview-balance">
         <header>
           <h2 id="weekview-balance">Deine Balance</h2>
-          <p className="zone__sub">Selbstmitgefühl, Pausen und Energie. Ohne Wertung, nur damit du dich siehst.</p>
+          <p className="zone__sub">Ohne Wertung, nur damit du dich siehst.</p>
         </header>
         <div className="band weekview__care" style={{ '--cols': 3 } as React.CSSProperties}>
           <article className="care">
-            <p className="tile__label">Selbstmitgefühl</p>
-            <div className="care__ring">
-              <Ring value={care.selfCompassion / 100} />
-              <span className="care__score">{care.selfCompassion}</span>
-            </div>
+            <p className="tile__label">Mit dir selbst</p>
             <p className="care__word">{care.selfCompassionWord}</p>
-            <ul className="care__parts">
-              {care.parts.map((part) => (
-                <li key={part.id}>
-                  <span>{part.label}</span>
-                  <span className="care__bar" aria-hidden="true">
-                    <span style={{ width: `${Math.round(part.value * 100)}%` }} />
-                  </span>
-                </li>
-              ))}
-            </ul>
           </article>
           <article className="care">
-            <p className="tile__label">Pausen-Index</p>
-            <PauseGauge ratio={care.pauseRatio} />
+            <p className="tile__label">Pausen</p>
             <p className="care__word">{care.pauseWord}</p>
-            <p className="muted small">
-              {w.focusMs > 0 ? `${formatDuration(w.pauseMs)} Pause auf ${formatDuration(w.focusMs)} Fokus.` : ''} Zwischen 10 und 25 % fühlt sich für die meisten am leichtesten an.
-            </p>
           </article>
           <article className="care care--energy">
             <p className="tile__label">Deine Energie</p>
@@ -188,40 +197,6 @@ export function WeekView({ state, projections, now }: Props) {
         </article>
       </div>
     </section>
-  );
-}
-
-function Ring({ value }: { value: number }) {
-  const r = 46;
-  const c = 2 * Math.PI * r;
-  return (
-    <svg viewBox="0 0 110 110" width="120" height="120" aria-hidden="true">
-      <circle cx="55" cy="55" r={r} className="care__track" />
-      <circle cx="55" cy="55" r={r} className="care__fill" strokeDasharray={c} strokeDashoffset={c * (1 - Math.min(1, value))} transform="rotate(-90 55 55)" />
-    </svg>
-  );
-}
-
-/** Half gauge with a soft "comfort zone" between 10 and 25 %. */
-function PauseGauge({ ratio }: { ratio: number }) {
-  const clamp = Math.min(0.5, Math.max(0, ratio));
-  const angle = Math.PI * (1 - clamp / 0.5);
-  const x = 70 + 54 * Math.cos(angle);
-  const y = 70 - 54 * Math.sin(angle);
-  const arc = (from: number, to: number) => {
-    const a1 = Math.PI * (1 - from / 0.5);
-    const a2 = Math.PI * (1 - to / 0.5);
-    return `M${70 + 54 * Math.cos(a1)} ${70 - 54 * Math.sin(a1)} A54 54 0 0 1 ${70 + 54 * Math.cos(a2)} ${70 - 54 * Math.sin(a2)}`;
-  };
-  return (
-    <svg className="gauge" viewBox="0 0 140 84" width="180" height="108" role="img" aria-label={`${Math.round(ratio * 100)} Prozent Pausen im Verhältnis zur Fokuszeit`}>
-      <path d={arc(0, 0.5)} className="gauge__track" />
-      <path d={arc(0.1, 0.25)} className="gauge__zone" />
-      <circle cx={x} cy={y} r="7" className="gauge__dot" />
-      <text x="70" y="74" textAnchor="middle" className="gauge__value">
-        {Math.round(ratio * 100)} %
-      </text>
-    </svg>
   );
 }
 

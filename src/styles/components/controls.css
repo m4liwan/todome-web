@@ -525,14 +525,19 @@ fieldset.field {
   font-size: 12px;
   color: var(--ink-3);
 }
+/* Tone and companion are choice cards too (frame and chosen state: settings.css). */
+.tone,
+.avatar-option {
+  padding: var(--s4);
+}
 .tone input,
 .avatar-option input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
-.tone:focus-within,
-.avatar-option:focus-within {
+.tone:has(input:focus-visible),
+.avatar-option:has(input:focus-visible) {
   outline: 1.5px solid rgb(var(--accent-rgb) / 0.8);
   outline-offset: 2px;
 }

@@ -39,6 +39,7 @@ contextBridge.exposeInMainWorld('todome', {
   restartAndInstall: () => ipcRenderer.invoke('todome:restart-and-install'),
   setStatus: (status) => ipcRenderer.send('todome:status', status),
   setTheme: (theme) => ipcRenderer.send('todome:set-theme', theme),
+  setUiScale: (factor) => ipcRenderer.send('todome:set-ui-scale', factor),
   onPower: (callback) => subscribe('todome:power', callback),
   onBeforeQuit: (callback) =>
     subscribe('todome:before-quit', (info) => {

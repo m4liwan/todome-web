@@ -25,6 +25,9 @@ function zoomFor(input, current) {
  * @param {import('electron').WebContents} contents
  * @param {{ read: () => number, write: (factor: number) => void }} store
  */
+/** The interface sizes chosen in the settings (90 / 100 / 110 / 120 %). */
+const UI_SCALES = [0.9, 1, 1.1, 1.2];
+
 function attachZoom(contents, store) {
   const apply = (factor) => {
     const f = nearest(factor);
@@ -42,6 +45,15 @@ function attachZoom(contents, store) {
     const i = STEPS.indexOf(nearest(contents.getZoomFactor()));
     apply(STEPS[Math.max(0, Math.min(STEPS.length - 1, i + (direction === 'in' ? 1 : -1)))]);
   });
+  return {
+    /** The interface size from the settings: exactly one of UI_SCALES, remembered too. */
+    setScale(factor) {
+      if (!UI_SCALES.includes(factor)) return false;
+      contents.setZoomFactor(factor);
+      store.write(factor);
+      return true;
+    },
+  };
 }
 
-module.exports = { attachZoom, zoomFor, STEPS };
+module.exports = { attachZoom, zoomFor, STEPS, UI_SCALES };

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { AppearanceSettings, Millis } from '../domain/types';
 
 /** Winter magic runs 1–26 December (or always / never, as chosen). */
@@ -8,28 +9,34 @@ export function isWinterActive(setting: AppearanceSettings['xmas'], now: Millis)
   return d.getMonth() === 11 && d.getDate() <= 26;
 }
 
-const BULBS = 28;
-const COLORS = ['#ffcf7a', '#ff8a8a', '#9fe3b0', '#a9c8ff', '#ffe2a8'];
+/** Waiting for December: the setting is on, the season has not begun yet. */
+export function winterWaiting(setting: AppearanceSettings['xmas'], now: Millis): boolean {
+  return setting === 'december' && !isWinterActive(setting, now);
+}
 
-/** A thin garland of warm lights along the top edge. Purely decorative. */
-export function Garland() {
+const BULBS = 22;
+
+/**
+ * The winter atmosphere (besides the falling snow, see Ambience): a fine
+ * hairline garland along the top edge with small warm lights that glow
+ * one after another, and a cool frost light breathing along the floor of
+ * the window. Purely decorative, behind and above nothing that matters.
+ */
+export function WinterMagic() {
   return (
-    <div className="garland" aria-hidden="true">
-      <svg className="garland__wire" viewBox="0 0 1000 30" preserveAspectRatio="none">
-        <path d="M0 6 Q 35.7 22 71.4 6 T 142.8 6 T 214.2 6 T 285.6 6 T 357 6 T 428.4 6 T 499.8 6 T 571.2 6 T 642.6 6 T 714 6 T 785.4 6 T 856.8 6 T 928.2 6 T 1000 6" />
-      </svg>
-      {Array.from({ length: BULBS }, (_, i) => {
-        const x = (i + 0.5) / BULBS;
-        // Bulbs hang on the low points of the wire.
-        const y = 12 + Math.sin(x * Math.PI * 14 - Math.PI / 2) * 6;
-        return (
-          <span
-            key={i}
-            className="garland__bulb"
-            style={{ left: `${x * 100}%`, top: `${y}px`, '--c': COLORS[i % COLORS.length], '--d': `${(i % 7) * 0.6}s` } as React.CSSProperties}
-          />
-        );
-      })}
+    <div className="winter" aria-hidden="true">
+      <div className="winter__garland">
+        <svg className="winter__wire" viewBox="0 0 1000 24" preserveAspectRatio="none">
+          <path d="M0 4 Q 45.45 18 90.9 4 T 181.8 4 T 272.7 4 T 363.6 4 T 454.5 4 T 545.4 4 T 636.3 4 T 727.2 4 T 818.1 4 T 909 4 T 1000 4" />
+        </svg>
+        {Array.from({ length: BULBS }, (_, i) => {
+          const x = (i + 0.5) / BULBS;
+          // The lights hang where the wire sags.
+          const y = 9 + Math.sin(x * Math.PI * 22 - Math.PI / 2) * 5;
+          return <span key={i} className="winter__bulb" style={{ left: `${x * 100}%`, top: `${y}px`, '--d': `${(i % 6) * 0.7}s` } as CSSProperties} />;
+        })}
+      </div>
+      <span className="winter__frost" />
     </div>
   );
 }

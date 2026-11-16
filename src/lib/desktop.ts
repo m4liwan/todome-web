@@ -1,6 +1,6 @@
 import type { CompanionMessage } from '../domain/companion';
 import type { Activity } from '../domain/energy';
-import type { AvatarId, CornerStyle, OverlaySettings, PaletteId, QuickCaptureKey, ThemePreference } from '../domain/types';
+import type { AvatarId, CompanionCorner, CornerStyle, OverlaySettings, UiScale, PaletteId, QuickCaptureKey, ThemePreference } from '../domain/types';
 
 /**
  * Bridge to the Electron shell (`electron/preload.cjs`). In a normal browser
@@ -17,7 +17,7 @@ export interface PowerEvent {
 export interface CompanionPayload {
   message: CompanionMessage;
   avatar: AvatarId;
-  position: 'left' | 'right';
+  position: CompanionCorner;
   theme: 'light' | 'dark';
 }
 
@@ -137,6 +137,8 @@ export interface DesktopBridge {
   restartAndInstall(): Promise<boolean>;
   setStatus(status: { text: string; attention: boolean }): void;
   setTheme(theme: ThemePreference): void;
+  /** The interface size from the settings (0.9 … 1.2), applied as the window's zoom. */
+  setUiScale(factor: UiScale): void;
   onPower(callback: (event: PowerEvent) => void): () => void;
   /** The shell is about to quit; `update` = a downloaded update installs on this quit. */
   onBeforeQuit(callback: (info: { update: boolean }) => void): () => void;

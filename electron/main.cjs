@@ -86,6 +86,8 @@ const START_HIDDEN = process.argv.includes('--hidden');
 // Generous transparent canvas: the bubble is bottom-anchored and never cut off;
 // empty areas let clicks through to the desktop.
 const COMPANION_SIZE = { width: 480, height: 600 };
+/** The main window's zoom (accessibility keys and the interface size from the settings). */
+let zoomControl = null;
 const COMPANION_MARGIN = 4;
 
 const CSP = [
@@ -335,7 +337,7 @@ function createWindow(startHidden) {
   });
   if (readShellState().maximized) win.maximize();
   // Accessibility: Ctrl + Plus / Minus / 0 and Ctrl + wheel zoom, remembered.
-  attachZoom(win.webContents, { read: () => Number(readShellState().zoom) || 1, write: (zoom) => writeShellState({ zoom }) });
+  zoomControl = attachZoom(win.webContents, { read: () => Number(readShellState().zoom) || 1, write: (zoom) => writeShellState({ zoom }) });
   if (!app.isPackaged) attachDevTools(win);
   // Show only once the app painted its first real frame (theme applied):
   // no white flash, straight into the welcome or onboarding screen.
@@ -387,7 +389,7 @@ function createWindow(startHidden) {
 }
 
 // ---------------------------------------------------------------------------
-// Companion window (transparent, at the screen edge, never steals focus)
+// Companion window (transparent, in a corner of the main screen, never steals focus)
 // ---------------------------------------------------------------------------
 function createCompanion() {
   companionReady = false;
@@ -429,8 +431,11 @@ function placeCompanion(position) {
   if (!companion) return;
   // Always on the primary monitor, even if ToDoMe sits on a second screen.
   const area = screen.getPrimaryDisplay().workArea;
-  const x = position === 'left' ? area.x + COMPANION_MARGIN : area.x + area.width - COMPANION_SIZE.width - COMPANION_MARGIN;
-  const y = area.y + area.height - COMPANION_SIZE.height - COMPANION_MARGIN;
+  // In the chosen corner of the main screen (bottom right by default).
+  const left = position === 'bottom-left' || position === 'top-left';
+  const top = position === 'top-right' || position === 'top-left';
+  const x = left ? area.x + COMPANION_MARGIN : area.x + area.width - COMPANION_SIZE.width - COMPANION_MARGIN;
+  const y = top ? area.y + COMPANION_MARGIN : area.y + area.height - COMPANION_SIZE.height - COMPANION_MARGIN;
   companion.setBounds({ x: Math.round(x), y: Math.round(y), ...COMPANION_SIZE });
 }
 
@@ -870,6 +875,11 @@ function registerIpc() {
     if (win && !win.isDestroyed()) win.setBackgroundColor(windowBackground());
   });
 
+  // The interface size chosen in the settings (90–120 %), applied as the window's zoom.
+  ipcMain.on('todome:set-ui-scale', (event, factor) => {
+    if (!fromApp(event) || typeof factor !== 'number' || !zoomControl) return;
+    zoomControl.setScale(factor);
+  });
   ipcMain.on('todome:set-theme', (event, theme) => {
     if (!fromApp(event) || !['system', 'light', 'dark'].includes(theme)) return;
     nativeTheme.themeSource = theme;
@@ -910,7 +920,7 @@ function registerIpc() {
     deliverCompanion({
       message: payload.message,
       avatar: String(payload.avatar || 'spike'),
-      position: payload.position === 'left' ? 'left' : 'right',
+      position: ['bottom-right', 'bottom-left', 'top-right', 'top-left'].includes(payload.position) ? payload.position : 'bottom-right',
       theme: ['light', 'dark'].includes(payload.theme) ? payload.theme : 'light',
     });
   });

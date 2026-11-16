@@ -22,6 +22,8 @@
   display: grid;
   place-items: center;
   width: 112px;
+  /* The size chosen in the settings (Kompakt / Standard / Groß). */
+  zoom: var(--buddy-k);
 }
 .home-hub__house::before {
   content: '';
@@ -259,8 +261,41 @@
 .ticker-field input {
   width: 100%;
 }
+/* The running text lies over the resting field; the field's own text (or
+   placeholder) steps aside for it. Its ends dissolve softly. */
+.ticker-field.is-ticking input,
+.ticker-field.is-ticking input::placeholder {
+  color: transparent;
+}
+.ticker-field__probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
 .ticker-field__text {
-  display: none;
+  position: absolute;
+  inset: 0 0 1px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--ink);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 90%, transparent);
+}
+.ticker-field.is-empty .ticker-field__text {
+  color: var(--ink-3);
+}
+.ticker-field__track {
+  display: flex;
+  flex: none;
+  white-space: nowrap;
+  animation: ticker-run var(--tick-s) linear infinite;
+}
+.ticker-field__track > span {
+  padding-right: 64px;
 }
 
 /* ---------- week teaser ---------- */

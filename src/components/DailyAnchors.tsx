@@ -17,7 +17,8 @@ import {
 import type { AppState, DailyAnchor, Millis } from '../domain/types';
 import { dayKey } from '../lib/time';
 import { Dialog } from './Dialog';
-import { IconArrowUp, IconCheck, IconClose, IconPlus } from './icons';
+import { IconArrowUp, IconCalendar, IconCheck, IconClose, IconPlus } from './icons';
+import { relativeDay, upcomingEvents } from '../domain/calendar';
 
 /* ------------------------------------------------------------------------
    The section on the home: a small week calendar and today's anchors
@@ -39,6 +40,8 @@ interface SectionProps {
   /** The pop-up for adding, renaming and the rhythm. */
   onManage: () => void;
   onImpulse: (anchor: DailyAnchor) => void;
+  /** Opens the full calendar on a day (dates, exams, reminders). */
+  onCalendar?: (day: string) => void;
 }
 
 /**
@@ -48,14 +51,20 @@ interface SectionProps {
  * impulse; other days only show what belongs to them. Nothing about earlier
  * days is kept, so nothing can be missed.
  */
-export function AnchorsSection({ state, now, onManage, onImpulse }: SectionProps) {
+export function AnchorsSection({ state, now, onManage, onImpulse, onCalendar }: SectionProps) {
   const services = useServices();
   const day = dayKey(now);
   const today = weekdayOf(now);
   const [picked, setPicked] = useState(today);
   const { due, done } = anchorsToday(state.anchors, now, day);
   const base = new Date(now);
-  const week = WEEKDAYS.map((name, i) => ({ i, name, date: new Date(base.getFullYear(), base.getMonth(), base.getDate() - today + i).getDate() }));
+  const week = WEEKDAYS.map((name, i) => {
+    const d = new Date(base.getFullYear(), base.getMonth(), base.getDate() - today + i, 12);
+    return { i, name, date: d.getDate(), key: dayKey(d.getTime()) };
+  });
+  const upcoming = upcomingEvents(state.calendar, now, 3);
+  const pickedKey = week[picked]?.key ?? day;
+  const datesOn = (key: string) => state.calendar.filter((e) => e.day === key);
   const dueOn = (weekday: number) => state.anchors.filter((a) => a.days.includes(weekday));
   const list = dueOn(picked);
   const isToday = picked === today;
@@ -72,13 +81,14 @@ export function AnchorsSection({ state, now, onManage, onImpulse }: SectionProps
         <div className="week-cal" role="group" aria-label="Diese Woche">
           {week.map((d) => {
             const items = dueOn(d.i);
+            const dates = datesOn(d.key);
             return (
               <button
                 key={d.name}
                 type="button"
-                className={`week-cal__day${d.i === today ? ' is-today' : ''}${d.i === picked ? ' is-picked' : ''}`}
+                className={`week-cal__day${d.i === today ? ' is-today' : ''}${d.i === picked ? ' is-picked' : ''}${dates.length ? ' has-date' : ''}`}
                 aria-pressed={d.i === picked}
-                aria-label={`${DAY_NAMES[d.i]}, ${d.date}.: ${items.length === 1 ? 'ein Anker' : `${items.length} Anker`}`}
+                aria-label={`${DAY_NAMES[d.i]}, ${d.date}.: ${items.length === 1 ? 'ein Anker' : `${items.length} Anker`}${dates.length ? `, ${dates.length === 1 ? 'ein Termin' : `${dates.length} Termine`}` : ''}`}
                 onClick={() => setPicked(d.i)}
               >
                 <span className="week-cal__name">{d.name}</span>
@@ -132,7 +142,31 @@ export function AnchorsSection({ state, now, onManage, onImpulse }: SectionProps
         ) : (
           state.anchors.length > 0 && <p className="anchors-sec__free">An diesem Tag ist frei.</p>
         )}
+        {onCalendar && (
+          <div className="cal-peek">
+            {upcoming.length > 0 && (
+              <ul className="cal-peek__list" aria-label="Demnächst im Kalender">
+                {upcoming.map((e) => (
+                  <li key={e.id} className="cal-peek__item">
+                    <span className={`cal__dot kind--${e.kind}`} aria-hidden="true" />
+                    <span>{e.title}</span>
+                    <span>
+                      {relativeDay(e.day, now)}
+                      {e.time ? `, ${e.time}` : ''}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         <div className="anchors-sec__actions">
+          {onCalendar && (
+            <button type="button" className="btn btn--small" onClick={() => onCalendar(pickedKey)}>
+              <IconCalendar size={14} />
+              Zum Horizont
+            </button>
+          )}
           <button type="button" className={`btn btn--small${state.anchors.length ? '' : ' btn--primary'}`} onClick={onManage}>
             {state.anchors.length ? (
               'Anker anpassen'

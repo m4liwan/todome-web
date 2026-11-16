@@ -1,12 +1,13 @@
 /**
  * Ambience sounds, synthesised live with the Web Audio API (no audio files):
- * rain, wind for clouds, a quiet snowy hush and rustling leaves.
+ * rain, wind for clouds, a quiet snowy hush, rustling leaves and a crackling
+ * fireplace.
  *
  * One AudioContext for the whole app. Changing the ambience crossfades,
  * the volume glides, and nothing is rebuilt on a re-render, so the sound
  * starts at once and never stutters.
  */
-export type SoundKind = 'rain' | 'clouds' | 'snow' | 'leaves';
+export type SoundKind = 'rain' | 'clouds' | 'snow' | 'leaves' | 'hearth';
 
 type Layer = { out: GainNode; stop: () => void };
 
@@ -172,6 +173,22 @@ function build(ac: AudioContext, kind: SoundKind): Layer {
     sources.push(lfo(ac, hush.gain, 0.022, 0.25));
     sources.push(lfo(ac, lp.frequency, 0.04, 90));
     bed([filter(ac, 'highpass', 5000), filter(ac, 'lowpass', 9000)], 0.03);
+  } else if (kind === 'hearth') {
+    // A fireplace, close by: only a faint, warm breath of the flames beneath
+    // (the deep roar stays far back), and in front of it the wood itself:
+    // fine, dry crackling in small clusters, now and then a log that snaps,
+    // and a soft pop when a pocket of resin bursts.
+    const flame = filter(ac, 'bandpass', 420, 0.6);
+    const breath = bed([filter(ac, 'highpass', 120), flame], 0.16);
+    sources.push(lfo(ac, breath.gain, 0.11, 0.05));
+    sources.push(lfo(ac, flame.frequency, 0.17, 90));
+    bed([filter(ac, 'highpass', 3200), filter(ac, 'lowpass', 7000)], 0.012);
+    // Crackle: many tiny, bright grains in bursts.
+    stops.push(grains(ac, out, { every: [30, 220], band: [2400, 9000], length: [0.002, 0.012], level: [0.08, 0.42], burst: 6 }));
+    // Wood snapping: a short, woody click with some body.
+    stops.push(grains(ac, out, { every: [700, 2600], band: [700, 2400], length: [0.015, 0.05], level: [0.28, 0.6], burst: 3 }));
+    // A resin pop, rarely.
+    stops.push(grains(ac, out, { every: [3500, 9000], band: [320, 900], length: [0.05, 0.12], level: [0.3, 0.55] }));
   } else {
     // Autumn: a mild breeze and leaves rustling in small bursts.
     const lp = filter(ac, 'lowpass', 650, 1);

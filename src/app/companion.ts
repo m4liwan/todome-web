@@ -23,7 +23,7 @@ import {
 } from '../domain/companion';
 import { promptFor, type AnswerId } from '../domain/copy';
 import { foregroundSession, projectAll } from '../domain/session';
-import type { AvatarId, CheckIn, Millis } from '../domain/types';
+import type { AvatarId, CheckIn, CompanionCorner, Millis } from '../domain/types';
 import { desktop, isCompanionView } from '../lib/desktop';
 import { dayKey, MIN } from '../lib/time';
 import { pauseSession } from '../state/commands';
@@ -37,17 +37,19 @@ import { currentMoment } from './attention';
 import { focusRhythm } from '../domain/rhythm';
 import { resolveTheme } from './theme';
 import { focusTimerOn, inFocusRound } from './focusTimer';
+import { dueReminder, reminderAt, reminderMessage } from '../domain/calendar';
+import { quietReason } from '../domain/checkinEngine';
 
 /**
  * Companion delivery. On the desktop the avatar appears in its own transparent
- * window at the screen edge; in a browser it appears inside the app.
+ * window in a corner of the main screen (bottom right by default); in a browser it appears inside the app.
  * Replies come back here and are turned into state changes.
  */
 
 export interface InlineCompanion {
   message: CompanionMessage;
   avatar: AvatarId;
-  position: 'left' | 'right';
+  position: CompanionCorner;
   dismissed: boolean;
 }
 
@@ -233,6 +235,14 @@ export function handleCompanionReply(services: Services, openModal: OpenModal, m
       openModal({ kind: 'start', taskId: message.taskId });
       return;
     }
+    case 'reminder': {
+      // "Kalender öffnen": straight to that day.
+      if (optionId !== 'open') return;
+      const e = message.eventId ? store.getState().calendar.find((x) => x.id === message.eventId) : undefined;
+      bringToFront();
+      openModal({ kind: 'calendar', day: e?.day });
+      return;
+    }
     case 'update': {
       if (optionId !== UPDATE_RESTART) {
         services.announce('Alles klar. Das Update wird beim nächsten Beenden installiert.');
@@ -279,6 +289,16 @@ export function useCompanion(openModal: OpenModal): void {
       }
 
       if (!state.settings.onboarded || isCompanionBusy(Date.now())) return;
+      // Calendar: a date ahead, reminded calmly and in time. It waits for a
+      // pause in typing (at most 3 minutes) and for the end of "Nicht stören".
+      const due = dueReminder(state.calendar, now);
+      if (due && quietReason(now, state.settings) !== 'dnd' && isGoodMoment('reminder', currentMoment(), now - reminderAt(due.event, due.reminder))) {
+        services.store.dispatch({ type: 'event/reminded', id: due.event.id, reminders: due.covers });
+        const message = reminderMessage(services.deps().newId(), due.event, due.reminder, now);
+        if (state.settings.companion.enabled) deliverCompanion(services, message);
+        else services.announce(message.text);
+        return;
+      }
       // A focus timer round runs: nothing but the timer speaks until the break.
       if (inFocusRound(state, now)) return;
       const moment = currentMoment();
