@@ -88,6 +88,7 @@ html.is-companion body {
 .buddy__avatar {
   flex: none;
   pointer-events: auto;
+  filter: drop-shadow(0 8px 22px rgb(var(--accent-rgb) / 0.16));
 }
 .buddy__bubble {
   position: relative;
@@ -99,10 +100,19 @@ html.is-companion body {
   pointer-events: auto;
   border: 1px solid var(--line-float);
   border-radius: var(--radius);
-  background: var(--bg-raised);
-  box-shadow: var(--shadow-float);
+  /* The corner towards him: the bubble is his, it points at the speaker. */
+  border-bottom-left-radius: 2px;
+  background: rgb(11 11 12 / 0.92);
+  backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow:
+    var(--shadow-float),
+    inset 0 1px 0 rgb(var(--accent-rgb) / 0.14);
   font-size: 14px;
   animation: rise var(--t-base) var(--ease) both;
+}
+.buddy--right .buddy__bubble {
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: 2px;
 }
 .buddy__head {
   display: flex;
@@ -213,6 +223,17 @@ html.is-companion body {
   white-space: normal;
   text-align: center;
   max-width: 100%;
+}
+/* The other answers are soft touches; only the suggested one is a clear button. */
+.buddy__options .btn:not(.btn--primary) {
+  border-color: transparent;
+  background: rgb(255 255 255 / 0.05);
+  color: var(--ink-2);
+}
+.buddy__options .btn:not(.btn--primary):hover {
+  border-color: rgb(var(--accent-rgb) / 0.35);
+  background: rgb(var(--accent-rgb) / 0.08);
+  color: var(--ink);
 }
 .scene__actor {
   position: absolute;

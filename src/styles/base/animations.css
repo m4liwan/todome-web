@@ -319,6 +319,15 @@
     transform: translateX(3px) rotate(45deg);
   }
 }
+/* Flow: a drop of light runs down the companion's hairline. */
+@keyframes stream-light {
+  from {
+    transform: translateY(-16%);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
 /* Flow: the companion floats gently alongside the lane. */
 @keyframes stream-drift {
   from {

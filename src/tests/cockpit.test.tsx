@@ -44,7 +44,7 @@ describe('the focus cockpit', () => {
     render(<Cockpit panels={stubs} />);
     const steps = [...document.querySelectorAll<HTMLElement>('.panel')].map((p) => Number(p.style.getPropertyValue('--i')));
     expect(steps.every((n) => n >= 0 && n <= 5)).toBe(true);
-    expect(document.querySelectorAll('.cockpit > * > .panel.enter')).toHaveLength(7);
+    expect(document.querySelectorAll('.cockpit .panel.enter')).toHaveLength(7);
   });
 });
 
@@ -160,7 +160,7 @@ describe('the four rooms', () => {
 
   it('Hub: the day comes first, the command room couples companion, water and the times of today', () => {
     render(<Cockpit panels={stubs} layout="hub" />);
-    const order = [...document.querySelectorAll('.cockpit > *')].map((r) => r.className.match(/cockpit__(\w+)/)?.[1]);
+    const order = [...document.querySelectorAll('.cockpit > *, .cockpit__fold > *')].map((r) => r.className.match(/cockpit__(\w+)/)?.[1]);
     expect(order.indexOf('day')).toBeLessThan(order.indexOf('stage'));
     const command = document.querySelector('.cockpit__command')!;
     for (const id of ['hub', 'water', 'times']) expect(command.querySelector(`.panel--${id}`), id).not.toBeNull();
@@ -169,11 +169,13 @@ describe('the four rooms', () => {
 
   it('Flow: one reading lane from the step to what comes next to the companion stream', () => {
     render(<Cockpit panels={stubs} layout="flow" />);
-    const lane = [...document.querySelectorAll('.cockpit > *')].map((r) => r.className.match(/cockpit__(\w+)/)?.[1]);
+    const lane = [...document.querySelectorAll('.cockpit > *, .cockpit__fold > *')].map((r) => r.className.match(/cockpit__(\w+)/)?.[1]);
     expect(lane.indexOf('stage')).toBeLessThan(lane.indexOf('next'));
     expect(lane.indexOf('next')).toBeLessThan(lane.indexOf('stream'));
     expect(document.querySelector('.cockpit__next .panel--plan')).not.toBeNull();
-    expect(document.querySelector('.cockpit__stream .panel--water')).not.toBeNull();
+    expect(document.querySelector('.cockpit__next .panel--water')).not.toBeNull();
+    // The companion has the stream to himself.
+    expect([...document.querySelectorAll('.cockpit__stream .panel')].map((p) => p.className)).toEqual([expect.stringContaining('panel--hub')]);
   });
 
   it('switches rooms from the head of Heute', () => {
@@ -195,5 +197,29 @@ describe('the four rooms', () => {
       if (/\.fs-(breathe|tunnel)/.test(r.selector) && /cockpit__hush/.test(r.selector)) quieted.push(r.selector);
     });
     expect(quieted.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('keeps the first screen of every room in one frame: main card and companion above the fold, the rest after it', () => {
+    const above: Record<(typeof ROOMS)[number], string[]> = {
+      classic: ['focus', 'hub', 'water', 'plan'],
+      sanctuary: ['focus', 'hub'],
+      hub: ['tl', 'focus', 'hub', 'water', 'times'],
+      flow: ['focus', 'plan', 'water', 'hub'],
+    };
+    for (const layout of ROOMS) {
+      const { unmount } = render(<Cockpit panels={stubs} layout={layout} />);
+      const fold = document.querySelector('.cockpit__fold')!;
+      expect(fold.parentElement?.classList.contains('cockpit'), layout).toBe(true);
+      expect(fold.querySelector('.cockpit__head .panel--greet'), layout).not.toBeNull();
+      for (const id of above[layout]) expect(fold.querySelector(`.panel--${id}`), `${layout}: ${id}`).not.toBeNull();
+      expect(fold.querySelector('.panel--anchors'), layout).toBeNull();
+      unmount();
+    }
+  });
+
+  it('sizes the first screen to the window, so the edge never cuts a module in half', () => {
+    const css = read('styles', 'layout', 'cockpit.css');
+    expect(css).toMatch(/\.cockpit__fold\s*\{[^}]*--fold-h:\s*calc\(100svh - var\(--frame-t\) - var\(--frame-b\)/);
+    expect(css).toMatch(/\.cockpit__fold\s*\{[^}]*min-height:\s*var\(--fold-h\)/);
   });
 });

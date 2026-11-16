@@ -4,7 +4,12 @@
    full-screen pause room of a routine.
    ======================================================================== */
 
-/* ---------- companion (side column) ---------- */
+/* ---------- companion (side column) ----------
+   A partner in the room, not a widget: no frame around him. He stands on a
+   soft pool of light, his name and what he is doing in one line, his words
+   in a speech bubble that points at him, the gestures (say hello, a glass
+   of water) as soft touches that light up on contact. Customising appears
+   only when you come closer (hover or keyboard). */
 .home-hub {
   position: relative;
   display: grid;
@@ -18,35 +23,94 @@
   place-items: center;
   width: 112px;
 }
+.home-hub__house::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 128%;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(var(--accent-rgb) / 0.2), rgb(var(--accent-rgb) / 0.06) 55%, rgb(var(--accent-rgb) / 0));
+  pointer-events: none;
+  translate: -50% 0;
+}
 .home-hub__house .scene {
+  position: relative;
   max-width: 100%;
 }
 .home-hub__info {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
   align-content: start;
-  gap: var(--s2);
+  column-gap: var(--s2);
+  row-gap: var(--s2);
   min-width: 0;
+}
+.home-hub__info > * {
+  flex-basis: 100%;
+}
+.home-hub__info > :is(.home-hub__name, .home-hub__doing) {
+  flex-basis: auto;
 }
 .home-hub__name {
   font-size: var(--fs-h2);
 }
 .home-hub__doing {
   font-size: var(--fs-meta);
-  color: var(--ink-2);
+  color: var(--ink-3);
 }
-.home-hub__info .muted.small,
-.home-hub__since {
+.home-hub__doing::before {
+  content: '· ';
+}
+.home-hub__info > .muted.small:not(.home-hub__since) {
+  order: 2;
   font-size: 12px;
   color: var(--ink-3);
 }
+/* His words: a soft bubble right under his name, its corner towards him. */
+.home-hub__info > .home-hub__since {
+  order: 1;
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--s2) var(--s3);
+  border-radius: var(--radius);
+  border-top-left-radius: 2px;
+  background: rgb(255 255 255 / 0.035);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
 .home-hub__actions {
+  order: 3;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s2);
-  margin-top: var(--s1);
+  gap: var(--s1);
+}
+.home-hub__actions .btn {
+  min-height: 28px;
+  padding: 0 var(--s3);
+  border-color: transparent;
+  background: rgb(255 255 255 / 0.04);
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.home-hub__actions .btn:hover:not(:disabled) {
+  border-color: rgb(var(--accent-rgb) / 0.35);
+  background: rgb(var(--accent-rgb) / 0.08);
+  color: var(--ink);
 }
 .home-hub__customize {
+  order: 4;
   justify-self: start;
+  opacity: 0;
+  transition: opacity var(--t-base) var(--ease);
+}
+.home-hub:is(:hover, :focus-within) :is(.home-hub__customize, .home-hub__feedback) {
+  opacity: 1;
 }
 .home-hub__feedback {
   position: absolute;
@@ -58,9 +122,11 @@
   height: 28px;
   border-radius: var(--radius);
   color: var(--ink-3);
+  opacity: 0.4;
   transition:
     color var(--t-fast) var(--ease),
-    background-color var(--t-fast) var(--ease);
+    background-color var(--t-fast) var(--ease),
+    opacity var(--t-base) var(--ease);
 }
 .home-hub__feedback:hover {
   background: var(--hover);

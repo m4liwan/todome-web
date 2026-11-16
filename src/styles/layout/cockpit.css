@@ -13,6 +13,20 @@
   column-gap: var(--s8);
   align-items: stretch;
 }
+/* The first screen: what belongs above the fold fills exactly the height of
+   the window (below the navigation), the main row takes what is left. So
+   nothing after it starts inside the window and gets cut by its edge; the
+   density tiers further down make the content fit into it. */
+.cockpit__fold {
+  --fold-h: calc(100svh - var(--frame-t) - var(--frame-b) - var(--s7) - var(--s4));
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto 1fr;
+  column-gap: var(--s8);
+  min-width: 0;
+  min-height: var(--fold-h);
+}
 .cockpit__head {
   grid-column: 1 / -1;
   min-width: 0;
@@ -35,7 +49,10 @@
   flex-direction: column;
   min-width: 0;
   padding-left: var(--s7);
+  /* An open hairline: it fades in and out, so the column is a neighbour of
+     the stage, not a box beside it. */
   border-left: 1px solid var(--line);
+  border-image: linear-gradient(rgb(255 255 255 / 0), rgb(255 255 255 / 0.09) 14%, rgb(255 255 255 / 0.05) 70%, rgb(255 255 255 / 0)) 1;
 }
 /* Companion, water and what comes next stack with hairlines between them;
    the plan takes the rest of the height, so the column ends with the stage. */
@@ -121,6 +138,10 @@
 }
 
 @media (max-width: 1180px) {
+  .cockpit__fold {
+    grid-template-rows: none;
+    min-height: 0;
+  }
   .cockpit__head .hello {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -137,6 +158,7 @@
     padding-left: 0;
     border-top: 1px solid var(--line);
     border-left: 0;
+    border-image: none;
   }
   .cockpit__side > .panel,
   .cockpit__side > .panel + .panel {
@@ -408,8 +430,14 @@
   max-width: 860px;
   margin-inline: auto;
 }
-.cockpit--sanctuary > * {
+.cockpit--sanctuary > *,
+.cockpit--sanctuary .cockpit__fold > * {
   grid-column: 1 / -1;
+}
+/* The first screen ends with the quiet line "Wenn du magst". */
+.cockpit--sanctuary .cockpit__fold {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: calc(var(--fold-h) - 50px);
 }
 .cockpit--sanctuary .cockpit__head {
   padding-top: var(--s7);
@@ -420,8 +448,9 @@
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
 }
-/* No numbers here: they are pressure. */
-.cockpit--sanctuary .cockpit__head .vitals {
+/* No numbers here: they are pressure. The goal of the block stays. */
+.cockpit--sanctuary .cockpit__head .vitals,
+.cockpit--sanctuary .facts > div:not(.facts__goal) {
   display: none;
 }
 .cockpit--sanctuary .cockpit__head .hello__chips {
@@ -476,14 +505,14 @@
 
 /* "Wenn du magst": one quiet line; everything else unfolds beneath it. */
 .hush {
-  margin-top: var(--s9);
+  margin-top: 0;
 }
 .hush__toggle {
   display: flex;
   align-items: center;
   gap: var(--s3);
   width: 100%;
-  padding: var(--s4) 0;
+  padding: var(--s3) 0;
   border-top: 1px solid var(--line);
   color: var(--ink-3);
   text-align: left;
@@ -544,39 +573,58 @@
   border-top: 0;
 }
 
-/* ===== 3 Hub / Command: the day in view, a command room on the right ===== */
+/* ===== 3 Hub / Command: the day in view, a command room at the flank of the main card ===== */
 .cockpit--hub {
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   grid-template-areas:
-    'head head'
-    'day day'
-    'stage command'
+    'fold fold'
     'next anchors'
     'more more';
 }
+.cockpit--hub .cockpit__fold {
+  grid-area: fold;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 2fr) minmax(0, 5fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'head day day'
+    'stage stage command';
+}
+/* The overview row: the greeting beside the day, both at a glance. The
+   numbers of the day live in the command room and on the main card here. */
 .cockpit--hub .cockpit__head {
   grid-area: head;
 }
+.cockpit--hub .cockpit__head .hello {
+  grid-template-columns: minmax(0, 1fr);
+}
+.cockpit--hub .cockpit__head .vitals {
+  display: none;
+}
 .cockpit--hub .cockpit__day {
   grid-area: day;
+  align-self: start;
   margin-top: 0;
-  padding-top: var(--s5);
-  padding-bottom: var(--s7);
+  padding: var(--s2) 0 var(--s5);
+  border-top: 0;
 }
 .cockpit--hub .cockpit__stage {
   grid-area: stage;
 }
+/* The command room: open, at the flank of the main card. The companion
+   leads it with room to breathe; water and the times of today sit beside
+   each other beneath him, like two instruments of the same desk. */
 .cockpit--hub .cockpit__command {
   grid-area: command;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: auto auto 1fr;
   align-content: start;
   column-gap: var(--s6);
 }
 .cockpit--hub .cockpit__command::before {
-  content: 'Kommandoraum';
+  content: 'Ihr zwei · Kommandoraum';
   grid-column: 1 / -1;
-  margin-bottom: var(--s5);
+  margin-bottom: var(--s4);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   letter-spacing: var(--track-label);
@@ -585,10 +633,19 @@
 }
 .cockpit--hub .cockpit__command > .panel--hub {
   grid-column: 1 / -1;
+  padding-bottom: var(--s6);
 }
 .cockpit--hub .cockpit__command > .panel--times {
   padding-left: var(--s6);
   border-left: 1px solid var(--line);
+}
+/* Where the plan fills the rest of a column (Classic), its content stays at
+   the top and its button keeps its own height. */
+.cockpit .panel--plan > * {
+  align-content: start;
+}
+.cockpit .panel--plan .later__actions {
+  align-items: flex-start;
 }
 /* "Danach" as its own region (Hub, Flow) keeps its natural height: the plan
    only fills the rest of the column where it shares one (Classic). */
@@ -597,40 +654,31 @@
 }
 .cockpit--hub .cockpit__next {
   grid-area: next;
-  margin-top: var(--s7);
-  padding: var(--s6) 0 0;
+  margin-top: var(--s8);
+  padding: var(--s7) 0 0;
   border-top: 1px solid var(--line);
   border-left: 0;
+  border-image: none;
 }
 .cockpit--hub .cockpit__anchors {
   grid-area: anchors;
-  margin-top: var(--s7);
-  padding: var(--s6) 0 0 var(--s7);
-  border-left: 1px solid var(--line);
+  padding-left: var(--s7);
 }
 .cockpit--hub .cockpit__more {
   grid-area: more;
 }
 
 /* ===== 4 Flow / Stream: one lane forward, the companion floats alongside ===== */
-.cockpit--flow {
-  grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(220px, 2.4fr);
+.cockpit--flow .cockpit__fold {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 2.6fr) minmax(220px, 2.2fr);
+  grid-template-rows: auto 1fr;
   grid-template-areas:
     'head head head'
-    'day day day'
-    'stage next stream'
-    'anchors anchors anchors'
-    'more more more';
+    'stage next stream';
   column-gap: var(--s7);
 }
 .cockpit--flow .cockpit__head {
   grid-area: head;
-}
-.cockpit--flow .cockpit__day {
-  grid-area: day;
-  margin-top: 0;
-  padding-top: var(--s5);
-  padding-bottom: var(--s7);
 }
 .cockpit--flow .cockpit__stage {
   grid-area: stage;
@@ -640,15 +688,6 @@
 }
 .cockpit--flow .cockpit__stream {
   grid-area: stream;
-  position: sticky;
-  top: calc(var(--frame-t) + var(--s5));
-  align-self: start;
-}
-.cockpit--flow .cockpit__anchors {
-  grid-area: anchors;
-}
-.cockpit--flow .cockpit__more {
-  grid-area: more;
 }
 /* The flow markers: a small chevron of light on each hairline, nudging forward. */
 .cockpit--flow :is(.cockpit__next, .cockpit__stream) {
@@ -670,6 +709,24 @@
 .cockpit--flow .cockpit__stream::before {
   animation-delay: 1.4s;
 }
+/* The stream: a drop of light travels down the companion's hairline, slow
+   as a breath, the rhythm of the day running past. Clipped to the column's
+   height, never to its width. */
+.cockpit--flow .cockpit__stream {
+  clip-path: inset(0 -100vw 0 -100vw);
+}
+.cockpit--flow .cockpit__stream::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 1px;
+  background: linear-gradient(rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb) / 0.55) 8%, rgb(var(--accent-rgb) / 0) 16%);
+  pointer-events: none;
+  animation: stream-light 9s linear infinite;
+}
+/* In the stream the companion stands upright and floats gently. */
 .cockpit--flow .cockpit__stream .home-hub {
   grid-template-columns: minmax(0, 1fr);
   justify-items: start;
@@ -680,33 +737,39 @@
 
 /* Narrow windows: one column in order of priority, the main card first after the greeting. */
 @media (max-width: 1180px) {
-  .cockpit:is(.cockpit--hub, .cockpit--flow) {
+  .cockpit:is(.cockpit--hub, .cockpit--flow),
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__fold {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
     grid-template-areas: none;
   }
-  .cockpit:is(.cockpit--hub, .cockpit--flow) > * {
+  .cockpit:is(.cockpit--hub, .cockpit--flow) > *,
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__fold > * {
     grid-area: auto;
     grid-column: 1 / -1;
   }
-  .cockpit:is(.cockpit--hub, .cockpit--flow) > .cockpit__head {
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__fold > .cockpit__head {
     order: -2;
   }
-  .cockpit:is(.cockpit--hub, .cockpit--flow) > .cockpit__stage {
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__fold > .cockpit__stage {
     order: -1;
   }
-  .cockpit:is(.cockpit--hub, .cockpit--flow) > .cockpit__day {
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__fold > .cockpit__day {
     margin-top: var(--s8);
     padding-top: var(--s7);
   }
-  .cockpit:is(.cockpit--hub, .cockpit--flow) > :is(.cockpit__next, .cockpit__stream, .cockpit__anchors) {
-    position: static;
+  .cockpit:is(.cockpit--hub, .cockpit--flow) :is(.cockpit__next, .cockpit__stream, .cockpit__anchors) {
     margin-top: var(--s7);
     padding: var(--s7) 0 0;
     border-top: 1px solid var(--line);
     border-left: 0;
   }
-  .cockpit--flow :is(.cockpit__next, .cockpit__stream)::before {
+  .cockpit--flow :is(.cockpit__next, .cockpit__stream)::before,
+  .cockpit--flow .cockpit__stream::after {
     display: none;
+  }
+  .cockpit--flow .cockpit__stream {
+    clip-path: none;
   }
   .cockpit--sanctuary .panel--focus {
     padding: var(--s6);
@@ -721,6 +784,221 @@
     justify-self: end;
     width: max-content;
     margin: 0 0 var(--s5) auto;
+  }
+}
+
+/* Classic on narrower desktops: the companion column gets more width, so he
+   is not squeezed into a tall, wrapped column. */
+@media (min-width: 1181px) and (max-width: 1400px) {
+  .cockpit--classic .cockpit__stage {
+    grid-column: span 7;
+  }
+  .cockpit--classic .cockpit__side {
+    grid-column: span 5;
+  }
+}
+
+/* ---------- density: the first screen fits the window ----------
+   Desktop windows differ in height (1440×940 is the app's default, a full
+   HD screen gives ~1040, a laptop ~730-800). Three tiers tighten spacing and
+   type step by step, so the first screen of every room fits without
+   scrolling. Proportions stay; only air and size give way. */
+
+/* Facts and steps stay side by side on a narrower stage, too (Hub, Flow). */
+@container (min-width: 540px) {
+  .cockpit .focus__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+    gap: var(--s5);
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 1080px) {
+  .cockpit__head {
+    padding-bottom: var(--s5);
+  }
+  .cockpit__head .hello {
+    gap: var(--s4);
+  }
+  .cockpit__head .hello h1 {
+    font-size: 34px;
+  }
+  .cockpit .panel--focus {
+    padding: var(--s6);
+  }
+  .cockpit .focus__inner {
+    gap: var(--s3);
+  }
+  .cockpit .focus__time {
+    font-size: 72px;
+  }
+  .cockpit .focus__grid {
+    padding-top: var(--s4);
+  }
+  .cockpit .focus__title {
+    font-size: clamp(30px, 6cqi, 52px);
+  }
+  .cockpit .tl-wave {
+    height: 36px;
+  }
+  .cockpit .steps {
+    gap: var(--s1);
+  }
+  .cockpit .step {
+    padding-block: 3px;
+  }
+  .cockpit .steps__add input:not([type='checkbox']) {
+    min-height: 30px;
+  }
+  .cockpit--sanctuary .cockpit__head {
+    padding-top: var(--s4);
+    padding-bottom: var(--s6);
+  }
+  .cockpit--sanctuary .cockpit__stage > .panel--hub {
+    margin-top: var(--s3);
+    padding-top: var(--s4);
+  }
+  .cockpit .focus__actions {
+    gap: 6px;
+    padding-top: 0;
+  }
+  .cockpit .focus__actions .btn {
+    min-height: 32px;
+    padding: 0 var(--s3);
+    font-size: 13px;
+  }
+  .cockpit__side > .panel {
+    padding-block: var(--s3);
+  }
+  .cockpit .hydro__line {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  .cockpit .home-hub__house {
+    zoom: 0.86;
+  }
+  .cockpit--sanctuary .cockpit__stage .home-hub__house {
+    zoom: 0.42;
+  }
+  /* While a block runs in Sanctuary, the shortcuts of the greeting rest
+     (breathing is on the main card), so "Wenn du magst" stays in view. */
+  .shell.is-focusing .cockpit--sanctuary .cockpit__head .hello__chips {
+    display: none;
+  }
+  .cockpit--sanctuary .panel--focus {
+    padding: var(--s5) var(--s6);
+  }
+  .cockpit__day .timeline {
+    gap: var(--s3);
+  }
+  .cockpit__day .timeline__canvas {
+    padding-top: 24px;
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__day .legend {
+    display: none;
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 900px) {
+  .cockpit__head {
+    padding-bottom: var(--s4);
+  }
+  .cockpit .focus__inner {
+    gap: var(--s2);
+  }
+  .cockpit .focus__grid {
+    padding-top: var(--s3);
+  }
+  .cockpit .focus__actions .btn {
+    gap: 6px;
+    padding: 0 10px;
+  }
+  .cockpit .focus__actions .btn > svg {
+    display: none;
+  }
+  .cockpit .later {
+    gap: var(--s3);
+  }
+  .cockpit .later__list li {
+    padding-block: var(--s2);
+  }
+  .cockpit:not(.cockpit--sanctuary) .home-hub__info > .muted.small:not(.home-hub__since) {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  .cockpit--sanctuary .cockpit__head .hello__text > p {
+    display: none;
+  }
+  .cockpit--sanctuary .cockpit__head {
+    padding-bottom: var(--s4);
+  }
+  .cockpit--sanctuary .panel--focus {
+    padding: var(--s3) var(--s6);
+  }
+  .cockpit--sanctuary .cockpit__stage > .panel--hub {
+    margin-top: var(--s2);
+    padding-top: var(--s3);
+  }
+  .cockpit__head .hello h1 {
+    font-size: 30px;
+  }
+  .cockpit__head .hello__chips {
+    margin-top: 0;
+  }
+  .cockpit .panel--focus {
+    padding: var(--s5);
+  }
+  .cockpit .focus__title {
+    font-size: clamp(30px, 5.6cqi, 46px);
+  }
+  .cockpit .focus__time {
+    font-size: 60px;
+  }
+  .cockpit .tl-wave {
+    height: 32px;
+  }
+  .cockpit .facts {
+    gap: var(--s3) var(--s4);
+  }
+  .cockpit__side > .panel {
+    padding-block: var(--s2);
+  }
+  .cockpit .home-hub__house {
+    zoom: 0.72;
+  }
+  .cockpit .hydro__line {
+    display: none;
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__day {
+    padding-top: var(--s3);
+    padding-bottom: var(--s4);
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) .cockpit__day .timeline__head .muted {
+    display: none;
+  }
+}
+
+@media (min-width: 1181px) and (max-height: 780px) {
+  .cockpit__head .hello__text > p {
+    display: none;
+  }
+  .cockpit__head .hello h1 {
+    font-size: 28px;
+  }
+  .cockpit .focus__time {
+    font-size: 52px;
+  }
+  .cockpit .focus__top {
+    gap: var(--s2);
+  }
+  .cockpit .tl-wave {
+    height: 24px;
+  }
+  .cockpit .home-hub__house {
+    zoom: 0.6;
   }
 }
 

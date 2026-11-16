@@ -345,33 +345,40 @@ export function Cockpit({ panels, meta = {}, layout = 'classic', onLayout }: Coc
     </div>
   );
 
+  // The first screen: what belongs above the fold fills exactly the window
+  // height (desktop), so nothing after it is ever cut in half by the edge.
+  const fold = (children: ReactNode[]) => (
+    <div key="fold" className="cockpit__fold">
+      {children}
+    </div>
+  );
+
   const rooms: Record<LayoutId, ReactNode[]> = {
     // Monolith: the main card thrones, the companion keeps watch at the right edge, the day closes the room.
-    classic: [head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side', 'Begleiter, Wasser und Danach', COCKPIT.side, 'aside'), day, anchors, more],
+    classic: [fold([head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side', 'Begleiter, Wasser und Danach', COCKPIT.side, 'aside')]), day, anchors, more],
     // Zen: the main card alone in the middle, the companion whispers right below it; the rest waits.
     sanctuary: [
-      head,
-      region('cockpit__stage', 'Jetzt', ['focus', 'hub']),
+      fold([head, region('cockpit__stage', 'Jetzt', ['focus', 'hub'])]),
       <Hush key="hush">{[region('cockpit__side', 'Wasser und Danach', ['water', 'plan'], 'aside'), day, anchors, more]}</Hush>,
     ],
-    // Command: the day first; on the left now and next, on the right the command room (companion,
-    // water, the times of today) above the Tages-Anker.
+    // Command: the day, the main card and the command room (companion, water, the times of today)
+    // in one view; what comes next and the Tages-Anker below.
     hub: [
-      head,
-      day,
-      region('cockpit__stage', 'Jetzt', COCKPIT.stage),
-      region('cockpit__side cockpit__command', 'Kommandoraum: Begleiter, Wasser und Zeiten', ['hub', 'water', 'times'], 'aside'),
+      fold([head, day, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side cockpit__command', 'Kommandoraum: Begleiter, Wasser und Zeiten', ['hub', 'water', 'times'], 'aside')]),
       region('cockpit__next cockpit__side', 'Danach', ['plan'], 'aside'),
       anchors,
       more,
     ],
-    // Stream: one lane forward, the step, what comes next, the companion floating alongside.
+    // Stream: one lane forward that fills the first screen: the step, what comes next (and water),
+    // the companion floating alongside; the day runs beneath the lane.
     flow: [
-      head,
+      fold([
+        head,
+        region('cockpit__stage', 'Jetzt', COCKPIT.stage),
+        region('cockpit__next cockpit__side', 'Danach und Wasser', ['plan', 'water'], 'aside'),
+        region('cockpit__stream cockpit__side', 'Dein Begleiter', ['hub'], 'aside'),
+      ]),
       day,
-      region('cockpit__stage', 'Jetzt', COCKPIT.stage),
-      region('cockpit__next cockpit__side', 'Danach', ['plan'], 'aside'),
-      region('cockpit__stream cockpit__side', 'Begleiter und Wasser', ['hub', 'water'], 'aside'),
       anchors,
       more,
     ],
