@@ -25,45 +25,52 @@
   }
 }
 
-/* The ambient light: three sources wander across the whole background,
-   each on its own slow path (components/ambient-light.css). */
+/* The ambient light: three elliptic sources wander across the whole window,
+   each on its own path, turning and swelling a little as they go
+   (components/ambient-light.css). */
 @keyframes light-drift-a {
   0% {
-    transform: translate3d(-30vw, -24vh, 0) scale(1);
+    transform: translate3d(-34vw, -30vh, 0) rotate(0deg) scale(1);
   }
-  35% {
-    transform: translate3d(-4vw, -32vh, 0) scale(1.08);
+  25% {
+    transform: translate3d(8vw, -36vh, 0) rotate(24deg) scale(1.12);
   }
-  70% {
-    transform: translate3d(-22vw, 8vh, 0) scale(0.94);
+  50% {
+    transform: translate3d(30vw, -4vh, 0) rotate(52deg) scale(0.92);
+  }
+  75% {
+    transform: translate3d(-6vw, 28vh, 0) rotate(80deg) scale(1.06);
   }
   100% {
-    transform: translate3d(-36vw, -6vh, 0) scale(1.04);
+    transform: translate3d(-38vw, 12vh, 0) rotate(104deg) scale(0.98);
   }
 }
 @keyframes light-drift-b {
   0% {
-    transform: translate3d(28vw, -16vh, 0) scale(0.96);
+    transform: translate3d(34vw, 30vh, 0) rotate(0deg) scale(1.04);
   }
-  40% {
-    transform: translate3d(10vw, 16vh, 0) scale(1.06);
+  30% {
+    transform: translate3d(-10vw, 36vh, 0) rotate(-30deg) scale(0.9);
   }
-  75% {
-    transform: translate3d(34vw, 26vh, 0) scale(1);
+  60% {
+    transform: translate3d(-32vw, -8vh, 0) rotate(-62deg) scale(1.1);
   }
   100% {
-    transform: translate3d(20vw, -28vh, 0) scale(1.1);
+    transform: translate3d(22vw, -32vh, 0) rotate(-96deg) scale(0.96);
   }
 }
 @keyframes light-drift-c {
   0% {
-    transform: translate3d(4vw, 34vh, 0) scale(0.9);
+    transform: translate3d(-12vw, 38vh, 0) rotate(0deg) scale(0.9);
   }
-  50% {
-    transform: translate3d(-24vw, 20vh, 0) scale(1.12);
+  33% {
+    transform: translate3d(36vw, 14vh, 0) rotate(40deg) scale(1.14);
+  }
+  66% {
+    transform: translate3d(14vw, -34vh, 0) rotate(76deg) scale(1);
   }
   100% {
-    transform: translate3d(18vw, 40vh, 0) scale(1);
+    transform: translate3d(-30vw, -12vh, 0) rotate(120deg) scale(1.08);
   }
 }
 /* Breathing focus: the halo breathes at six breaths a minute. */

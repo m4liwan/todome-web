@@ -39,21 +39,35 @@ describe('the ambient light', () => {
     expect(decl(light, 'opacity')).toContain('var(--ambient)');
   });
 
-  it('wanders across the whole background while nothing runs', () => {
+  it('wanders across the whole background, slowly enough to calm, fast enough to live', () => {
     const drift = rules('components', 'ambient-light.css').filter((r) => /^\.light__source--[abc]$/.test(r.selector));
     expect(drift).toHaveLength(3);
-    for (const r of drift) expect(decl(r, 'animation'), r.selector).toMatch(/light-drift-[abc] \d+s/);
+    for (const r of drift) {
+      const m = /light-drift-[abc] (\d+)s/.exec(decl(r, 'animation') ?? '');
+      expect(m, r.selector).not.toBeNull();
+      expect(Number(m![1]), r.selector).toBeGreaterThanOrEqual(24);
+      expect(Number(m![1]), r.selector).toBeLessThanOrEqual(60);
+    }
+    // Every path reaches into each half of the window, left and right, up and down.
+    const keys = read('styles', 'base', 'animations.css');
+    for (const id of ['a', 'b', 'c']) {
+      const body = new RegExp(String.raw`@keyframes light-drift-${id} \{([\s\S]*?)\n\}`).exec(keys)?.[1] ?? '';
+      const points = [...body.matchAll(/translate3d\((-?\d+)vw, (-?\d+)vh/g)].map((m) => [Number(m[1]), Number(m[2])] as const);
+      expect(Math.min(...points.map((p) => p[0])), id).toBeLessThan(0);
+      expect(Math.max(...points.map((p) => p[0])), id).toBeGreaterThan(0);
+      expect(Math.min(...points.map((p) => p[1])), id).toBeLessThan(0);
+      expect(Math.max(...points.map((p) => p[1])), id).toBeGreaterThan(0);
+    }
   });
 
-  // Peripheral movement pulls attention: during a block the wandering light
-  // holds its place (paused, so it never jumps back), and so it does in calm
-  // motion. Only the focus style's own halo may breathe.
-  it('stands still while a block runs and in calm motion', () => {
+  // The light keeps living during a block (each focus style shapes it); only
+  // calm motion (and reduced motion, globally) holds it still, where it is.
+  it('holds still only in calm motion', () => {
     const still = rules('base', 'accessibility.css')
       .filter((r) => decl(r, 'animation-play-state') === 'paused')
       .flatMap((r) => r.selectors);
-    expect(still).toContain('.shell.is-focusing .light__source');
     expect(still).toContain('.shell.is-fx-calm .light__source');
+    expect(still).not.toContain('.shell.is-focusing .light__source');
   });
 
   it('gives every focus style a light profile of its own', () => {

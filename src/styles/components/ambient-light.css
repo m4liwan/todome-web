@@ -2,9 +2,10 @@
    Ambient light (components/AmbientLight.tsx): three soft sources in the
    chosen colour wander across the whole background; a fine grain inside the
    light keeps its gradients smooth (no banding) and gives it a little tooth.
-   Strength follows --ambient (0 = pure darkness). Each focus style turns it
-   into its own light: the wandering pauses where it is and fades, and the
-   halo takes over with the style's profile.
+   Strength follows --ambient (0 = pure darkness; the light switch in the
+   navigation). It keeps living during a block: each focus style turns it into
+   its own light, the wandering sources step back and the halo takes over
+   with the style's profile. Only calm motion holds it still.
    ======================================================================== */
 
 .light {
@@ -13,7 +14,7 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  opacity: calc(var(--ambient) * 0.3);
+  opacity: calc(var(--ambient) * 0.36);
   transition: opacity var(--t-slow) var(--ease);
 }
 .light__source,
@@ -22,8 +23,8 @@
   top: 50%;
   left: 50%;
   width: var(--size);
-  height: var(--size);
-  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  height: calc(var(--size) * var(--squash, 1));
+  margin: calc(var(--size) * var(--squash, 1) / -2) 0 0 calc(var(--size) / -2);
   border-radius: 50%;
   /* A gaussian-like falloff in many small steps: no hard rim, no blur filter. */
   background: radial-gradient(
@@ -38,23 +39,24 @@
   will-change: transform;
 }
 .light__source {
+  --squash: 0.66;
   transition: opacity 1600ms var(--ease);
 }
 .light__source--a {
   --size: 72vmax;
   --tone: var(--accent-rgb);
-  animation: light-drift-a 74s ease-in-out infinite alternate;
+  animation: light-drift-a 38s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 .light__source--b {
   --size: 60vmax;
   --tone: var(--accent-2-rgb);
-  animation: light-drift-b 92s ease-in-out infinite alternate;
+  animation: light-drift-b 46s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 .light__source--c {
   --size: 44vmax;
   --tone: var(--accent-rgb);
   opacity: 0.7;
-  animation: light-drift-c 116s ease-in-out infinite alternate;
+  animation: light-drift-c 54s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
 }
 /* The grain only dithers the light: grey noise at a few percent, so the
    black between the lights stays black. */
