@@ -1,8 +1,8 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import postcss, { type Rule } from 'postcss';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AREAS, COCKPIT, Cockpit, showArea } from '../components/Cockpit';
 
 const IDS = ['greet', 'focus', 'hub', 'plan', 'tl', 'anchors', 'water', 'weather', 'times', 'week', 'impulse', 'thoughts', 'routines'];
@@ -106,5 +106,94 @@ describe('the areas (sub-navigation)', () => {
       for (const sel of r.selectors) if (/is-focusing|\.fs-/.test(sel) && !/\.cockpit/.test(sel)) offenders.push(sel);
     });
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('the four rooms', () => {
+  beforeEach(() => window.localStorage.clear());
+  const ROOMS = ['classic', 'sanctuary', 'hub', 'flow'] as const;
+
+  it('places all thirteen modules exactly once in every room, the main card always on the stage', () => {
+    for (const layout of ROOMS) {
+      const { unmount } = render(<Cockpit panels={stubs} layout={layout} />);
+      for (const id of IDS) expect(document.querySelectorAll(`.panel--${id}`), `${layout}: ${id}`).toHaveLength(1);
+      expect(document.querySelector('.cockpit__stage .panel--focus'), layout).not.toBeNull();
+      expect(document.querySelector(`.cockpit--${layout}`), layout).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it('gives the companion its own place in every room', () => {
+    const place = (layout: (typeof ROOMS)[number]) => {
+      const { unmount } = render(<Cockpit panels={stubs} layout={layout} />);
+      const hub = document.querySelector('.panel--hub')!;
+      const where = hub.parentElement!.className;
+      unmount();
+      return where;
+    };
+    expect(place('classic')).toContain('cockpit__side');
+    // Sanctuary: a whisper right under the main card.
+    expect(place('sanctuary')).toContain('cockpit__stage');
+    expect(place('hub')).toContain('cockpit__command');
+    expect(place('flow')).toContain('cockpit__stream');
+  });
+
+  it('Sanctuary: everything but the main card and the companion waits behind "Wenn du magst"', () => {
+    render(<Cockpit panels={stubs} layout="sanctuary" />);
+    const stage = document.querySelector('.cockpit__stage')!;
+    expect([...stage.querySelectorAll('.panel')].map((p) => p.className.match(/panel--(\w+)/)?.[1])).toEqual(['focus', 'hub']);
+    const toggle = screen.getByRole('button', { name: /Wenn du magst/ });
+    const body = document.getElementById(toggle.getAttribute('aria-controls')!)!;
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(body.hasAttribute('inert')).toBe(true);
+    for (const id of ['water', 'plan', 'tl', 'anchors', 'thoughts']) expect(body.querySelector(`.panel--${id}`), id).not.toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(body.hasAttribute('inert')).toBe(false);
+  });
+
+  it('Sanctuary: the companion tour can still reach an area', () => {
+    render(<Cockpit panels={stubs} layout="sanctuary" />);
+    act(() => showArea('mind'));
+    expect(screen.getByRole('button', { name: /Wenn du magst/ }).getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('Hub: the day comes first, the command room couples companion, water and the times of today', () => {
+    render(<Cockpit panels={stubs} layout="hub" />);
+    const order = [...document.querySelectorAll('.cockpit > *')].map((r) => r.className.match(/cockpit__(\w+)/)?.[1]);
+    expect(order.indexOf('day')).toBeLessThan(order.indexOf('stage'));
+    const command = document.querySelector('.cockpit__command')!;
+    for (const id of ['hub', 'water', 'times']) expect(command.querySelector(`.panel--${id}`), id).not.toBeNull();
+    expect(screen.getByRole('region', { name: 'Tages-Anker' })).not.toBeNull();
+  });
+
+  it('Flow: one reading lane from the step to what comes next to the companion stream', () => {
+    render(<Cockpit panels={stubs} layout="flow" />);
+    const lane = [...document.querySelectorAll('.cockpit > *')].map((r) => r.className.match(/cockpit__(\w+)/)?.[1]);
+    expect(lane.indexOf('stage')).toBeLessThan(lane.indexOf('next'));
+    expect(lane.indexOf('next')).toBeLessThan(lane.indexOf('stream'));
+    expect(document.querySelector('.cockpit__next .panel--plan')).not.toBeNull();
+    expect(document.querySelector('.cockpit__stream .panel--water')).not.toBeNull();
+  });
+
+  it('switches rooms from the head of Heute', () => {
+    const onLayout = vi.fn();
+    render(<Cockpit panels={stubs} layout="classic" onLayout={onLayout} />);
+    const group = screen.getByRole('radiogroup', { name: 'Aufbau von Heute' });
+    const radios = within(group).getAllByRole('radio');
+    expect(radios.map((r) => r.getAttribute('aria-label'))).toEqual(['Classic', 'Sanctuary', 'Hub', 'Flow']);
+    expect(radios[0]!.getAttribute('aria-checked')).toBe('true');
+    fireEvent.click(radios[3]!);
+    expect(onLayout).toHaveBeenCalledWith('flow');
+  });
+
+  it('arranges three rooms on top of the Classic base, and the focus styles reach the Sanctuary drawer too', () => {
+    const css = read('styles', 'layout', 'cockpit.css');
+    for (const layout of ROOMS.filter((r) => r !== 'classic')) expect(css, layout).toMatch(new RegExp(String.raw`\.cockpit--${layout}\b`));
+    const quieted: string[] = [];
+    postcss.parse(css).walkRules((r: Rule) => {
+      if (/\.fs-(breathe|tunnel)/.test(r.selector) && /cockpit__hush/.test(r.selector)) quieted.push(r.selector);
+    });
+    expect(quieted.length).toBeGreaterThanOrEqual(2);
   });
 });

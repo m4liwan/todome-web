@@ -309,10 +309,425 @@
   transition-delay: 80ms, 80ms, 0s;
 }
 
+/* ---------- the four rooms (Cockpit layout prop, appearance.layout) ----------
+   Same modules, four arrangements. The regions keep their names in every
+   room (stage, side, day, anchors, more), so the focus styles below and the
+   companion tour work everywhere. Classic is the base above. */
+
+/* The room switch: four floor plans, quiet in the corner of the head. */
+.cockpit__head {
+  position: relative;
+}
+.rooms {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--line);
+  opacity: 0.5;
+  transition: opacity var(--t-base) var(--ease);
+}
+.rooms:is(:hover, :focus-within) {
+  opacity: 1;
+}
+.rooms__opt {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 28px;
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  transition:
+    color var(--t-fast) var(--ease),
+    background-color var(--t-base) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+.rooms__opt:hover {
+  background-color: var(--hover);
+  color: var(--ink);
+}
+.rooms__opt:active {
+  transform: scale(0.94);
+}
+.rooms__opt[aria-checked='true'] {
+  background-color: rgb(var(--accent-rgb) / 0.1);
+  color: rgb(var(--accent-rgb));
+}
+.rooms__opt:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.7);
+  outline-offset: -2px;
+}
+/* The name unveils below its plan, with the feeling of the room. */
+.rooms__name {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  display: grid;
+  gap: 2px;
+  padding: 7px 11px;
+  border: 1px solid var(--line-float);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-float);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-align: left;
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-base) var(--ease),
+    visibility var(--t-base);
+}
+.rooms__name small {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.rooms__opt:is(:hover, :focus-visible) .rooms__name {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 80ms;
+}
+
+/* ===== 2 Sanctuary / Zen: one column in the middle, the rest waits ===== */
+.cockpit--sanctuary {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 860px;
+  margin-inline: auto;
+}
+.cockpit--sanctuary > * {
+  grid-column: 1 / -1;
+}
+.cockpit--sanctuary .cockpit__head {
+  padding-top: var(--s7);
+  padding-bottom: var(--s8);
+  text-align: center;
+}
+.cockpit--sanctuary .cockpit__head .hello {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+/* No numbers here: they are pressure. */
+.cockpit--sanctuary .cockpit__head .vitals {
+  display: none;
+}
+.cockpit--sanctuary .cockpit__head .hello__chips {
+  justify-content: center;
+  opacity: 0.45;
+  transition: opacity var(--t-base) var(--ease);
+}
+.cockpit--sanctuary .cockpit__head .hello__chips:is(:hover, :focus-within) {
+  opacity: 1;
+}
+.cockpit--sanctuary .cockpit__stage {
+  display: grid;
+  gap: 0;
+}
+.cockpit--sanctuary .panel--focus {
+  padding: var(--s8);
+}
+/* The companion whispers right under the main card: small, close, one line. */
+.cockpit--sanctuary .cockpit__stage > .panel--hub {
+  margin: var(--s5) var(--s8) 0;
+  padding-top: var(--s5);
+  border-top: 1px solid var(--line);
+  opacity: 0.8;
+  transition: opacity var(--t-base) var(--ease);
+}
+.cockpit--sanctuary .cockpit__stage > .panel--hub:is(:hover, :focus-within) {
+  opacity: 1;
+}
+.cockpit--sanctuary .home-hub {
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--s4);
+}
+.cockpit--sanctuary .home-hub__house {
+  zoom: 0.5;
+}
+.cockpit--sanctuary .home-hub__info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--s3);
+  row-gap: 0;
+}
+.cockpit--sanctuary .home-hub__name {
+  font-size: var(--fs-body);
+}
+.cockpit--sanctuary :is(.home-hub__info > .muted.small:not(.home-hub__since), .home-hub__actions, .home-hub__customize, .home-hub__feedback) {
+  display: none;
+}
+.cockpit--sanctuary .home-hub__since {
+  flex-basis: 100%;
+}
+
+/* "Wenn du magst": one quiet line; everything else unfolds beneath it. */
+.hush {
+  margin-top: var(--s9);
+}
+.hush__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  width: 100%;
+  padding: var(--s4) 0;
+  border-top: 1px solid var(--line);
+  color: var(--ink-3);
+  text-align: left;
+  transition: color var(--t-fast) var(--ease);
+}
+.hush__toggle:hover {
+  color: var(--ink);
+}
+.hush__toggle:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.7);
+  outline-offset: 4px;
+}
+.hush__name {
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.hush__hint {
+  flex: 1 1 auto;
+  font-size: var(--fs-meta);
+}
+.hush__knob {
+  display: grid;
+  transform: rotate(90deg);
+  transition: transform var(--t-slow) var(--ease);
+}
+.hush__toggle[aria-expanded='true'] .hush__knob {
+  transform: rotate(-90deg);
+}
+.hush__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--t-slow) var(--ease),
+    opacity var(--t-slow) var(--ease);
+}
+.hush__body.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.hush__inner {
+  display: grid;
+  min-height: 0;
+  overflow: clip;
+  overflow-clip-margin: var(--s2);
+}
+.hush .cockpit__side {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  column-gap: var(--s7);
+  padding: var(--s6) 0 0;
+  border-left: 0;
+}
+.hush .cockpit__side > .panel,
+.hush .cockpit__side > .panel + .panel {
+  padding-block: 0 var(--s6);
+  border-top: 0;
+}
+
+/* ===== 3 Hub / Command: the day in view, a command room on the right ===== */
+.cockpit--hub {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  grid-template-areas:
+    'head head'
+    'day day'
+    'stage command'
+    'next anchors'
+    'more more';
+}
+.cockpit--hub .cockpit__head {
+  grid-area: head;
+}
+.cockpit--hub .cockpit__day {
+  grid-area: day;
+  margin-top: 0;
+  padding-top: var(--s5);
+  padding-bottom: var(--s7);
+}
+.cockpit--hub .cockpit__stage {
+  grid-area: stage;
+}
+.cockpit--hub .cockpit__command {
+  grid-area: command;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  column-gap: var(--s6);
+}
+.cockpit--hub .cockpit__command::before {
+  content: 'Kommandoraum';
+  grid-column: 1 / -1;
+  margin-bottom: var(--s5);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.cockpit--hub .cockpit__command > .panel--hub {
+  grid-column: 1 / -1;
+}
+.cockpit--hub .cockpit__command > .panel--times {
+  padding-left: var(--s6);
+  border-left: 1px solid var(--line);
+}
+/* "Danach" as its own region (Hub, Flow) keeps its natural height: the plan
+   only fills the rest of the column where it shares one (Classic). */
+.cockpit :is(.cockpit__next, .cockpit__stream) > .panel {
+  flex: none;
+}
+.cockpit--hub .cockpit__next {
+  grid-area: next;
+  margin-top: var(--s7);
+  padding: var(--s6) 0 0;
+  border-top: 1px solid var(--line);
+  border-left: 0;
+}
+.cockpit--hub .cockpit__anchors {
+  grid-area: anchors;
+  margin-top: var(--s7);
+  padding: var(--s6) 0 0 var(--s7);
+  border-left: 1px solid var(--line);
+}
+.cockpit--hub .cockpit__more {
+  grid-area: more;
+}
+
+/* ===== 4 Flow / Stream: one lane forward, the companion floats alongside ===== */
+.cockpit--flow {
+  grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(220px, 2.4fr);
+  grid-template-areas:
+    'head head head'
+    'day day day'
+    'stage next stream'
+    'anchors anchors anchors'
+    'more more more';
+  column-gap: var(--s7);
+}
+.cockpit--flow .cockpit__head {
+  grid-area: head;
+}
+.cockpit--flow .cockpit__day {
+  grid-area: day;
+  margin-top: 0;
+  padding-top: var(--s5);
+  padding-bottom: var(--s7);
+}
+.cockpit--flow .cockpit__stage {
+  grid-area: stage;
+}
+.cockpit--flow .cockpit__next {
+  grid-area: next;
+}
+.cockpit--flow .cockpit__stream {
+  grid-area: stream;
+  position: sticky;
+  top: calc(var(--frame-t) + var(--s5));
+  align-self: start;
+}
+.cockpit--flow .cockpit__anchors {
+  grid-area: anchors;
+}
+.cockpit--flow .cockpit__more {
+  grid-area: more;
+}
+/* The flow markers: a small chevron of light on each hairline, nudging forward. */
+.cockpit--flow :is(.cockpit__next, .cockpit__stream) {
+  position: relative;
+}
+.cockpit--flow :is(.cockpit__next, .cockpit__stream)::before {
+  content: '';
+  position: absolute;
+  top: var(--s7);
+  left: -5px;
+  width: 9px;
+  height: 9px;
+  border-top: 1px solid rgb(var(--accent-rgb) / 0.7);
+  border-right: 1px solid rgb(var(--accent-rgb) / 0.7);
+  background: var(--bg);
+  transform: rotate(45deg);
+  animation: flow-nudge 2.8s var(--ease) infinite;
+}
+.cockpit--flow .cockpit__stream::before {
+  animation-delay: 1.4s;
+}
+.cockpit--flow .cockpit__stream .home-hub {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: start;
+}
+.cockpit--flow .cockpit__stream .home-hub__house {
+  animation: stream-drift 7s ease-in-out infinite alternate;
+}
+
+/* Narrow windows: one column in order of priority, the main card first after the greeting. */
+@media (max-width: 1180px) {
+  .cockpit:is(.cockpit--hub, .cockpit--flow) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: none;
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) > * {
+    grid-area: auto;
+    grid-column: 1 / -1;
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) > .cockpit__head {
+    order: -2;
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) > .cockpit__stage {
+    order: -1;
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) > .cockpit__day {
+    margin-top: var(--s8);
+    padding-top: var(--s7);
+  }
+  .cockpit:is(.cockpit--hub, .cockpit--flow) > :is(.cockpit__next, .cockpit__stream, .cockpit__anchors) {
+    position: static;
+    margin-top: var(--s7);
+    padding: var(--s7) 0 0;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+  .cockpit--flow :is(.cockpit__next, .cockpit__stream)::before {
+    display: none;
+  }
+  .cockpit--sanctuary .panel--focus {
+    padding: var(--s6);
+  }
+  .cockpit--sanctuary .cockpit__stage > .panel--hub {
+    margin-inline: var(--s6);
+  }
+}
+@media (max-width: 760px) {
+  .rooms {
+    position: static;
+    justify-self: end;
+    width: max-content;
+    margin: 0 0 var(--s5) auto;
+  }
+}
+
 /* ---------- focus styles: each one arranges the cockpit its own way ----------
    The light changes with them (components/ambient-light.css); the stage
    crosses its own threshold as the style begins. */
-.cockpit :is(.cockpit__head, .cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more) {
+.cockpit :is(.cockpit__head, .cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more, .cockpit__hush) {
   transition:
     opacity var(--t-slow) var(--ease),
     filter var(--t-slow) var(--ease);
@@ -320,11 +735,11 @@
 
 /* Atmender Fokus (open, soft): everything stays in place, gently out of
    focus, and comes back on contact. The stage simply settles. */
-.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more) {
+.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more, .cockpit__hush) {
   opacity: 0.35;
   filter: blur(1.5px);
 }
-.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more):is(:hover, :focus-within) {
+.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more, .cockpit__hush):is(:hover, :focus-within) {
   opacity: 0.92;
   filter: none;
 }
@@ -343,7 +758,7 @@
 
 /* Schwebender Tunnel (still concentration): everything else leaves, the
    stage floats up into the middle of a darkened room. */
-.shell:is(.fs-tunnel, .fs-cocoon, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__anchors, .cockpit__more) {
+.shell:is(.fs-tunnel, .fs-cocoon, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__anchors, .cockpit__more, .cockpit__hush) {
   display: none;
 }
 .shell:is(.fs-tunnel, .fs-cocoon) .cockpit__day {
@@ -365,6 +780,10 @@
   width: min(100%, 880px);
 }
 .shell:is(.fs-cocoon, .fs-micro) .cockpit__head {
+  display: none;
+}
+/* In Sanctuary the companion stays close in the tunnel; the cocoon holds nothing else. */
+.shell.fs-cocoon .cockpit__stage > .panel--hub {
   display: none;
 }
 .shell.fs-cocoon .cockpit__stage {

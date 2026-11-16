@@ -76,6 +76,36 @@
   transition: opacity 1600ms var(--ease);
 }
 
+/* ---------- the rooms of Heute ----------
+   Each room has its own light while nothing runs; a focus style takes over
+   when a block starts (its rules come later and win). */
+.shell.is-room-sanctuary .light__source {
+  opacity: 0.4;
+}
+.shell.is-room-sanctuary .light__halo {
+  --size: 64vmax;
+  opacity: 0.4;
+}
+.shell.is-room-hub .light__source--a {
+  --size: 92vmax;
+}
+.shell.is-room-hub .light__halo {
+  --size: 48vmax;
+  opacity: 0.28;
+  transform: translate(26vw, -18vh);
+}
+.shell.is-room-flow .light__source--a {
+  animation-duration: 26s;
+}
+.shell.is-room-flow .light__source--b {
+  animation-duration: 32s;
+}
+.shell.is-room-flow .light__halo {
+  --size: 120vmax;
+  --squash: 0.28;
+  opacity: 0.3;
+}
+
 /* ---------- focus profiles ---------- */
 
 /* Atmender Fokus: open and warm. The wandering lights stay, softer; a wide

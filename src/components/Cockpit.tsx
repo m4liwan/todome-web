@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from 'react';
+import type { LayoutId } from '../domain/types';
 import { IconChevronRight } from './icons';
 
 /**
@@ -25,7 +26,7 @@ export const AREAS: ReadonlyArray<{ id: AreaId; label: string; panels: readonly 
 ];
 
 /** Entrance stagger: reading order, capped so the last module never waits long. */
-const STEP: Record<string, number> = { greet: 0, focus: 1, hub: 1, water: 2, plan: 2, tl: 3, anchors: 4 };
+const STEP: Record<string, number> = { greet: 0, focus: 1, hub: 1, water: 2, plan: 2, times: 2, tl: 3, anchors: 4 };
 
 const AREA_KEY = 'todome:area';
 const AREA_EVENT = 'todome:area';
@@ -53,10 +54,10 @@ const inert = (on: boolean) => ({ inert: on ? '' : undefined }) as Record<string
  * back and the pane slides in from the side it comes from. Arrow keys move,
  * Escape folds. The last choice is remembered on this device.
  */
-function Areas({ panels }: { panels: Record<string, ReactNode> }) {
+function Areas({ panels, areas = AREAS }: { panels: Record<string, ReactNode>; areas?: typeof AREAS }) {
   const [active, setActive] = useState<AreaId>(storedArea);
   const [open, setOpen] = useState(false);
-  const at = AREAS.findIndex((a) => a.id === active);
+  const at = areas.findIndex((a) => a.id === active);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
 
@@ -72,6 +73,7 @@ function Areas({ panels }: { panels: Record<string, ReactNode> }) {
   useEffect(() => {
     const onArea = (e: Event) => {
       const id = (e as CustomEvent<AreaId>).detail;
+      // The ids are the same in every room (only Hub moves a panel out).
       if (AREAS.some((a) => a.id === id)) setActive(id);
     };
     window.addEventListener(AREA_EVENT, onArea);
@@ -102,10 +104,10 @@ function Areas({ panels }: { panels: Record<string, ReactNode> }) {
       fold();
       return;
     }
-    const go = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: AREAS.length - 1 }[e.key];
+    const go = { ArrowRight: at + 1, ArrowLeft: at - 1, Home: 0, End: areas.length - 1 }[e.key];
     if (go === undefined) return;
     e.preventDefault();
-    const next = AREAS[(go + AREAS.length) % AREAS.length]!;
+    const next = areas[(go + areas.length) % areas.length]!;
     choose(next.id);
     document.getElementById(`area-tab-${next.id}`)?.focus();
   };
@@ -121,18 +123,18 @@ function Areas({ panels }: { panels: Record<string, ReactNode> }) {
             ref={trigger}
             aria-expanded={open}
             aria-controls="area-options"
-            aria-label={`Bereich: ${AREAS[at]?.label}. Andere Bereiche zeigen`}
+            aria-label={`Bereich: ${areas[at]?.label}. Andere Bereiche zeigen`}
             onClick={() => setOpen((o) => !o)}
           >
             <span className="orbit__name" key={active}>
-              {AREAS[at]?.label}
+              {areas[at]?.label}
             </span>
             <span className="orbit__knob" aria-hidden="true">
               <IconChevronRight size={14} />
             </span>
           </button>
           <div className="orbit__options" id="area-options" role="tablist" aria-label="Bereiche" {...inert(!open)}>
-            {AREAS.map((a, i) => (
+            {areas.map((a, i) => (
               <button
                 key={a.id}
                 type="button"
@@ -157,7 +159,7 @@ function Areas({ panels }: { panels: Record<string, ReactNode> }) {
       </div>
 
       <div className="areas__stack">
-        {AREAS.map((a, i) => (
+        {areas.map((a, i) => (
           <div
             key={a.id}
             role="tabpanel"
@@ -179,39 +181,206 @@ function Areas({ panels }: { panels: Record<string, ReactNode> }) {
   );
 }
 
-export function Cockpit({ panels, meta = {} }: { panels: Record<string, ReactNode>; meta?: { anchors?: string } }) {
+/** The rooms of "Heute": the same modules, four arrangements, four feelings. All free. */
+export const ROOMS: ReadonlyArray<{ id: LayoutId; label: string; mood: string; text: string }> = [
+  { id: 'classic', label: 'Classic', mood: 'Monolith', text: 'Klar und geerdet. Die Hauptkarte thront, der Begleiter wacht ruhig am Rand.' },
+  { id: 'sanctuary', label: 'Sanctuary', mood: 'Zen', text: 'Nur der eine Schritt. Alles andere wartet, bis du es rufst.' },
+  { id: 'hub', label: 'Hub', mood: 'Command', text: 'Der ganze Tag im Blick, der Begleiter im Kommandoraum.' },
+  { id: 'flow', label: 'Flow', mood: 'Stream', text: 'Eine Bahn nach vorn: Schritt, Danach, Begleiter.' },
+];
+
+/** A tiny floor plan of each room (for the switch and the settings). */
+export function RoomGlyph({ id }: { id: LayoutId }) {
+  const r = (x: number, y: number, w: number, h: number, strong = false) => <rect x={x} y={y} width={w} height={h} rx={0.8} opacity={strong ? 1 : 0.45} />;
+  return (
+    <svg className="room-glyph" viewBox="0 0 20 14" width={20} height={14} aria-hidden="true" fill="currentColor">
+      {id === 'classic' && (
+        <>
+          {r(0, 0, 13, 9, true)}
+          {r(14.5, 0, 5.5, 9)}
+          {r(0, 10.5, 20, 3.5)}
+        </>
+      )}
+      {id === 'sanctuary' && (
+        <>
+          {r(5, 2, 10, 7, true)}
+          {r(7.5, 10.5, 5, 1.5)}
+        </>
+      )}
+      {id === 'hub' && (
+        <>
+          {r(0, 0, 20, 2.5)}
+          {r(0, 4, 11, 10, true)}
+          {r(12.5, 4, 7.5, 4.5)}
+          {r(12.5, 9.5, 7.5, 4.5)}
+        </>
+      )}
+      {id === 'flow' && (
+        <>
+          {r(0, 0, 20, 2.5)}
+          {r(0, 4, 10, 10, true)}
+          {r(11.5, 4, 4.5, 10)}
+          {r(17.5, 4, 2.5, 10)}
+        </>
+      )}
+    </svg>
+  );
+}
+
+/**
+ * The room switch in the head of "Heute": four floor plans in a quiet row,
+ * the name unveils on hover. Arrow keys move between rooms.
+ */
+function RoomSwitch({ layout, onLayout }: { layout: LayoutId; onLayout: (id: LayoutId) => void }) {
+  const at = ROOMS.findIndex((r) => r.id === layout);
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const go = { ArrowRight: at + 1, ArrowDown: at + 1, ArrowLeft: at - 1, ArrowUp: at - 1, Home: 0, End: ROOMS.length - 1 }[e.key];
+    if (go === undefined) return;
+    e.preventDefault();
+    const next = ROOMS[(go + ROOMS.length) % ROOMS.length]!;
+    onLayout(next.id);
+    // The room rebuilds itself; the keyboard stays on the switch.
+    window.setTimeout(() => document.getElementById(`room-${next.id}`)?.focus({ preventScroll: true }), 0);
+  };
+  return (
+    <div className="rooms" role="radiogroup" aria-label="Aufbau von Heute">
+      {ROOMS.map((r) => (
+        <button
+          key={r.id}
+          type="button"
+          role="radio"
+          id={`room-${r.id}`}
+          aria-checked={r.id === layout}
+          aria-label={r.label}
+          tabIndex={r.id === layout ? 0 : -1}
+          className="rooms__opt"
+          onClick={() => r.id !== layout && onLayout(r.id)}
+          onKeyDown={onKey}
+        >
+          <RoomGlyph id={r.id} />
+          <span className="rooms__name" aria-hidden="true">
+            {r.label}
+            <small>{r.mood}</small>
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Sanctuary keeps everything but the main card and the companion behind one
+ * quiet line. It unfolds on demand (and for the companion tour).
+ */
+function Hush({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const unfold = () => setOpen(true);
+    window.addEventListener(AREA_EVENT, unfold);
+    return () => window.removeEventListener(AREA_EVENT, unfold);
+  }, []);
+  return (
+    <section className="cockpit__hush hush" aria-label="Wenn du magst">
+      <button type="button" className="hush__toggle" aria-expanded={open} aria-controls="cockpit-hush" onClick={() => setOpen((o) => !o)}>
+        <span className="hush__name">Wenn du magst</span>
+        <span className="hush__hint">Wasser, Danach, dein Tag, Tages-Anker und mehr</span>
+        <span className="hush__knob" aria-hidden="true">
+          <IconChevronRight size={14} />
+        </span>
+      </button>
+      <div id="cockpit-hush" className={`hush__body${open ? ' is-open' : ''}`} {...inert(!open)}>
+        <div className="hush__inner">{children}</div>
+      </div>
+    </section>
+  );
+}
+
+/** Hub moves the times of today into its command room. */
+const areasFor = (layout: LayoutId) => (layout === 'hub' ? AREAS.map((a) => ({ ...a, panels: a.panels.filter((p) => p !== 'times') })) : AREAS);
+
+interface CockpitProps {
+  panels: Record<string, ReactNode>;
+  meta?: { anchors?: string };
+  /** The room (Classic by default). */
+  layout?: LayoutId;
+  /** Shows the room switch in the head when given. */
+  onLayout?: (id: LayoutId) => void;
+}
+
+export function Cockpit({ panels, meta = {}, layout = 'classic', onLayout }: CockpitProps) {
   const panel = (id: string) => (
     <div key={id} className={`panel panel--${id} enter`} style={{ '--i': STEP[id] ?? 4 } as CSSProperties}>
       {panels[id]}
     </div>
   );
+  const region = (cls: string, label: string, ids: readonly string[], Tag: 'section' | 'aside' = 'section') => (
+    <Tag key={cls} className={cls} aria-label={label}>
+      {ids.map(panel)}
+    </Tag>
+  );
 
+  const head = (
+    <header key="head" className="cockpit__head">
+      {onLayout && <RoomSwitch layout={layout} onLayout={onLayout} />}
+      {COCKPIT.head.map(panel)}
+    </header>
+  );
+  const day = region('cockpit__day', 'Dein Tag', COCKPIT.day);
+  const anchors = (
+    <section key="anchors" className="cockpit__anchors" aria-labelledby="cockpit-anchors">
+      <h2 className="cockpit__title" id="cockpit-anchors">
+        Tages-Anker
+        {meta.anchors && (
+          <span className="cockpit__meta" aria-hidden="true">
+            {meta.anchors}
+          </span>
+        )}
+      </h2>
+      {COCKPIT.anchors.map(panel)}
+    </section>
+  );
+  const more = (
+    <div key="more" className="cockpit__more enter" style={{ '--i': 5 } as CSSProperties}>
+      <Areas panels={panels} areas={areasFor(layout)} />
+    </div>
+  );
+
+  const rooms: Record<LayoutId, ReactNode[]> = {
+    // Monolith: the main card thrones, the companion keeps watch at the right edge, the day closes the room.
+    classic: [head, region('cockpit__stage', 'Jetzt', COCKPIT.stage), region('cockpit__side', 'Begleiter, Wasser und Danach', COCKPIT.side, 'aside'), day, anchors, more],
+    // Zen: the main card alone in the middle, the companion whispers right below it; the rest waits.
+    sanctuary: [
+      head,
+      region('cockpit__stage', 'Jetzt', ['focus', 'hub']),
+      <Hush key="hush">{[region('cockpit__side', 'Wasser und Danach', ['water', 'plan'], 'aside'), day, anchors, more]}</Hush>,
+    ],
+    // Command: the day first; on the left now and next, on the right the command room (companion,
+    // water, the times of today) above the Tages-Anker.
+    hub: [
+      head,
+      day,
+      region('cockpit__stage', 'Jetzt', COCKPIT.stage),
+      region('cockpit__side cockpit__command', 'Kommandoraum: Begleiter, Wasser und Zeiten', ['hub', 'water', 'times'], 'aside'),
+      region('cockpit__next cockpit__side', 'Danach', ['plan'], 'aside'),
+      anchors,
+      more,
+    ],
+    // Stream: one lane forward, the step, what comes next, the companion floating alongside.
+    flow: [
+      head,
+      day,
+      region('cockpit__stage', 'Jetzt', COCKPIT.stage),
+      region('cockpit__next cockpit__side', 'Danach', ['plan'], 'aside'),
+      region('cockpit__stream cockpit__side', 'Begleiter und Wasser', ['hub', 'water'], 'aside'),
+      anchors,
+      more,
+    ],
+  };
+
+  // The key rebuilds the room on every switch: the modules enter anew.
   return (
-    <div className="cockpit">
-      <header className="cockpit__head">{COCKPIT.head.map(panel)}</header>
-      <section className="cockpit__stage" aria-label="Jetzt">
-        {COCKPIT.stage.map(panel)}
-      </section>
-      <aside className="cockpit__side" aria-label="Begleiter, Wasser und Danach">
-        {COCKPIT.side.map(panel)}
-      </aside>
-      <section className="cockpit__day" aria-label="Dein Tag">
-        {COCKPIT.day.map(panel)}
-      </section>
-      <section className="cockpit__anchors" aria-labelledby="cockpit-anchors">
-        <h2 className="cockpit__title" id="cockpit-anchors">
-          Tages-Anker
-          {meta.anchors && (
-            <span className="cockpit__meta" aria-hidden="true">
-              {meta.anchors}
-            </span>
-          )}
-        </h2>
-        {COCKPIT.anchors.map(panel)}
-      </section>
-      <div className="cockpit__more enter" style={{ '--i': 5 } as CSSProperties}>
-        <Areas panels={panels} />
-      </div>
+    <div key={layout} className={`cockpit cockpit--${layout}`}>
+      {rooms[layout]}
     </div>
   );
 }

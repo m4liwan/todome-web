@@ -16,6 +16,7 @@ function open() {
       <SettingsDialog open onClose={() => {}} initialTab="design" />
     </ServicesContext.Provider>,
   );
+  return store;
 }
 
 const panel = () => document.getElementById('settings-panel')!;
@@ -57,5 +58,16 @@ describe('the living settings', () => {
     expect(css).toMatch(/\[data-dock='bottom'\][^{]*\.dialog--settings\[open\]/);
     expect(css).not.toMatch(/data-dock='(left|right)'/);
     expect(css).toMatch(/\.dialog--settings\[open\][^}]*animation: settings-in/);
+  });
+
+  it('offers the four rooms of Heute with a preview each, all of them free', () => {
+    const store = open();
+    const group = screen.getByRole('radiogroup', { name: 'Aufbau von Heute', hidden: true });
+    const rooms = [...group.querySelectorAll<HTMLElement>('[role="radio"]')];
+    expect(rooms.map((r) => r.querySelector('strong')?.textContent)).toEqual(['Classic', 'Sanctuary', 'Hub', 'Flow']);
+    for (const r of rooms) expect(r.querySelector('.room-opt__preview')).not.toBeNull();
+    expect(rooms.some((r) => r.hasAttribute('aria-disabled'))).toBe(false);
+    fireEvent.click(rooms[1]!);
+    expect(store.getState().settings.appearance.layout).toBe('sanctuary');
   });
 });

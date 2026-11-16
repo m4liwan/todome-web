@@ -213,6 +213,36 @@
 .docks {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+/* The rooms of Heute: a floor plan, the name, the feeling, one line. */
+.room-picker {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s2);
+}
+.room-opt__preview {
+  display: grid;
+  place-items: center;
+  height: 64px;
+  margin-bottom: var(--s2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  color: var(--ink-3);
+  transition: color var(--t-base) var(--ease);
+}
+.room-opt__preview .room-glyph {
+  width: 52px;
+  height: 36px;
+}
+.room-opt.is-on .room-opt__preview {
+  color: rgb(var(--accent-rgb));
+}
+.room-opt__mood {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
 /* A tiny window with its dock on the chosen side. */
 .dock-opt__preview {
   position: relative;
@@ -513,6 +543,9 @@
 }
 
 @media (max-width: 860px) {
+  .room-picker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .focus-styles {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

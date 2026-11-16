@@ -194,6 +194,12 @@ export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose';
 /** Global corner rounding: architectural, precise, or soft (the original look). */
 export type CornerStyle = 'sharp' | 'precise' | 'soft';
 
+/**
+ * The room of "Heute": four arrangements of the same modules, each with its
+ * own feeling (Monolith, Zen, Command, Stream). The main card leads in all.
+ */
+export type LayoutId = 'classic' | 'sanctuary' | 'hub' | 'flow';
+
 /** Where the main navigation (the dock) sits. */
 export type DockPosition = 'top' | 'bottom';
 
@@ -209,6 +215,8 @@ export interface AppearanceSettings {
   /** Strength of the ambient light, 0 (pure darkness) … 1 (a soft glow, never glaring). */
   ambient: number;
   corners: CornerStyle;
+  /** The room of "Heute" (Classic by default). */
+  layout: LayoutId;
   /** Where the main navigation sits (top centre by default). */
   dock: DockPosition;
   ambience: AmbienceId;

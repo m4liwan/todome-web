@@ -306,6 +306,29 @@
     transform: none;
   }
 }
+/* Flow: the chevron on a hairline nudges forward and settles. */
+@keyframes flow-nudge {
+  0%,
+  60%,
+  100% {
+    opacity: 0.55;
+    transform: translateX(0) rotate(45deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(3px) rotate(45deg);
+  }
+}
+/* Flow: the companion floats gently alongside the lane. */
+@keyframes stream-drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+
 /* A settings panel arrives from the direction you travel along the bar. */
 @keyframes panel-forward {
   from {

@@ -17,7 +17,8 @@ describe('state from schema 3', () => {
     expect(s?.schemaVersion).toBe(4);
     expect(s?.thoughts).toEqual([]);
     expect(s?.wellbeing.energyLog).toEqual({ '2026-11-03': 4 });
-    expect(s?.settings.appearance).not.toHaveProperty('layout');
+    // The rooms came back in 2.x: data without one starts in Classic.
+    expect(s?.settings.appearance.layout).toBe('classic');
   });
 });
 
@@ -104,14 +105,14 @@ describe('settings from 1.4', () => {
 });
 
 describe('defaults for new installs', () => {
-  it('knows no home layouts and no workspace editor', () => {
-    expect(emptyState().settings.appearance).not.toHaveProperty('layout');
+  it('starts in the Classic room and knows no workspace editor', () => {
+    expect(emptyState().settings.appearance.layout).toBe('classic');
     expect(emptyState().settings).not.toHaveProperty('workspace');
   });
 });
 
 describe('settings from 1.17 (home layouts)', () => {
-  it('drops the retired home layouts and the workspace editor', () => {
+  it('keeps a known room, drops the workspace editor', () => {
     const old = emptyState();
     const raw = {
       ...old,
@@ -122,7 +123,7 @@ describe('settings from 1.17 (home layouts)', () => {
       },
     };
     const s = parseState(JSON.stringify(raw));
-    expect(s?.settings.appearance).not.toHaveProperty('layout');
+    expect(s?.settings.appearance.layout).toBe('flow');
     expect(s?.settings).not.toHaveProperty('workspace');
     expect(s?.settings.appearance).toMatchObject({ palette: 'cyan', standby: 'drift' });
   });
@@ -189,5 +190,16 @@ describe('settings from 1.8', () => {
     expect(s?.settings.appearance.focusStyle).toBe('tunnel');
     expect(s?.settings.appearance).not.toHaveProperty('silentFocus');
     expect(s?.settings).toMatchObject({ uiSounds: true, oneStep: false, brain: null });
+  });
+});
+
+describe('the room of Heute', () => {
+  it('keeps the four rooms and falls back to Classic for anything else', () => {
+    const base = emptyState();
+    const load = (layout: unknown) =>
+      parseState(JSON.stringify({ ...base, settings: { ...base.settings, appearance: { ...base.settings.appearance, layout } } }))?.settings.appearance.layout;
+    for (const room of ['classic', 'sanctuary', 'hub', 'flow']) expect(load(room)).toBe(room);
+    expect(load('diagonal')).toBe('classic');
+    expect(load(undefined)).toBe('classic');
   });
 });

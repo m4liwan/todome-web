@@ -46,6 +46,7 @@ const RETIRED_PALETTES: Record<string, AppearanceSettings['palette']> = {
 const PALETTES = new Set(['lime', 'cyan', 'amber', 'mono', 'violet', 'rose']);
 const CORNERS = new Set(['sharp', 'precise', 'soft']);
 const DOCKS = new Set(['top', 'bottom']);
+const LAYOUTS = new Set(['classic', 'sanctuary', 'hub', 'flow']);
 
 function migrateAppearance(raw: unknown): AppearanceSettings {
   const a = { ...DEFAULT_APPEARANCE, ...(isRecord(raw) ? (raw as Partial<AppearanceSettings>) : {}) };
@@ -53,8 +54,6 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   const legacy = isRecord(raw) ? (raw as Record<string, unknown>) : {};
   if (!('focusStyle' in legacy)) a.focusStyle = legacy.silentFocus === true ? 'tunnel' : 'breathe';
   delete (a as Partial<AppearanceSettings> & { silentFocus?: boolean }).silentFocus;
-  // 1.18: the four home layouts became one cockpit.
-  delete (a as Partial<AppearanceSettings> & { layout?: unknown }).layout;
   const p = String(a.palette);
   a.palette = RETIRED_PALETTES[p] ?? (PALETTES.has(p) ? a.palette : 'lime');
   // 1.18: ambient light strength and corner rounding.
@@ -63,6 +62,9 @@ function migrateAppearance(raw: unknown): AppearanceSettings {
   // 1.18: the navigation could sit on any edge; since the bar it is top or
   // bottom centre (a side choice from before lands at the top).
   if (!DOCKS.has(String(a.dock))) a.dock = DEFAULT_APPEARANCE.dock;
+  // 2.x: the four rooms of "Heute" are back (1.18 had dropped the old layouts);
+  // a known room is kept, anything else starts in Classic.
+  if (!LAYOUTS.has(String(a.layout))) a.layout = DEFAULT_APPEARANCE.layout;
   // 2.x: level effects arrive switched on; only a real choice survives.
   if (typeof a.companionFx !== 'boolean') a.companionFx = DEFAULT_APPEARANCE.companionFx;
   return a;

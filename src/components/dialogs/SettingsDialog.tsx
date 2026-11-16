@@ -7,6 +7,7 @@ import { desktop, type AutostartStatus } from '../../lib/desktop';
 import { bloom, focusTone } from '../../lib/chimes';
 import { freeState, hasPro, isProPalette, openPro, themesUnlocked } from '../../app/pro';
 import { IconArrowUpRight, IconChart, IconChat, IconCompanion, IconHelp, IconLock, IconMusic, IconSettings, IconSparkle } from '../icons';
+import { ROOMS, RoomGlyph } from '../Cockpit';
 import { companionHello } from '../../app/companion';
 import { avatarName } from '../../domain/companion';
 import { COPYRIGHT } from '../../domain/legal';
@@ -371,6 +372,29 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           )}
           {tab === 'design' && (
             <>
+        <section>
+          <h3>Heute</h3>
+          <p className="muted small">Vier Räume für denselben Tag. Jeder gibt dir ein anderes Gefühl; dein nächster Schritt steht in allen in der Mitte. Du kannst auch direkt in „Heute“ oben rechts wechseln.</p>
+          <div className="room-picker" role="radiogroup" aria-label="Aufbau von Heute">
+            {ROOMS.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                role="radio"
+                aria-checked={s.appearance.layout === r.id}
+                className={`option room-opt${s.appearance.layout === r.id ? ' is-on' : ''}`}
+                onClick={() => set({ appearance: { ...s.appearance, layout: r.id } })}
+              >
+                <span className="room-opt__preview" aria-hidden="true">
+                  <RoomGlyph id={r.id} />
+                </span>
+                <strong>{r.label}</strong>
+                <span className="room-opt__mood">{r.mood}</span>
+                <span>{r.text}</span>
+              </button>
+            ))}
+          </div>
+        </section>
         <section>
           <h3>Navigation</h3>
           <p className="muted small">Die Leiste mit allen Bereichen und deinem Feierabend. Sie färbt sich mit deinem Licht und folgt deinem Eckenstil.</p>

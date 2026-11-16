@@ -380,7 +380,7 @@ export function App() {
   const anchorsDue = anchorsToday(state.anchors, now, today);
 
   return (
-    <div className={`shell shell--${view}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${legendary}`}>
+    <div className={`shell shell--${view}${focusing ? ' is-focusing' : ''}${focusStyle ? ` fs-${focusStyle}` : ''}${state.settings.oneStep ? ' is-one-step' : ''}${winter ? ' is-winter' : ''}${state.settings.onboarded ? '' : ' is-covered'}${landing ? ' is-landing' : ''}${view === 'today' ? ` is-room-${state.settings.appearance.layout}` : ''}${legendary}`}>
       <AmbientLight />
       <Ambience kind={state.settings.appearance.ambience} weather={state.weather} dark={theme === 'dark'} />
       {winter && state.settings.appearance.ambience !== 'snow' && <Ambience kind="snow" weather={null} dark={theme === 'dark'} />}
@@ -393,7 +393,14 @@ export function App() {
 
       <div className="app">
         <main id="main" className={`dash dash--${view}`}>
-          {view === 'today' && <Cockpit panels={p} meta={{ anchors: anchorsDue.due.length ? `${anchorsDue.done}/${anchorsDue.due.length}` : undefined }} />}
+          {view === 'today' && (
+            <Cockpit
+              panels={p}
+              meta={{ anchors: anchorsDue.due.length ? `${anchorsDue.done}/${anchorsDue.due.length}` : undefined }}
+              layout={state.settings.appearance.layout}
+              onLayout={(layout) => services.store.dispatch({ type: 'settings/update', patch: { appearance: { ...state.settings.appearance, layout } } })}
+            />
+          )}
           {view === 'times' && (
             <div className="view-fade view-fade--wide" key="times">
               <WeekView state={state} projections={projections} now={now} />
