@@ -9,6 +9,7 @@
     if (location.hash === '#overlay') return root.classList.add('is-overlay');
     if (location.hash === '#companion') return root.classList.add('is-companion');
     root.setAttribute('data-theme', 'dark');
+    root.setAttribute('data-dock', 'top');
     var boot = JSON.parse(window.localStorage.getItem('todome:boot') || 'null');
     if (!boot) return;
     if (typeof boot.palette === 'string' && /^[a-z]{2,12}$/.test(boot.palette)) root.setAttribute('data-palette', boot.palette);

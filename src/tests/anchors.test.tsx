@@ -233,12 +233,12 @@ describe('Tages-Anker: pop-up', () => {
 });
 
 describe('Tages-Anker: a section of the home', () => {
-  it('lives in the areas of the cockpit, no longer as a floating pill, and stays off the welcome screen', () => {
+  it('has its own section in the cockpit, no longer a floating pill, and stays off the welcome screen', () => {
     const read = (p: string) => readFileSync(fileURLToPath(new URL(p, import.meta.url)), 'utf8');
     const app = read('../app/App.tsx');
     expect(app).toMatch(/anchors: <AnchorsSection/);
     expect(app).not.toMatch(/AnchorsPill|anchors-fab/);
-    expect(read('../components/Cockpit.tsx')).toMatch(/id: 'anchors', label: 'Tages-Anker'/);
+    expect(read('../components/Cockpit.tsx')).toMatch(/anchors: \['anchors'\]/);
     expect(read('../components/Splash.tsx')).not.toMatch(/nchor/);
   });
 });

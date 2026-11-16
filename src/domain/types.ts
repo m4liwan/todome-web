@@ -194,7 +194,7 @@ export type PaletteId = 'lime' | 'cyan' | 'amber' | 'mono' | 'violet' | 'rose';
 /** Global corner rounding: architectural, precise, or soft (the original look). */
 export type CornerStyle = 'sharp' | 'precise' | 'soft';
 
-/** Where the floating navigation (the dock) sits. */
+/** Where the main navigation (the dock) sits. */
 export type DockPosition = 'left' | 'right' | 'top' | 'bottom';
 
 /** How the rest screen looks. */
@@ -209,7 +209,7 @@ export interface AppearanceSettings {
   /** Strength of the ambient light, 0 (pure darkness) … 1 (a soft glow, never glaring). */
   ambient: number;
   corners: CornerStyle;
-  /** Where the floating navigation sits (left by default). */
+  /** Where the main navigation sits (top centre by default). */
   dock: DockPosition;
   ambience: AmbienceId;
   standby: StandbyLayout;

@@ -28,11 +28,11 @@ const STATIONS: Array<{ id: Exclude<View, 'closing'>; label: string; icon: React
 ];
 
 /**
- * The floating dock: one calm bar, inset from the window edge, on the side the
- * user chose (left by default). Icons only; each name slides out on hover or
- * keyboard focus. Wordmark, the three views and the day end on one side, the
- * tools (do-not-disturb, light, settings) on the other. A soft lens glides to
- * the current view.
+ * The main navigation, on the edge the user chose (top centre by default,
+ * where it merges with the room below). Icons only; each name slides out on
+ * hover or keyboard focus, a soft lens glides to the current view. The day
+ * end stands apart as the anchor of the day: named and softly lit. Tools
+ * (do-not-disturb, light, settings) close the row.
  */
 export function Dock({ state, view, onView, onOpen, onResume }: Props) {
   const { store, clock } = useServices();
@@ -42,7 +42,7 @@ export function Dock({ state, view, onView, onOpen, onResume }: Props) {
   const lit = appearance.ambient > 0;
   const closedToday = state.coach.closedDay === dayKey(clock.now());
   const set = (patch: Partial<AppState['settings']>) => store.dispatch({ type: 'settings/update', patch });
-  const at = view === 'closing' ? STATIONS.length : STATIONS.findIndex((s) => s.id === view);
+  const at = STATIONS.findIndex((s) => s.id === view);
 
   const item = (key: string, label: string, icon: ReactNode, props: { onClick: () => void; current?: boolean; pressed?: boolean; name?: string; className?: string }, extra?: ReactNode) => (
     <button
@@ -73,23 +73,25 @@ export function Dock({ state, view, onView, onOpen, onResume }: Props) {
         {STATIONS.map((s) =>
           item(s.id, s.label, s.icon, { onClick: () => onView(s.id), current: view === s.id }, s.id === 'companion' && <LevelBadge level={state.progression.stats.level} />),
         )}
-        {closedToday
-          ? item('resume', 'Fokus wieder aufnehmen', <IconPlay size={18} />, {
-              className: 'dock__item--closing',
-              onClick: () => {
-                uiSound(state, 'bloom');
-                onResume();
-              },
-            })
-          : item('closing', labels.dayEnd, <IconSunset size={20} />, {
-              className: 'dock__item--closing',
-              current: view === 'closing',
-              onClick: () => {
-                if (view !== 'closing') uiSound(state, 'bloom');
-                onView('closing');
-              },
-            })}
       </div>
+
+      {/* The day end: the one anchor that ends the day, set apart from the views. */}
+      {closedToday
+        ? item('resume', 'Fokus wieder aufnehmen', <IconPlay size={18} />, {
+            className: 'dock__item--closing',
+            onClick: () => {
+              uiSound(state, 'bloom');
+              onResume();
+            },
+          })
+        : item('closing', labels.dayEnd, <IconSunset size={20} />, {
+            className: 'dock__item--closing',
+            current: view === 'closing',
+            onClick: () => {
+              if (view !== 'closing') uiSound(state, 'bloom');
+              onView('closing');
+            },
+          })}
 
       <span className="dock__sep" aria-hidden="true" />
 

@@ -86,6 +86,16 @@ describe('the floating dock', () => {
     }
   });
 
+  it('sets the day end apart from the views, as the anchor of the day', () => {
+    mount();
+    const end = screen.getByRole('button', { name: contextLabels(emptyState().settings.userContext).dayEnd });
+    expect(end.closest('.dock__stations')).toBeNull();
+    expect(end.className).toContain('dock__item--closing');
+    const css = readFileSync(join(process.cwd(), 'src', 'styles', 'components', 'dock.css'), 'utf8');
+    // In the top bar it is named and softly lit, not just an icon.
+    expect(css).toMatch(/\.dock__item--closing[^{]*\{[^}]*box-shadow:[^}]*accent/);
+  });
+
   it('carries the wordmark', () => {
     mount();
     expect(document.querySelector('.dock .dock__brand')).not.toBeNull();
@@ -110,8 +120,8 @@ describe('the floating dock', () => {
         return v;
       };
       const inset = px(':root', '--dock-inset');
-      // Padding, 4 stations + 3 tools, the separator and the two gaps around it.
-      const body = px('.dock', 'padding-top') * 2 + 7 * px('.dock', '--cell') + 1 + 2 * px('.dock', 'row-gap');
+      // Padding, 3 stations + 3 tools, the day end, the separator and the gaps between the groups.
+      const body = px('.dock', 'padding-top') * 2 + 6 * px('.dock', '--cell') + px('.dock', '--item') + 1 + 3 * px('.dock', 'row-gap');
       left = inset * 2 + body;
       right = px(":root[data-dock='right'] .dock", 'top') + inset + body;
     });
@@ -121,14 +131,15 @@ describe('the floating dock', () => {
 });
 
 describe('the dock position', () => {
-  it('keeps a known position and falls back to the left for anything else', () => {
+  it('keeps a known position and falls back to the top centre for anything else', () => {
     const base = emptyState();
     const load = (dock: unknown) =>
       parseState(JSON.stringify({ ...base, settings: { ...base.settings, appearance: { ...base.settings.appearance, dock } } }))?.settings.appearance.dock;
     expect(load('bottom')).toBe('bottom');
     expect(load('right')).toBe('right');
-    expect(load('diagonal')).toBe('left');
-    expect(load(undefined)).toBe('left');
+    expect(load('left')).toBe('left');
+    expect(load('diagonal')).toBe('top');
+    expect(load(undefined)).toBe('top');
   });
 
   it('frames the content on the side the dock sits on', () => {

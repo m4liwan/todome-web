@@ -76,11 +76,11 @@ const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
   { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
 ];
 
-/** Where the floating navigation sits; left keeps the reading flow free. */
+/** Where the main navigation sits; top centre merges it with the room. */
 const DOCKS: Array<{ id: DockPosition; label: string; text: string }> = [
+  { id: 'top', label: 'Oben', text: 'Mittig im Kopf, eins mit dem Raum' },
   { id: 'left', label: 'Links', text: 'Ruhig am Rand, wie ein Buchrücken' },
   { id: 'right', label: 'Rechts', text: 'Der Blick startet beim Inhalt' },
-  { id: 'top', label: 'Oben', text: 'Kompakt über allem' },
   { id: 'bottom', label: 'Unten', text: 'Wie ein Dock, griffbereit' },
 ];
 

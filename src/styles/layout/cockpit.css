@@ -1,34 +1,59 @@
 /* ========================================================================
    Cockpit: the one home screen (components/Cockpit.tsx).
-   Stage (8 of 12) and side column (4 of 12), the day across the full width,
-   then the areas (one at a time, behind a tab row). No boxes: hairlines and
-   space carry the order. While a block runs, everything but the stage steps
-   back (fs-* styles).
+   The greeting across the head; the stage (8 of 12) beside the side column
+   (4 of 12: companion, water, what comes next), both of equal weight; the
+   day and the Tages-Anker across the full width; then the areas behind a
+   round switch. No boxes: hairlines and space carry the order. While a
+   block runs, everything but the stage steps back (fs-* styles).
    ======================================================================== */
 
 .cockpit {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--s8);
-  align-items: start;
+  align-items: stretch;
+}
+.cockpit__head {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-bottom: var(--s7);
+}
+/* The greeting and the numbers of the day on one line: words left, numbers right. */
+.cockpit__head .hello {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: var(--s8);
 }
 .cockpit__stage {
   grid-column: span 8;
   display: grid;
-  gap: var(--s8);
   min-width: 0;
 }
 .cockpit__side {
   grid-column: span 4;
-  align-self: stretch;
-  display: grid;
-  align-content: start;
-  gap: var(--s7);
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   padding-left: var(--s7);
   border-left: 1px solid var(--line);
 }
+/* Companion, water and what comes next stack with hairlines between them;
+   the plan takes the rest of the height, so the column ends with the stage. */
+.cockpit__side > .panel {
+  padding-block: var(--s6);
+}
+.cockpit__side > .panel:first-child {
+  padding-top: 0;
+}
+.cockpit__side > .panel + .panel {
+  border-top: 1px solid var(--line);
+}
+.cockpit__side > .panel--plan {
+  flex: 1 1 auto;
+  padding-bottom: 0;
+}
 .cockpit__day,
+.cockpit__anchors,
 .cockpit__more {
   grid-column: 1 / -1;
   min-width: 0;
@@ -36,92 +61,24 @@
   padding-top: var(--s7);
   border-top: 1px solid var(--line);
 }
-.cockpit__more {
-  padding-top: 0;
-  border-top: 0;
-}
-
-/* ---------- areas: a tab row with a gliding underline, one pane at a time ---------- */
-.areas {
+.cockpit__anchors {
   display: grid;
   gap: var(--s6);
 }
-.areas__nav {
-  position: relative;
-  display: flex;
-  box-shadow: inset 0 1px var(--line);
-  gap: var(--s6);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.areas__tab {
+.cockpit__title {
   display: inline-flex;
   align-items: baseline;
-  gap: var(--s2);
-  flex: none;
-  padding: var(--s5) 0 var(--s4);
+  gap: var(--s3);
   font-size: var(--fs-h2);
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--ink-3);
-  white-space: nowrap;
-  transition: color var(--t-base) var(--ease);
 }
-.areas__tab:hover,
-.areas__tab[aria-selected='true'] {
-  color: var(--ink);
-}
-.areas__meta {
+.cockpit__meta {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
+  font-weight: 400;
   letter-spacing: var(--track-label);
-  color: var(--ink-3);
-}
-.areas__tab[aria-selected='true'] .areas__meta {
   color: var(--accent);
-}
-/* The underline sits on the hairline above the row, like a tab pulled out of it. */
-.areas__ink {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  background: var(--ink);
-  pointer-events: none;
-  transform-origin: left;
-  transform: translateX(var(--x)) scaleX(var(--w));
-  transition: transform var(--t-slow) var(--ease);
-}
-.areas__stack {
-  position: relative;
-}
-/* Only the active pane takes room (the areas end the page, nothing below can
-   jump); the others wait beside it, out of flow. */
-.areas__pane {
-  transition:
-    opacity var(--t-slow) var(--ease),
-    transform var(--t-slow) var(--ease),
-    visibility 0s linear var(--t-slow);
-}
-.areas__pane.is-before,
-.areas__pane.is-after {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-.areas__pane.is-before {
-  transform: translateX(-48px);
-}
-.areas__pane.is-after {
-  transform: translateX(48px);
-}
-.areas__pane.is-on {
-  transition-delay: 80ms, 80ms, 0s;
 }
 
 /* Every module: a plain column, no surface. */
@@ -164,37 +121,198 @@
 }
 
 @media (max-width: 1180px) {
+  .cockpit__head .hello {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .cockpit__stage,
   .cockpit__side {
     grid-column: 1 / -1;
   }
   .cockpit__side {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    column-gap: var(--s7);
     margin-top: var(--s7);
     padding-top: var(--s7);
     padding-left: 0;
     border-top: 1px solid var(--line);
     border-left: 0;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--s7);
+  }
+  .cockpit__side > .panel,
+  .cockpit__side > .panel + .panel {
+    padding-block: 0 var(--s6);
+    border-top: 0;
   }
 }
 @media (max-width: 760px) {
   .cockpit {
     column-gap: 0;
   }
-  .cockpit__side {
-    grid-template-columns: minmax(0, 1fr);
-  }
   .cockpit .panel--focus {
     padding: var(--s5);
   }
 }
 
+/* ---------- areas: a round switch, one pane at a time ---------- */
+.areas {
+  display: grid;
+  gap: var(--s7);
+}
+.areas__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+}
+/* The orbit: a round pill naming the current area. Opened, the other areas
+   grow out of it one after another; chosen, it folds back around the name. */
+.orbit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgb(10 10 11 / 0.6);
+  transition:
+    border-color var(--t-base) var(--ease),
+    box-shadow var(--t-slow) var(--ease);
+}
+.orbit:hover,
+.orbit.is-open {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.orbit.is-open {
+  box-shadow:
+    0 0 0 4px rgb(var(--accent-rgb) / 0.05),
+    0 18px 50px rgb(0 0 0 / 0.5);
+}
+.orbit__current {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  height: 36px;
+  padding: 0 5px 0 var(--s4);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  transition: padding var(--t-slow) var(--ease);
+}
+.orbit__name {
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  animation: fade-up var(--t-base) var(--ease) both;
+  transition:
+    max-width var(--t-slow) var(--ease),
+    opacity var(--t-base) var(--ease);
+}
+/* Open, the name steps aside: the areas themselves say where you are. */
+.orbit.is-open .orbit__current {
+  padding-left: 5px;
+}
+.orbit.is-open .orbit__name {
+  max-width: 0;
+  opacity: 0;
+}
+.orbit__knob {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--active);
+  color: var(--ink-2);
+  transition:
+    transform var(--t-slow) var(--ease),
+    background-color var(--t-base) var(--ease);
+}
+.orbit__current:hover .orbit__knob {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink);
+}
+.orbit.is-open .orbit__knob {
+  transform: rotate(180deg);
+}
+.orbit__options {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.orbit__option {
+  max-width: 0;
+  height: 36px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-2);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-10px);
+  transition:
+    max-width var(--t-slow) var(--ease),
+    padding var(--t-slow) var(--ease),
+    opacity var(--t-base) var(--ease),
+    transform var(--t-slow) var(--ease),
+    color var(--t-fast) var(--ease),
+    background-color var(--t-fast) var(--ease);
+}
+.orbit.is-open .orbit__option {
+  max-width: 220px;
+  padding: 0 var(--s4);
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i) * 45ms);
+}
+.orbit__option:hover {
+  background: var(--hover);
+  color: var(--ink);
+}
+.orbit__option[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.areas__stack {
+  position: relative;
+}
+/* Only the active pane takes room (the areas end the page, nothing below can
+   jump); the others wait beside it, out of flow. */
+.areas__pane {
+  transition:
+    opacity var(--t-slow) var(--ease),
+    transform var(--t-slow) var(--ease),
+    visibility 0s linear var(--t-slow);
+}
+.areas__pane.is-before,
+.areas__pane.is-after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+.areas__pane.is-before {
+  transform: translateX(-48px);
+}
+.areas__pane.is-after {
+  transform: translateX(48px);
+}
+.areas__pane.is-on {
+  transition-delay: 80ms, 80ms, 0s;
+}
+
 /* ---------- focus styles: each one arranges the cockpit its own way ----------
    The light changes with them (components/ambient-light.css); the stage
    crosses its own threshold as the style begins. */
-.cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more),
-.cockpit .panel--greet {
+.cockpit :is(.cockpit__head, .cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more) {
   transition:
     opacity var(--t-slow) var(--ease),
     filter var(--t-slow) var(--ease);
@@ -202,11 +320,11 @@
 
 /* Atmender Fokus (open, soft): everything stays in place, gently out of
    focus, and comes back on contact. The stage simply settles. */
-.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more) {
+.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more) {
   opacity: 0.35;
   filter: blur(1.5px);
 }
-.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__more):is(:hover, :focus-within) {
+.shell.fs-breathe .cockpit :is(.cockpit__side, .cockpit__day, .cockpit__anchors, .cockpit__more):is(:hover, :focus-within) {
   opacity: 0.92;
   filter: none;
 }
@@ -215,7 +333,7 @@
 }
 
 /* Fokus-Timer (rhythm): the stage and what comes next; the rest waits. */
-.shell.fs-breathe.fs-pomodoro .cockpit :is(.cockpit__day, .cockpit__more) {
+.shell.fs-breathe.fs-pomodoro .cockpit :is(.cockpit__day, .cockpit__anchors, .cockpit__more) {
   display: none;
 }
 .shell.fs-breathe.fs-pomodoro .cockpit__side {
@@ -225,7 +343,7 @@
 
 /* Schwebender Tunnel (still concentration): everything else leaves, the
    stage floats up into the middle of a darkened room. */
-.shell:is(.fs-tunnel, .fs-cocoon, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__more) {
+.shell:is(.fs-tunnel, .fs-cocoon, .fs-micro) .cockpit :is(.cockpit__side, .cockpit__anchors, .cockpit__more) {
   display: none;
 }
 .shell:is(.fs-tunnel, .fs-cocoon) .cockpit__day {
@@ -242,7 +360,11 @@
 
 /* Deep-Work-Kokon (nothing else): no greeting either; the stage closes in
    around you from a little larger. */
-.shell.fs-cocoon .cockpit .panel--greet {
+.shell:is(.fs-tunnel, .fs-cocoon, .fs-micro) .cockpit__head {
+  justify-self: center;
+  width: min(100%, 880px);
+}
+.shell:is(.fs-cocoon, .fs-micro) .cockpit__head {
   display: none;
 }
 .shell.fs-cocoon .cockpit__stage {
@@ -252,9 +374,6 @@
 
 /* Mikro-Schritt (one bite at a time): a narrower stage that steps in from
    the side, the day stays faintly below for orientation. */
-.shell.fs-micro .cockpit .panel--greet {
-  display: none;
-}
 .shell.fs-micro .cockpit__stage {
   width: min(100%, 760px);
   animation: stage-step 700ms var(--ease) both;
@@ -264,4 +383,10 @@
 }
 .shell.fs-micro .cockpit__day:is(:hover, :focus-within) {
   opacity: 1;
+}
+
+/* Water sits right under the companion: its own little companion line would
+   only repeat the figure above it. */
+.cockpit__side .hydro__buddy {
+  display: none;
 }

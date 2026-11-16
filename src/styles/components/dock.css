@@ -1,8 +1,10 @@
 /* ========================================================================
-   Dock: the floating navigation (components/Dock.tsx). One quiet bar inset
-   from the window edge, on the side the user chose (data-dock on <html>,
-   left by default). Icons only; each name slides out of its icon on hover
-   or keyboard focus. A soft lens glides to the current view.
+   Dock: the main navigation (components/Dock.tsx), on the edge the user
+   chose (data-dock on <html>). Top centre by default: no bar there, the
+   row stands in the room and a hairline grows out of it towards the edges.
+   On the other edges a quiet floating bar. Icons only; each name slides out
+   on hover or keyboard focus. A soft lens glides to the current view; the
+   day end is the softly lit anchor of the row.
    ======================================================================== */
 
 .dock {
@@ -47,6 +49,27 @@
 :root[data-dock='bottom'] .dock {
   top: auto;
   bottom: var(--dock-inset);
+}
+/* Top centre: the row is part of the room, not a bar on top of it. */
+:root[data-dock='top'] .dock {
+  top: var(--s3);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+/* The horizon: a hairline that grows out of the navigation and fades out
+   towards the edges of the window. */
+:root[data-dock='top'] .dock::after {
+  content: '';
+  position: absolute;
+  top: calc(100% + var(--s2));
+  left: 50%;
+  width: min(1680px, 100vw);
+  height: 1px;
+  translate: -50% 0;
+  background: linear-gradient(90deg, rgb(255 255 255 / 0), rgb(255 255 255 / 0.05) 20%, rgb(255 255 255 / 0.12) 50%, rgb(255 255 255 / 0.05) 80%, rgb(255 255 255 / 0));
+  pointer-events: none;
 }
 
 .dock__brand {
@@ -190,6 +213,53 @@
   transition-delay: 0ms;
 }
 
+/* ---------- the day end: the anchor of the day ----------
+   Set apart from the views and softly lit in the light colour: the one
+   step that closes the day, always within reach, never loud. */
+.dock__item--closing {
+  flex: none;
+  border: 1px solid rgb(var(--accent-rgb) / 0.3);
+  color: var(--ink);
+  box-shadow:
+    0 0 0 3px rgb(var(--accent-rgb) / 0.04),
+    0 0 22px rgb(var(--accent-rgb) / 0.14);
+  transition:
+    color var(--t-fast) var(--ease),
+    border-color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease);
+}
+.dock__item--closing:is(:hover, :focus-visible) {
+  border-color: rgb(var(--accent-rgb) / 0.6);
+  box-shadow:
+    0 0 0 4px rgb(var(--accent-rgb) / 0.07),
+    0 0 30px rgb(var(--accent-rgb) / 0.24);
+}
+.dock__item--closing[aria-current='page'] {
+  border-color: rgb(var(--accent-rgb) / 0.7);
+  background: rgb(var(--accent-rgb) / 0.1);
+}
+/* In a row (top, bottom) it is named: icon and word in one small pill. */
+:root:is([data-dock='top'], [data-dock='bottom']) .dock__item--closing {
+  display: inline-flex;
+  gap: var(--s2);
+  width: auto;
+  margin: 0 var(--s2);
+  padding: 0 var(--s4) 0 var(--s3);
+}
+:root:is([data-dock='top'], [data-dock='bottom']) .dock__item--closing .dock__label,
+:root:is([data-dock='top'], [data-dock='bottom']) .dock__item--closing:is(:hover, :focus-visible) .dock__label {
+  position: static;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font-size: var(--fs-meta);
+  opacity: 1;
+  clip-path: none;
+  transform: none;
+}
+
 /* The companion's level: a tiny mono number tucked under its icon. */
 .dock__item .level-badge {
   position: absolute;
@@ -230,6 +300,10 @@
   }
   .dock__brand {
     display: none;
+  }
+  .dock__item--closing {
+    width: var(--item);
+    height: var(--item);
   }
   :root[data-dock='right'] .dock {
     top: var(--chrome-h);

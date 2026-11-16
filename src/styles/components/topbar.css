@@ -13,12 +13,18 @@
   height: var(--chrome-h);
   background: linear-gradient(rgb(5 5 5 / 0.92), rgb(5 5 5 / 0));
 }
+/* Top centre navigation: the strip spans the whole head of the room, so
+   content scrolling up fades out beneath the navigation. */
+:root[data-dock='top'] .topbar-wrap {
+  height: calc(var(--frame-t) + var(--s5));
+  background: linear-gradient(rgb(5 5 5 / 0.97) calc(100% - var(--s5) - var(--s2)), rgb(5 5 5 / 0));
+}
 .topbar {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: var(--s3);
-  height: 100%;
+  height: var(--chrome-h);
   padding-right: var(--s4);
 }
 .topbar .media {
