@@ -28,7 +28,7 @@
   pointer-events: none;
 }
 .dialog::backdrop {
-  background: rgb(0 0 0 / 0.72);
+  background: rgb(var(--scrim-rgb) / 0.72);
   backdrop-filter: blur(6px);
 }
 .dialog:focus,
@@ -119,7 +119,7 @@ html.is-desktop .select__list {
   inset: calc(var(--chrome-h) + var(--s2)) auto calc(var(--dock-inset) + var(--dock-size) + var(--s3)) 50%;
 }
 .dialog--settings::backdrop {
-  background: rgb(0 0 0 / 0.5);
+  background: rgb(var(--scrim-rgb) / 0.5);
   backdrop-filter: blur(3px);
 }
 
@@ -181,7 +181,7 @@ html.is-desktop .select__list {
   color: var(--ink);
 }
 .energy__step.is-filled {
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgb(var(--tint-rgb) / 0.22);
   color: var(--ink);
 }
 .energy__step:is([aria-checked='true'], [aria-pressed='true'], .is-on) {

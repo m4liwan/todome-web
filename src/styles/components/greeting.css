@@ -39,7 +39,7 @@
   cursor: pointer;
 }
 .energy-chip:hover {
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgb(var(--tint-rgb) / 0.22);
   background: var(--hover);
   color: var(--ink);
 }

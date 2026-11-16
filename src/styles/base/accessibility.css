@@ -13,8 +13,8 @@
   :root {
     --ink-2: #d6dae1;
     --ink-3: #b3b9c3;
-    --line: rgba(255, 255, 255, 0.3);
-    --line-strong: rgba(255, 255, 255, 0.5);
+    --line: rgb(var(--tint-rgb) / 0.3);
+    --line-strong: rgb(var(--tint-rgb) / 0.5);
   }
   .shell.is-focusing .vitals,
   .shell.is-focusing .timeline,

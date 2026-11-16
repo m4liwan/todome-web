@@ -11,13 +11,13 @@
   right: 0;
   z-index: 30;
   height: var(--chrome-h);
-  background: linear-gradient(rgb(5 5 5 / 0.92), rgb(5 5 5 / 0));
+  background: linear-gradient(rgb(var(--bg-rgb) / 0.92), rgb(var(--bg-rgb) / 0));
 }
 /* Top centre navigation: the strip spans the whole head of the room, so
    content scrolling up fades out beneath the navigation. */
 :root[data-dock='top'] .topbar-wrap {
   height: calc(var(--frame-t) + var(--s5));
-  background: linear-gradient(rgb(5 5 5 / 0.97) calc(100% - var(--s5) - var(--s2)), rgb(5 5 5 / 0));
+  background: linear-gradient(rgb(var(--bg-rgb) / 0.97) calc(100% - var(--s5) - var(--s2)), rgb(var(--bg-rgb) / 0));
 }
 .topbar {
   display: flex;
@@ -87,5 +87,8 @@ html.is-desktop .topbar {
   object-fit: contain;
 }
 .brand-logo__ink {
-  opacity: 0;
+  opacity: var(--logo-ink);
+}
+.brand-logo__light {
+  opacity: var(--logo-light);
 }

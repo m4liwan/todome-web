@@ -150,7 +150,7 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   width: min(920px, 84vw);
   height: 1px;
   margin-left: calc(min(920px, 84vw) / -2);
-  background: linear-gradient(90deg, rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb) / 0.55) 30%, rgb(255 255 255 / 0.85) 50%, rgb(var(--accent-rgb) / 0.55) 70%, rgb(var(--accent-rgb) / 0));
+  background: linear-gradient(90deg, rgb(var(--accent-rgb) / 0), rgb(var(--accent-rgb) / 0.55) 30%, rgb(var(--tint-rgb) / 0.85) 50%, rgb(var(--accent-rgb) / 0.55) 70%, rgb(var(--accent-rgb) / 0));
   animation: splash-slit 1.8s var(--ease) 0.25s both;
 }
 .splash__glow {
@@ -229,11 +229,11 @@ html.is-desktop :is(.onboard, .standby, .pause-room) :is(button, a, input, selec
   transition: transform 1.2s var(--ease) 0.15s;
 }
 .splash__rail--left {
-  background: linear-gradient(90deg, rgb(255 255 255 / 0), var(--line-strong));
+  background: linear-gradient(90deg, rgb(var(--tint-rgb) / 0), var(--line-strong));
   transform-origin: left center;
 }
 .splash__rail--right {
-  background: linear-gradient(90deg, var(--line-strong), rgb(255 255 255 / 0));
+  background: linear-gradient(90deg, var(--line-strong), rgb(var(--tint-rgb) / 0));
   transform-origin: right center;
 }
 .splash__enter.is-ready .splash__rail {

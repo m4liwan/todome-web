@@ -15,6 +15,22 @@
   --danger: #e2615e;
   --hover: rgba(255, 255, 255, 0.04);
   --active: rgba(255, 255, 255, 0.06);
+  /* The theme in channels, for the few places that mix their own alpha:
+     the page, floating glass, the ink as a tint, the strongest ink,
+     shadows (and their strength) and the veil behind dialogs. */
+  --bg-rgb: 5 5 5;
+  --raised-rgb: 11 11 12;
+  --tint-rgb: 255 255 255;
+  --ink-max: #ffffff;
+  --shade-rgb: 0 0 0;
+  --shade-k: 1;
+  --scrim-rgb: 0 0 0;
+  /* How the ambient light meets the page: it glows on black, it tints paper. */
+  --light-blend: normal;
+  /* The wordmark and the "Me." mark: light on black, ink on paper. */
+  --logo-ink: 0;
+  --logo-light: 1;
+  --mark-filter: none;
 
   /* Hairlines: structure, interaction, floating layers */
   --line: rgba(255, 255, 255, 0.05);
@@ -89,7 +105,7 @@
   --prop-shadow: rgba(0, 0, 0, 0.4);
 
   /* HUD corner marks: the one frame motif (focus stage, splash, full-screen views) */
-  --hud-line: rgba(255, 255, 255, 0.1);
+  --hud-line: rgb(var(--tint-rgb) / 0.1);
   --hud-frame: linear-gradient(var(--hud-line), var(--hud-line)) left top / 22px 1px,
     linear-gradient(var(--hud-line), var(--hud-line)) left top / 1px 22px,
     linear-gradient(var(--hud-line), var(--hud-line)) right top / 22px 1px,
@@ -154,4 +170,73 @@
   --accent-mesh: #e49aae;
   --accent-2: #c46a86;
   --accent-2-rgb: 196 106 134;
+}
+
+/* ---------- Tageslicht: the light theme (Settings → Design) ----------
+   Warm alabaster paper instead of white, deep anthracite type, dark
+   hairlines. The same silence and structure as the OLED black: only the
+   tokens change. The light colours turn deeper, so accents keep their
+   contrast on paper; the ambient light tints the paper (multiply). */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f6f5f0;
+  --bg-rgb: 246 245 240;
+  --bg-raised: #fbfaf6;
+  --raised-rgb: 251 250 246;
+  --ink: #141414;
+  --ink-2: #4f4e4b;
+  --ink-3: #8a8883;
+  --ink-max: #000000;
+  --danger: #b8402f;
+  --tint-rgb: 20 20 20;
+  --hover: rgba(0, 0, 0, 0.04);
+  --active: rgba(0, 0, 0, 0.06);
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.14);
+  --line-float: rgba(0, 0, 0, 0.1);
+  --shade-rgb: 70 58 36;
+  --shade-k: 0.22;
+  --scrim-rgb: 236 234 226;
+  --shadow-float: 0 24px 60px rgb(70 58 36 / 0.12), 0 2px 8px rgb(70 58 36 / 0.08);
+  --light-blend: multiply;
+  --logo-ink: 1;
+  --logo-light: 0;
+  --mark-filter: invert(1) brightness(0.12);
+  --prop-a: #c9c6bd;
+  --prop-belt: #b5b1a6;
+  --prop-shadow: rgba(70, 58, 36, 0.18);
+  --accent-rgb: 101 163 13;
+  --accent-mesh: #65a30d;
+  --accent-2: #4d7c0f;
+  --accent-2-rgb: 77 124 15;
+}
+:root[data-theme='light'][data-palette='cyan'] {
+  --accent-rgb: 14 145 160;
+  --accent-mesh: #0e91a0;
+  --accent-2: #155e75;
+  --accent-2-rgb: 21 94 117;
+}
+:root[data-theme='light'][data-palette='amber'] {
+  --accent-rgb: 196 120 40;
+  --accent-mesh: #c47828;
+  --accent-2: #9a5a1e;
+  --accent-2-rgb: 154 90 30;
+}
+:root[data-theme='light'][data-palette='mono'] {
+  --accent-rgb: 64 66 74;
+  --accent-mesh: #40424a;
+  --accent-2: #26282e;
+  --accent-2-rgb: 38 40 46;
+}
+:root[data-theme='light'][data-palette='violet'] {
+  --accent-rgb: 109 88 230;
+  --accent-mesh: #6d58e6;
+  --accent-2: #5440c8;
+  --accent-2-rgb: 84 64 200;
+}
+:root[data-theme='light'][data-palette='rose'] {
+  --accent-rgb: 196 86 120;
+  --accent-mesh: #c45678;
+  --accent-2: #a03c5f;
+  --accent-2-rgb: 160 60 95;
 }

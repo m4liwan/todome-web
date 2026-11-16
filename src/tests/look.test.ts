@@ -15,10 +15,13 @@ const cssFiles = readdirSync(styles, { recursive: true, encoding: 'utf8' })
   .map((f) => join(styles, f));
 
 describe('design tokens', () => {
-  it('has no light theme left anywhere', () => {
+  // Tageslicht lives in the tokens only (see daylight.test); the system's
+  // preference never decides: the theme is a choice in the settings.
+  it('keeps the light theme in the tokens and never follows the system', () => {
     const offenders = cssFiles.flatMap((file) => {
       const css = readFileSync(file, 'utf8');
-      return /data-theme=['"]light['"]\]|prefers-color-scheme/.test(css) ? [file] : [];
+      const light = /data-theme=['"]light['"]\]/.test(css) && !file.endsWith('tokens.css');
+      return light || /prefers-color-scheme/.test(css) ? [file] : [];
     });
     expect(offenders).toEqual([]);
   });

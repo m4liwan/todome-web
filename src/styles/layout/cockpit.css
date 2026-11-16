@@ -52,7 +52,7 @@
   /* An open hairline: it fades in and out, so the column is a neighbour of
      the stage, not a box beside it. */
   border-left: 1px solid var(--line);
-  border-image: linear-gradient(rgb(255 255 255 / 0), rgb(255 255 255 / 0.09) 14%, rgb(255 255 255 / 0.05) 70%, rgb(255 255 255 / 0)) 1;
+  border-image: linear-gradient(rgb(var(--tint-rgb) / 0), rgb(var(--tint-rgb) / 0.09) 14%, rgb(var(--tint-rgb) / 0.05) 70%, rgb(var(--tint-rgb) / 0)) 1;
 }
 /* Companion, water and what comes next stack with hairlines between them;
    the plan takes the rest of the height, so the column ends with the stage. */
@@ -197,19 +197,19 @@
   padding: 3px;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
-  background: rgb(10 10 11 / 0.6);
+  background: rgb(var(--raised-rgb) / 0.6);
   transition:
     border-color var(--t-base) var(--ease),
     box-shadow var(--t-slow) var(--ease);
 }
 .orbit:hover,
 .orbit.is-open {
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgb(var(--tint-rgb) / 0.18);
 }
 .orbit.is-open {
   box-shadow:
     0 0 0 4px rgb(var(--accent-rgb) / 0.05),
-    0 18px 50px rgb(0 0 0 / 0.5);
+    0 18px 50px rgb(var(--shade-rgb) / calc(0.5 * var(--shade-k)));
 }
 .orbit__current {
   display: inline-flex;
@@ -254,7 +254,7 @@
     background-color var(--t-base) var(--ease);
 }
 .orbit__current:hover .orbit__knob {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(var(--tint-rgb) / 0.1);
   color: var(--ink);
 }
 .orbit.is-open .orbit__knob {
@@ -684,7 +684,7 @@
   height: 7px;
   pointer-events: none;
   background:
-    radial-gradient(circle at 3.5px 3.5px, var(--bg) 2.2px, var(--line-strong) 2.7px, rgb(255 255 255 / 0) 3.3px),
+    radial-gradient(circle at 3.5px 3.5px, var(--bg) 2.2px, var(--line-strong) 2.7px, rgb(var(--tint-rgb) / 0) 3.3px),
     radial-gradient(circle at calc(100% - 3.5px) 3.5px, rgb(var(--accent-rgb) / 0.9) 2.4px, rgb(var(--accent-rgb) / 0) 3.6px),
     linear-gradient(90deg, var(--line-strong), rgb(var(--accent-rgb) / 0.45)) center / 100% 1px no-repeat;
 }
@@ -918,7 +918,7 @@
   min-width: var(--s6);
   height: 1px;
   margin-left: var(--s3);
-  background: linear-gradient(90deg, var(--line-strong), rgb(255 255 255 / 0));
+  background: linear-gradient(90deg, var(--line-strong), rgb(var(--tint-rgb) / 0));
 }
 
 @media (max-width: 1180px) {

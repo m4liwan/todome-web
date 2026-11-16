@@ -221,7 +221,8 @@ export function parseState(raw: string | null): AppState | null {
         },
         appearance: migrateAppearance(settings.appearance),
         // 1.18: light mode is gone; 'system' and 'light' load as dark.
-        theme: 'dark',
+        // 2.x: Tageslicht is back as a choice; anything else (also the old 'system') loads as the night.
+        theme: settings.theme === 'light' ? 'light' : 'dark',
         ...migrateMedia(settings),
       },
       wellbeing: (() => {

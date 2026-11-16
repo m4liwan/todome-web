@@ -120,7 +120,7 @@
   height: 10px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, rgb(var(--tone)), rgb(var(--tone) / 0.35));
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+  box-shadow: 0 0 0 1px rgb(var(--tint-rgb) / 0.08);
 }
 .haven-picker__opt--moon .haven-picker__swatch {
   --tone: 205 222 255;

@@ -73,8 +73,8 @@ describe('settings from 1.17 (OLED redesign)', () => {
     for (const [from, to] of Object.entries(expected)) expect(withAppearance({ palette: from })?.settings.appearance.palette, from).toBe(to);
   });
 
-  it('loads light and system themes as dark', () => {
-    expect(withAppearance({}, 'light')?.settings.theme).toBe('dark');
+  it('loads the system theme as dark; Tageslicht (light) is a choice again since 2.x', () => {
+    expect(withAppearance({}, 'light')?.settings.theme).toBe('light');
     expect(withAppearance({}, 'system')?.settings.theme).toBe('dark');
   });
 

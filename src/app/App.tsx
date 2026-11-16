@@ -158,7 +158,7 @@ export function App() {
   useAttention();
 
   const { state, now, projections, foreground } = useProjections();
-  useApplyTheme(state.settings.appearance);
+  useApplyTheme(state.settings.appearance, state.settings.theme);
   const theme = useResolvedTheme(state.settings.theme);
   useOverlaySync(state, now, foreground, theme);
   const appearance = state.settings.appearance;

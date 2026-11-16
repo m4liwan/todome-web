@@ -16,7 +16,7 @@ html.is-quick body {
   border: 1px solid var(--line-float);
   border-radius: var(--radius);
   background: var(--bg-raised);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.5);
+  box-shadow: 0 12px 32px rgb(var(--shade-rgb) / calc(0.5 * var(--shade-k)));
   animation: rise var(--t-base) var(--ease) both;
 }
 .quick__input {

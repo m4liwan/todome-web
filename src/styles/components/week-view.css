@@ -93,7 +93,7 @@
   width: 100%;
   height: max(2px, calc(var(--h) * 100%));
   border-radius: 2px 2px 0 0;
-  background: rgba(255, 255, 255, 0.14);
+  background: rgb(var(--tint-rgb) / 0.14);
   transform-origin: bottom;
   animation: rise var(--t-slow) var(--ease) both;
 }

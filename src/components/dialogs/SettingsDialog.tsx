@@ -78,6 +78,12 @@ const CORNERS: Array<{ id: CornerStyle; label: string; text: string }> = [
   { id: 'soft', label: 'Weich', text: 'Sanft gerundet' },
 ];
 
+/** Night (OLED black) or Tageslicht (warm paper): only here, nowhere else. */
+const THEMES: Array<{ id: Settings['theme']; label: string; text: string }> = [
+  { id: 'dark', label: 'Nacht', text: 'Tiefes Schwarz, still und konzentriert.' },
+  { id: 'light', label: 'Tageslicht', text: 'Warmes Papier, wach und klar.' },
+];
+
 /** Where the navigation bar sits; top centre merges it with the room. */
 const DOCKS: Array<{ id: DockPosition; label: string; text: string }> = [
   { id: 'top', label: 'Oben', text: 'Mittig im Kopf, eins mit dem Raum' },
@@ -378,6 +384,29 @@ export function SettingsDialog({ open, onClose, initialTab = 'general', onShowCo
           )}
           {tab === 'design' && (
             <>
+        <section>
+          <h3>Erscheinungsbild</h3>
+          <p className="muted small">Die Nacht ist tiefes OLED-Schwarz. Tageslicht ist warmes Papier für den wachen Morgen, mit derselben Stille.</p>
+          <div className="theme-picker" role="radiogroup" aria-label="Erscheinungsbild">
+            {THEMES.map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="radio"
+                aria-checked={s.theme === t.id}
+                className={`option theme-opt${s.theme === t.id ? ' is-on' : ''}`}
+                onClick={() => set({ theme: t.id })}
+              >
+                <span className={`theme-opt__preview theme-opt__preview--${t.id}`} aria-hidden="true">
+                  <i />
+                  <i />
+                </span>
+                <strong>{t.label}</strong>
+                <span>{t.text}</span>
+              </button>
+            ))}
+          </div>
+        </section>
         <section>
           <h3>Heute</h3>
           <p className="muted small">Fünf Räume für denselben Tag. Jeder gibt dir ein anderes Gefühl; dein nächster Schritt steht in allen in der Mitte.</p>

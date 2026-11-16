@@ -2,14 +2,14 @@ import { useEffect, useSyncExternalStore } from 'react';
 import type { AppearanceSettings, ThemePreference } from '../domain/types';
 import { desktop } from '../lib/desktop';
 
-/** ToDoMe is always dark (OLED redesign): kept as a function so callers stay simple. */
-export function resolveTheme(_pref: ThemePreference): 'dark' {
-  return 'dark';
+/** Night (OLED black) unless Tageslicht was chosen in the settings; the system never decides. */
+export function resolveTheme(pref: ThemePreference): 'dark' | 'light' {
+  return pref === 'light' ? 'light' : 'dark';
 }
 
-/** Always dark; the hook form keeps the call sites of the former theme switch working. */
-export function useResolvedTheme(_pref: ThemePreference): 'dark' {
-  return 'dark';
+/** The theme in effect (hook form for components). */
+export function useResolvedTheme(pref: ThemePreference): 'dark' | 'light' {
+  return resolveTheme(pref);
 }
 
 /*
@@ -46,10 +46,10 @@ export const prefersReducedMotion = () =>
 
 type Look = Pick<AppearanceSettings, 'palette' | 'ambient' | 'corners' | 'dock'>;
 
-/** Remembers light, corners and the dock side for public/boot.js (first frame, before React). */
-export function rememberBoot(look: Look): void {
+/** Remembers the theme, light, corners and the dock side for public/boot.js (first frame, before React). */
+export function rememberBoot(look: Look, theme: 'dark' | 'light' = 'dark'): void {
   try {
-    window.localStorage.setItem('todome:boot', JSON.stringify({ theme: 'dark', palette: look.palette, ambient: look.ambient, corners: look.corners, dock: look.dock }));
+    window.localStorage.setItem('todome:boot', JSON.stringify({ theme, palette: look.palette, ambient: look.ambient, corners: look.corners, dock: look.dock }));
   } catch {
     /* ignore */
   }
@@ -61,19 +61,24 @@ export function writeAmbient(ambient: number): void {
 }
 
 /**
- * Applies the look: always dark, the ambient light colour (`data-palette`),
- * its strength (`--ambient`), the corner rounding (`data-corners`) and the
- * dock side (`data-dock`). Light changes fade softly; the desktop shell
- * follows (title bar, window background).
+ * Applies the look: night or Tageslicht (`data-theme`), the ambient light
+ * colour (`data-palette`), its strength (`--ambient`), the corner rounding
+ * (`data-corners`) and the dock side (`data-dock`). Theme and light changes
+ * fade softly; the desktop shell follows (title bar, window background).
  */
-export function useApplyTheme(look: Look): void {
+export function useApplyTheme(look: Look, pref: ThemePreference = 'dark'): void {
   const { palette, ambient, corners, dock } = look;
-  useEffect(() => rememberBoot({ palette, ambient, corners, dock }), [palette, ambient, corners, dock]);
+  const theme = resolveTheme(pref);
+  useEffect(() => rememberBoot({ palette, ambient, corners, dock }, theme), [palette, ambient, corners, dock, theme]);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    desktop?.setTheme('dark');
-  }, []);
+    const root = document.documentElement;
+    root.classList.add('theme-fade');
+    root.setAttribute('data-theme', theme);
+    desktop?.setTheme(theme);
+    const id = window.setTimeout(() => root.classList.remove('theme-fade'), 700);
+    return () => window.clearTimeout(id);
+  }, [theme]);
 
   useEffect(() => {
     const root = document.documentElement;

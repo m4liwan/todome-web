@@ -15,6 +15,7 @@
   overflow: hidden;
   pointer-events: none;
   opacity: calc(var(--ambient) * 0.36);
+  mix-blend-mode: var(--light-blend);
   transition: opacity var(--t-slow) var(--ease);
 }
 .light__source,

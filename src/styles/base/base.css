@@ -143,7 +143,7 @@ textarea {
 input:not([type='checkbox']):not([type='radio']):not([type='range']):hover,
 select:hover,
 textarea:hover {
-  border-bottom-color: rgba(255, 255, 255, 0.18);
+  border-bottom-color: rgb(var(--tint-rgb) / 0.18);
 }
 input:not([type='checkbox']):not([type='radio']):not([type='range']):focus,
 select:focus,
@@ -179,7 +179,7 @@ input[type='range'] {
   background: var(--line-strong) padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.18) padding-box;
+  background: rgb(var(--tint-rgb) / 0.18) padding-box;
 }
 
 /* ---------- shell ---------- */

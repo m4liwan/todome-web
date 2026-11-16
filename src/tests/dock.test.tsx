@@ -156,7 +156,7 @@ describe('the bar in the OLED look', () => {
     expect(vars['--pn-dot']).not.toMatch(/accent/);
     // Hairlines instead of grey surfaces: the edge is the app's hairline, the surface the page's black.
     expect(vars['--pn-edge']).toBe('var(--line)');
-    expect(vars['--pn-surface']).toMatch(/^rgb\(5 5 5 \//);
+    expect(vars['--pn-surface']).toMatch(/^rgb\(var\(--bg-rgb\) \//);
     // No fixed colour anywhere else: no hex, no grey.
     const fixed: string[] = [];
     nav.walkDecls((d) => {

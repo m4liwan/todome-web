@@ -181,7 +181,8 @@ export interface CheckIn {
 
 export type Tone = 'gentle' | 'direct' | 'sporty';
 /** ToDoMe is always dark (OLED redesign, 1.18). Older data said 'system' or 'light'; it loads as 'dark'. */
-export type ThemePreference = 'dark';
+/** Night (OLED black, the default) or Tageslicht (warm paper), chosen in the settings. */
+export type ThemePreference = 'dark' | 'light';
 /** Six free companions (Spike, Mark, Bit, Spark, Kiki, Pixie) and two in Pro (Keimi, Woody). */
 export type AvatarId = 'spike' | 'mark' | 'bit' | 'spark' | 'kiki' | 'pixie' | 'keimi' | 'woody';
 

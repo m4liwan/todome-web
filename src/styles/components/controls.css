@@ -105,7 +105,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(105deg, rgb(255 255 255 / 0) 30%, rgb(255 255 255 / 0.07) 50%, rgb(255 255 255 / 0) 70%);
+  background: linear-gradient(105deg, rgb(var(--tint-rgb) / 0) 30%, rgb(var(--tint-rgb) / 0.07) 50%, rgb(var(--tint-rgb) / 0) 70%);
   pointer-events: none;
   transform: translateX(-110%);
   transition: transform 0s linear var(--t-slow);
@@ -122,7 +122,7 @@
   transform: translateX(1px);
 }
 :is(.btn, .round-btn, .icon-btn, .icon-ghost, .play-btn):hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.24);
+  border-color: rgb(var(--tint-rgb) / 0.24);
   background-color: var(--hover);
   color: var(--ink);
 }
@@ -150,13 +150,13 @@
   color: var(--bg);
 }
 .btn--primary::after {
-  background: linear-gradient(105deg, rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0.07) 50%, rgb(0 0 0 / 0) 70%);
+  background: linear-gradient(105deg, rgb(var(--bg-rgb) / 0) 30%, rgb(var(--bg-rgb) / 0.07) 50%, rgb(var(--bg-rgb) / 0) 70%);
 }
 .btn--primary:hover:not(:disabled) {
-  border-color: #fff;
-  background-color: #fff;
+  border-color: var(--ink-max);
+  background-color: var(--ink-max);
   color: var(--bg);
-  box-shadow: 0 0 24px rgb(255 255 255 / 0.12);
+  box-shadow: 0 0 24px rgb(var(--tint-rgb) / 0.12);
 }
 .btn--primary:active:not(:disabled) {
   background-color: #e4e4e7;
@@ -269,7 +269,7 @@
     transform var(--t-fast) var(--ease);
 }
 button.chip:hover:not(:disabled) {
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgb(var(--tint-rgb) / 0.22);
   color: var(--ink);
   background: var(--hover);
 }
@@ -501,7 +501,7 @@ fieldset.field {
 }
 .choice:hover:not(:disabled) {
   background: var(--hover);
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgb(var(--tint-rgb) / 0.22);
 }
 .choice span {
   font-size: var(--fs-meta);
@@ -556,7 +556,7 @@ fieldset.field {
   cursor: pointer;
 }
 .select:hover:not(:disabled) {
-  border-bottom-color: rgba(255, 255, 255, 0.18);
+  border-bottom-color: rgb(var(--tint-rgb) / 0.18);
 }
 .select:disabled {
   opacity: 0.5;

@@ -102,7 +102,7 @@ html.is-companion body {
   border-radius: var(--radius);
   /* The corner towards him: the bubble is his, it points at the speaker. */
   border-bottom-left-radius: 2px;
-  background: rgb(11 11 12 / 0.92);
+  background: rgb(var(--raised-rgb) / 0.92);
   backdrop-filter: blur(16px) saturate(1.2);
   box-shadow:
     var(--shadow-float),
@@ -227,7 +227,7 @@ html.is-companion body {
 /* The other answers are soft touches; only the suggested one is a clear button. */
 .buddy__options .btn:not(.btn--primary) {
   border-color: transparent;
-  background: rgb(255 255 255 / 0.05);
+  background: rgb(var(--tint-rgb) / 0.05);
   color: var(--ink-2);
 }
 .buddy__options .btn:not(.btn--primary):hover {

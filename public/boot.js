@@ -1,6 +1,6 @@
 /*
  * ToDoMe. boot: runs before the first paint (classic script, same origin, CSP-safe).
- * Always dark; sets the saved light colour, its strength, the corner
+ * Sets the saved theme (night or Tageslicht), the light colour, its strength, the corner
  * rounding and the dock side on <html>, so the very first frame already looks right. No app logic here.
  */
 (function () {
@@ -12,6 +12,7 @@
     root.setAttribute('data-dock', 'top');
     var boot = JSON.parse(window.localStorage.getItem('todome:boot') || 'null');
     if (!boot) return;
+    if (boot.theme === 'light') root.setAttribute('data-theme', 'light');
     if (typeof boot.palette === 'string' && /^[a-z]{2,12}$/.test(boot.palette)) root.setAttribute('data-palette', boot.palette);
     if (boot.corners === 'sharp' || boot.corners === 'precise' || boot.corners === 'soft') root.setAttribute('data-corners', boot.corners);
     if (boot.dock === 'top' || boot.dock === 'bottom') root.setAttribute('data-dock', boot.dock);
